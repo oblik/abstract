@@ -177,7 +177,7 @@ export default function SearchComponent() {
                             {!isRecentActivity && (
                                 <div className="flex flex-col pb-2 gap-2">
                                     <p className="text-sm font-medium ">Events</p>
-                                    <div className="flex flex-col gap-2">
+                                    <div className="flex flex-col gap-2 overflow-auto max-h-[350px]">
                                         {filterEvent.length === 0 ? (
                                             <div>
                                                 <p className="text-sm text-center text-gray-500">

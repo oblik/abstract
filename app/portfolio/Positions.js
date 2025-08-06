@@ -299,7 +299,7 @@ const Positions = (props) => {
                         </div>
                         <div className="flex items-center gap-2">
                           {
-                            item?.positions.length == 1 && (
+                            props.isPrivate && item?.positions.length == 1 && (
                               <button
                                 className="text-gray-400 hover:text-white transition-colors duration-300"
                                 onClick={() =>
@@ -389,7 +389,7 @@ const Positions = (props) => {
 
                       <td>
                         <div className="flex justify-start items-center gap-2">
-                          {data.claim && (
+                          {props.isPrivate && data.claim && (
                             <Button
                               size="sm"
                               className="bg-[#37ce37] text-[#fff] hover:text-[#000]"
@@ -399,7 +399,7 @@ const Positions = (props) => {
                             </Button>
                           )}
                           {
-                            item?.positions.length > 1 && (
+                            props.isPrivate && item?.positions.length > 1 && (
                               <button
                                 className="text-gray-400 hover:text-white transition-colors duration-300"
                                 onClick={() =>

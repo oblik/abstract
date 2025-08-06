@@ -1758,7 +1758,7 @@ export default function PortfolioPage({ categories }) {
                   </tbody>
                 </table>
               </div> */}
-              <Positions uniqueId={data?.uniqueId} />
+              <Positions uniqueId={data?.uniqueId} isPrivate={true} />
             </TabsContent>
             <TabsContent value="openorders">
               {/* <div className="flex space-x-4 mb-3">

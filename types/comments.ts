@@ -14,6 +14,7 @@ export interface CommentProps extends React.HTMLAttributes<HTMLDivElement> {
     wallet_address?: string;
     parentId?: string | null;
     reply_count?: number;
+    positions: any[]
   };
   onReply?: (commentId: string) => void;
   onDelete?: (commentId: string) => void;

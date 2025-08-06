@@ -14,7 +14,7 @@ import { Trash2, Reply } from "lucide-react";
 import CommentForm from "./CommentForm";
 import { CommentProps, PostCommentRequestData } from "@/types/comments";
 import CommentList from "./CommentList";
-import { getComments, postComment } from "@/services/market";
+import { getComments, getCommentsPaginate, postComment } from "@/services/market";
 import { toastAlert } from "@/lib/toast";
 import { useSelector, useDispatch } from "react-redux";
 import { SocketContext } from "@/config/socketConnectivity";
@@ -25,6 +25,7 @@ import { addUserName } from "@/services/user";
 import Link from "next/link";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { longNumbersNoDecimals } from "@/lib/roundOf";
 
 const avatarColors = [
   "bg-blue-500",
@@ -117,39 +118,61 @@ export function Comment({
               {comment?.userId?.userName || "Unknown user"}
             </Link>
           </span>
-
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild>
+          {
+            comment.positions && comment.positions.length == 1 ? (
               <button
                 className="flex items-center gap-1 px-2 py-0.5 text-[12px] font-normal rounded"
                 aria-label="Customise options"
-                style={{ background: "#152632", color: "#7DFDFE" }}
+                style={{ 
+                  background: comment.positions?.[0].side == "yes" ? "#152632": "#210d1a", 
+                  color: comment.positions?.[0].side == "yes" ? "#7DFDFE": "#ec4899" 
+                }}
               >
-                <span>125 | More than 10 Million</span>
-                <ChevronDownIcon className="w-4 h-4" />
+                <span>{longNumbersNoDecimals(comment.positions?.[0].quantity)} | {comment.positions?.[0].label}</span>
               </button>
-            </DropdownMenu.Trigger>
-
-            <DropdownMenu.Portal>
-              <DropdownMenu.Content
-                className="comment-dropdown-content"
-                sideOffset={5}
-              >
-                <DropdownMenu.Item className="px-2 py-0.5 cursor-pointer hover:bg-[#100f0f] text-[12px] font-normal flex gap-2 items-center justify-between">
-                  <span style={{ background: "#152632", color: "#7DFDFE" }} >15.9K</span>                  
-                  <span>More than 10 Million</span>
-                </DropdownMenu.Item>
-                <DropdownMenu.Item className="px-2 py-0.5 cursor-pointer hover:bg-[#100f0f] text-[12px] font-normal flex gap-2 items-center justify-between">
-                  <span style={{ background: "#152632", color: "#7DFDFE" }} >10.2K</span>                  
-                  <span>More than 8 Million</span>
-                </DropdownMenu.Item>
-                <DropdownMenu.Item className="px-2 py-0.5 cursor-pointer hover:bg-[#100f0f] text-[12px] font-normal flex gap-2 items-center justify-between">
-                  <span style={{ background: "#210d1a", color: "#ec4899" }} >2.2K</span>                  
-                  <span>More than 8 Million</span>
-                </DropdownMenu.Item>
-              </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-          </DropdownMenu.Root>
+              ) 
+              : comment.positions.length > 1 ? (
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger asChild>
+                    <button
+                      className="flex items-center gap-1 px-2 py-0.5 text-[12px] font-normal rounded"
+                      aria-label="Customise options"
+                      style={{ 
+                        background: comment.positions?.[0].side == "yes" ? "#152632": "#210d1a", 
+                        color: comment.positions?.[0].side == "yes" ? "#7DFDFE": "#ec4899" 
+                      }}
+                    >
+                      <span>{longNumbersNoDecimals(comment.positions?.[0].quantity)} | {comment.positions?.[0].label}</span>
+                      <ChevronDownIcon className="w-4 h-4" />
+                    </button>
+                  </DropdownMenu.Trigger>
+      
+                  <DropdownMenu.Portal>
+                    <DropdownMenu.Content
+                      className="comment-dropdown-content"
+                      sideOffset={5}
+                    >
+                      {
+                        comment.positions?.map(item => (
+                          <DropdownMenu.Item className="px-2 py-0.5 cursor-pointer hover:bg-[#100f0f] text-[12px] font-normal flex gap-2 items-center justify-between">
+                            <span 
+                              style={{ 
+                                background: item.side == "yes" ? "#152632": "#210d1a", 
+                                color: item.side == "yes" ? "#7DFDFE": "#ec4899" 
+                              }}
+                            >
+                              {longNumbersNoDecimals(item.quantity)}
+                            </span>                  
+                            <span>{item.label}</span>
+                          </DropdownMenu.Item>
+                        ))
+                      }
+                    </DropdownMenu.Content>
+                  </DropdownMenu.Portal>
+                </DropdownMenu.Root>
+              ) 
+              : null
+          }
           <span className="text-xs text-gray-400">{timeAgo}</span>
         </div>
 
@@ -375,6 +398,7 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ eventId }: CommentSectionProps) {
+  const limit = 10;
   const { address } = useSelector(
     (state: any) => state?.walletconnect?.walletconnect
   );
@@ -382,6 +406,7 @@ export function CommentSection({ eventId }: CommentSectionProps) {
   const [comments, setComments] = useState<CommentProps["comment"][]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
   const socketContext = useContext(SocketContext);
 
@@ -389,11 +414,56 @@ export function CommentSection({ eventId }: CommentSectionProps) {
     const fetchComments = async () => {
       try {
         setIsLoading(true);
-        const response = await getComments(eventId);
+        const response = await getCommentsPaginate(eventId, { page, limit });
         if (!response.success) {
           return;
         }
-        setComments(response.comments || []);
+        const positions = response.positions || [];
+        const allComments = response.comments || [];
+
+        // Create a positions lookup map for O(1) access
+        const positionsMap = new Map();
+        positions.forEach(item => {
+          const userId = item.userId.toString();
+          if (!positionsMap.has(userId)) {
+            positionsMap.set(userId, []);
+          }
+          
+          positionsMap.get(userId).push({
+            quantity: item.quantity,
+            side: item.side,
+            label: !isEmpty(item?.marketId?.groupItemTitle) 
+              ? item?.marketId?.groupItemTitle 
+              : (item.side === "yes" ? item.marketId.outcome[0].title : item.marketId.outcome[1].title)
+          });
+        });
+
+        // Helper function to add positions to a comment
+        const addPositionsToComment = (comment) => {
+          const userId = comment.userId._id?.toString() || comment.userId.toString();
+          return {
+            ...comment,
+            positions: positionsMap.get(userId) || []
+          };
+        };
+
+        // Flatten comments and add positions
+        const flatComments = allComments.reduce((acc, comment) => {
+          // Add parent comment (without replies property)
+          const { replies, ...parentComment } = comment;
+          acc.push(addPositionsToComment(parentComment));
+          
+          // Add replies if they exist
+          if (replies?.length > 0) {
+            replies.forEach(reply => {
+              acc.push(addPositionsToComment(reply));
+            });
+          }
+          
+          return acc;
+        }, []);
+        console.log(flatComments, "flatComments");
+        setComments(flatComments);
       } catch (error) {
         console.error("Error loading comments:", error);
       } finally {
@@ -440,10 +510,6 @@ export function CommentSection({ eventId }: CommentSectionProps) {
   };
 
   const handleDelete = async (commentId: string) => {
-    // if (!confirm("Are you sure you want to delete this comment?")) {
-    //   return;
-    // }
-
     try {
       const { success, message } = await deleteComment({ id: commentId });
       if (!success) {
@@ -453,13 +519,10 @@ export function CommentSection({ eventId }: CommentSectionProps) {
         );
         return;
       }
-      // toastAlert("success", "Comment deleted successfully!");
 
       setComments((prev) => {
         const deletedComment = prev.find((c) => c?._id === commentId);
         const newComments = prev.filter((c) => c?._id !== commentId);
-
-        // // If it's a reply, update the reply count of the parent comment
         if (deletedComment?.parentId) {
           const parentIndex = newComments.findIndex(
             (c) => c?._id === deletedComment.parentId
@@ -474,13 +537,10 @@ export function CommentSection({ eventId }: CommentSectionProps) {
             };
           }
         }
-
-        // If it's a main comment, also delete all its replies
         return newComments.filter((c) => c?.parentId !== commentId);
       });
     } catch (error) {
       console.error("Error deleting comment:", error);
-      // alert("Failed to delete comment. Please try again later.");
     }
   };
 
@@ -498,6 +558,7 @@ export function CommentSection({ eventId }: CommentSectionProps) {
       // console.log('cmt socket Data: ', parsedData);
       const { type, data } = parsedData;
       if (type === "add" && data?.eventId === eventId) {
+        data.positions = [];
         setComments((prev) => [data, ...prev]);
       } else if (type === "delete" && data?.eventId === eventId) {
         setComments((prev) =>

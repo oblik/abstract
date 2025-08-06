@@ -266,7 +266,7 @@ export default function PortfolioPage() {
             </select>
           </div>
           <TabsContent value="positions">
-            <Positions uniqueId={uniqueId} />
+            <Positions uniqueId={uniqueId} isPrivate={true} />
           </TabsContent>
           <TabsContent value="activity">
             <div className="p-4">

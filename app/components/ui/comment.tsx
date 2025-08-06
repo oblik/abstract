@@ -91,12 +91,12 @@ export function Comment({
       <div className="flex-shrink-0">
         <Link href={`/profile/@${comment?.userId?.uniqueId}`}>
           <Avatar>
-            {comment?.userId?.profileImg ? (
+            {/* {comment?.userId?.profileImg ? ( */}
               <AvatarImage
                 src={comment?.userId?.profileImg}
                 alt={comment?.userId?.userName}
               />
-            ) : (
+            {/* ) : ( */}
               <AvatarFallback
                 className={getColorFromUsername(comment?.userId?.userName)}
               >
@@ -104,7 +104,7 @@ export function Comment({
                   ? comment?.userId?.userName.charAt(0).toUpperCase()
                   : "unknown".charAt(0).toUpperCase()}
               </AvatarFallback>
-            )}
+            {/* )} */}
           </Avatar>
         </Link>
       </div>

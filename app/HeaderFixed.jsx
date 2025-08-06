@@ -171,7 +171,7 @@ export default function HeaderFixed() {
       </div>
 
       {/* Bottom Nav */}
-      <div className="bottom-nav-fixed h-16 flex justify-between items-center lg:hidden fixed bottom-0 left-0 right-0 w-full bg-black border-t border-[#1E1E1E] z-[9999] px-8 md:px-20">
+      <div className="bottom-nav-fixed h-16 flex lg:hidden bg-black border-t border-[#1E1E1E] z-[9999] px-8 md:px-20">
         <Link
           href="/"
           className={cn(

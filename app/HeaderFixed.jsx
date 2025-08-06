@@ -152,7 +152,7 @@ export default function HeaderFixed() {
       {/* Search Bar */}
       <div
         className={cn(
-          "absolute left-0 bottom-0 w-full h-[80vh] bg-[#181818] z-[56] rounded-t-2xl shadow-2xl transition-transform duration-500 ease-in-out will-change-transform lg:hidden",
+          "fixed left-0 bottom-0 w-full h-[80vh] bg-[#181818] z-[56] rounded-t-2xl shadow-2xl transition-transform duration-500 ease-in-out will-change-transform lg:hidden",
           isSearchOpen ? "translate-y-0" : "translate-y-full"
         )}
       >
@@ -171,7 +171,7 @@ export default function HeaderFixed() {
       </div>
 
       {/* Bottom Nav */}
-      <div className="bottom-nav-fixed h-16 flex justify-between items-center lg:hidden fixed bottom-0 left-0 right-0 w-full bg-black border-t border-[#1E1E1E] z-[9999] px-8 md:px-20">
+      <div className="bottom-nav-fixed h-16 flex lg:hidden bg-black border-t border-[#1E1E1E] z-[9999] px-8 md:px-20">
         <Link
           href="/"
           className={cn(

@@ -346,7 +346,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                   }}
                 >
                   <Image
-                    src="/images/logo_icon.png"
+                    src={image}
                     alt="Event"
                     width={screenWidth < 640 ? 50 : 75}
                     height={screenWidth < 640 ? 50 : 75}

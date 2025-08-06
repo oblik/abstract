@@ -152,7 +152,7 @@ export default function HeaderFixed() {
       {/* Search Bar */}
       <div
         className={cn(
-          "absolute left-0 bottom-0 w-full h-[80vh] bg-[#181818] z-[56] rounded-t-2xl shadow-2xl transition-transform duration-500 ease-in-out will-change-transform lg:hidden",
+          "fixed left-0 bottom-0 w-full h-[80vh] bg-[#181818] z-[56] rounded-t-2xl shadow-2xl transition-transform duration-500 ease-in-out will-change-transform lg:hidden",
           isSearchOpen ? "translate-y-0" : "translate-y-full"
         )}
       >

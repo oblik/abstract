@@ -556,10 +556,35 @@ export function CommentSection({ eventId }: CommentSectionProps) {
     const handleCommentAdded = (result: any) => {
       const parsedData = JSON.parse(result);
       // console.log('cmt socket Data: ', parsedData);
-      const { type, data } = parsedData;
+      const { type, data, positions } = parsedData;
       if (type === "add" && data?.eventId === eventId) {
         data.positions = [];
-        setComments((prev) => [data, ...prev]);
+        // Create a positions lookup map for O(1) access
+        const positionsMap = new Map();
+        positions.forEach(item => {
+          const userId = item.userId.toString();
+          if (!positionsMap.has(userId)) {
+            positionsMap.set(userId, []);
+          }
+          
+          positionsMap.get(userId).push({
+            quantity: item.quantity,
+            side: item.side,
+            label: !isEmpty(item?.marketId?.groupItemTitle) 
+              ? item?.marketId?.groupItemTitle 
+              : (item.side === "yes" ? item.marketId.outcome[0].title : item.marketId.outcome[1].title)
+          });
+        });
+
+        // Helper function to add positions to a comment
+        const addPositionsToComment = (comment) => {
+          const userId = comment.userId._id?.toString() || comment.userId.toString();
+          return {
+            ...comment,
+            positions: positionsMap.get(userId) || []
+          };
+        };
+        setComments((prev) => [addPositionsToComment(data), ...prev]);
       } else if (type === "delete" && data?.eventId === eventId) {
         setComments((prev) =>
           prev.filter((comment) => comment?._id !== data.id)

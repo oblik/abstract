@@ -385,7 +385,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
         </div>
       )}
 
-      {buyorsell == "buy" ? (
+      {buyorsell == "buy" && !isEmpty(price) && !isEmpty(amount) ? (
         <>
           <div className="pt-2 space-y-2 pb-2">
             <div className="flex justify-between text-sm pt-2">
@@ -433,7 +433,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
             </div>
           </div>
         </>
-      ) : (
+      ) : !isEmpty(price) && !isEmpty(amount) && (
         <div className="pt-1 pb-1 mt-2">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">

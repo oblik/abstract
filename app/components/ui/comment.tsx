@@ -247,16 +247,20 @@ export function ReplyForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // if (!account || !reply.trim()) {
-    //   return;
-    // }
+    const parentComment: any = comments?.find((c: any) => c?._id === parentId);
+    const parentUsername = parentComment?.userId?.userName;
+
+    let contentToSubmit = reply.trim();
+    if (parentUsername && contentToSubmit.startsWith(`@${parentUsername}`)) {
+      contentToSubmit = contentToSubmit.substring(`@${parentUsername} `.length).trim();
+    }
 
     try {
       setIsSubmitting(true);
       const reqData = {
         userId: user._id,
         eventId: eventId,
-        content: reply,
+        content: contentToSubmit,
         parentId: parentId,
       };
       const { success, comment } = await postComment(reqData);
@@ -335,14 +339,6 @@ export function ReplyForm({
   useEffect(() => {
     // Find the parent comment to get the username
     const parentComment: any = comments?.find((c: any) => c?._id === parentId);
-    console.log(
-      parentComment,
-      "parentComment",
-      parentId,
-      "parentId",
-      comments,
-      "comments"
-    );
     if (parentComment?.userId?.userName) {
       setReply(`@${parentComment?.userId?.userName} `);
     }
@@ -398,31 +394,38 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ eventId }: CommentSectionProps) {
-  const limit = 10;
-  const { address } = useSelector(
-    (state: any) => state?.walletconnect?.walletconnect
-  );
-  const [account, setaccount] = useState(address);
-  const [comments, setComments] = useState<CommentProps["comment"][]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-
   const socketContext = useContext(SocketContext);
 
-  React.useEffect(() => {
-    const fetchComments = async () => {
-      try {
+  const limit = 10;
+  const { address } = useSelector((state: any) => state?.walletconnect?.walletconnect);
+  const [account, setaccount] = useState(address);
+  const [comments, setComments] = useState<CommentProps["comment"][]>([]); // This will now hold all loaded comments
+  const [isLoading, setIsLoading] = useState(false); // For the initial big load
+  const [isFetching, setIsFetching] = useState(false); // For subsequent "load more" requests
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [total, setTotal] = useState(0);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  
+  const fetchComments = async (pageToFetch = 1, isInitialLoad = false) => {
+    try {
+      if (isInitialLoad) {
         setIsLoading(true);
-        const response = await getCommentsPaginate(eventId, { page, limit });
-        if (!response.success) {
-          return;
-        }
-        const positions = response.positions || [];
-        const allComments = response.comments || [];
+      } else {
+        setIsFetching(true);
+      }
+  
+      const response = await getCommentsPaginate(eventId, { page: pageToFetch, limit });
+  
+      if (!response.success) {
+        setHasMore(false);
+        return;
+      }
+  
+      const { comments, positions, count } = response;
+      setTotal(count);
 
-        // Create a positions lookup map for O(1) access
-        const positionsMap = new Map();
+      const positionsMap = new Map();
         positions.forEach(item => {
           const userId = item.userId.toString();
           if (!positionsMap.has(userId)) {
@@ -438,7 +441,6 @@ export function CommentSection({ eventId }: CommentSectionProps) {
           });
         });
 
-        // Helper function to add positions to a comment
         const addPositionsToComment = (comment) => {
           const userId = comment.userId._id?.toString() || comment.userId.toString();
           return {
@@ -447,13 +449,10 @@ export function CommentSection({ eventId }: CommentSectionProps) {
           };
         };
 
-        // Flatten comments and add positions
-        const flatComments = allComments.reduce((acc, comment) => {
-          // Add parent comment (without replies property)
+        const flatComments = comments.reduce((acc, comment) => {
           const { replies, ...parentComment } = comment;
           acc.push(addPositionsToComment(parentComment));
           
-          // Add replies if they exist
           if (replies?.length > 0) {
             replies.forEach(reply => {
               acc.push(addPositionsToComment(reply));
@@ -462,48 +461,30 @@ export function CommentSection({ eventId }: CommentSectionProps) {
           
           return acc;
         }, []);
-        console.log(flatComments, "flatComments");
-        setComments(flatComments);
-      } catch (error) {
-        console.error("Error loading comments:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (eventId) {
-      fetchComments();
-    }
-  }, [eventId]);
-
-  const handleCommentAdded = (newComment: CommentProps["comment"]) => {
-    if (newComment) {
-      // If it's a reply, we need to update the parent's reply count
-      if (!newComment.parentId) {
-        // It's a top-level comment
-        setComments((prev) => [newComment, ...prev]);
-      } else {
-        // It's a reply, add to the list and update parent
-        setComments((prev) => {
-          const updated = [...prev];
-          const parentIndex = updated.findIndex(
-            (c) => c?._id === newComment.parentId
-          );
-
-          if (parentIndex !== -1 && updated[parentIndex]) {
-            // Update parent's reply count
-            updated[parentIndex] = {
-              ...updated[parentIndex]!,
-              reply_count: (updated[parentIndex]!.reply_count || 0) + 1,
-            };
-          }
-
-          // Add the reply to the list
-          return [newComment, ...updated];
-        });
-      }
+  
+      setComments(prevComments => {
+        if (isInitialLoad) {
+          return flatComments;
+        }
+        return [...prevComments, ...flatComments]; // Append new comments
+      });
+  
+      setPage(pageToFetch);
+      setHasMore(comments.length === limit);
+  
+    } catch (error) {
+      console.error("Error loading comments:", error);
+    } finally {
+      setIsLoading(false);
+      setIsFetching(false);
     }
   };
+  
+  useEffect(() => {
+    if (eventId) {
+      fetchComments(1, true);
+    }
+  }, [eventId]);
 
   const handleReply = (commentId: string) => {
     setReplyingTo((prevState) => (prevState === commentId ? null : commentId));
@@ -544,8 +525,15 @@ export function CommentSection({ eventId }: CommentSectionProps) {
     }
   };
 
-  // Calculate total comments count (main comments + replies)
-  const totalCommentsCount = comments.length;
+  const loadMoreComments = () => {
+    if (!isFetching && hasMore) {
+      fetchComments(page + 1);
+    }
+  };
+    
+  const handleCommentAdded = () => {
+    fetchComments(1, true);
+  };
 
   useEffect(() => {
     const socket = socketContext?.socket;
@@ -553,47 +541,7 @@ export function CommentSection({ eventId }: CommentSectionProps) {
       return;
     }
 
-    const handleCommentAdded = (result: any) => {
-      const parsedData = JSON.parse(result);
-      // console.log('cmt socket Data: ', parsedData);
-      const { type, data, positions } = parsedData;
-      if (type === "add" && data?.eventId === eventId) {
-        data.positions = [];
-        // Create a positions lookup map for O(1) access
-        const positionsMap = new Map();
-        positions.forEach(item => {
-          const userId = item.userId.toString();
-          if (!positionsMap.has(userId)) {
-            positionsMap.set(userId, []);
-          }
-          
-          positionsMap.get(userId).push({
-            quantity: item.quantity,
-            side: item.side,
-            label: !isEmpty(item?.marketId?.groupItemTitle) 
-              ? item?.marketId?.groupItemTitle 
-              : (item.side === "yes" ? item.marketId.outcome[0].title : item.marketId.outcome[1].title)
-          });
-        });
-
-        // Helper function to add positions to a comment
-        const addPositionsToComment = (comment) => {
-          const userId = comment.userId._id?.toString() || comment.userId.toString();
-          return {
-            ...comment,
-            positions: positionsMap.get(userId) || []
-          };
-        };
-        setComments((prev) => [addPositionsToComment(data), ...prev]);
-      } else if (type === "delete" && data?.eventId === eventId) {
-        setComments((prev) =>
-          prev.filter((comment) => comment?._id !== data.id)
-        );
-      }
-    };
-
     socket.on("comment", handleCommentAdded);
-
     return () => {
       socket.off("comment", handleCommentAdded);
     };
@@ -602,7 +550,7 @@ export function CommentSection({ eventId }: CommentSectionProps) {
   return (
     <div className="mt-6">
       <h2 className="text-xl font-bold mb-4">
-        Comments ({totalCommentsCount})
+        Comments ({total})
       </h2>
       <CommentForm eventId={eventId} onCommentAdded={handleCommentAdded} />
       <CommentList
@@ -614,6 +562,9 @@ export function CommentSection({ eventId }: CommentSectionProps) {
         eventId={eventId}
         onReplyAdded={handleCommentAdded}
         currentUserWallet={account ? account : ""}
+        hasMore={hasMore}
+        onLoadMore={loadMoreComments}
+        isFetching={isFetching}
       />
     </div>
   );

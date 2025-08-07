@@ -31,6 +31,9 @@ export interface CommentListProps {
   eventId: string;
   onReplyAdded: (newReply: CommentProps["comment"]) => void;
   currentUserWallet?: string;
+  hasMore: boolean;
+  onLoadMore: () => void;
+  isFetching: boolean;
 }
 
 //post request data type

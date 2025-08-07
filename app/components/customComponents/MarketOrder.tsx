@@ -265,7 +265,7 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
           </Button>
         </div> */}
       </div>
-    {(activeView === "Yes" ? lastYesOrder : lastNoOrder) && (
+    {(activeView === "Yes" ? lastYesOrder : lastNoOrder) && (buyorsell == "buy" ? !isEmpty(ordVal): !isEmpty(amount)) && (
       <div className="pt-2 space-y-2 pb-2">
         {/* Shares */}
         <div className="flex justify-between text-sm pt-2">

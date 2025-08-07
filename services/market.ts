@@ -133,7 +133,7 @@ export const getCommentsPaginate = async (eventId: string, data: { page: number;
     let respData = await axios({
       url: `${config.backendURL}/api/v1/user/comments/event/paginate/${eventId}`,
       method: "get",
-      data
+      params: data
     });
     return handleResp(respData, "success");
   } catch (error: any) {

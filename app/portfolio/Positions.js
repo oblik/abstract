@@ -355,12 +355,12 @@ const Positions = (props) => {
                         )}
                       </td>
                       <td>
-                        {data.side == "no" ? 100 - data?.last : data?.last}¢
+                        {data.side == "no" ? 100 - data?.odd : data?.odd}¢
                         {/* <span className={(data.side == "no" ? (100 - data?.last) : data?.last) > data?.filled?.[0]?.price ? "text-green-500" : "text-red-500"}>({((((data.side == "no" ? (100 - data?.last) : data?.last) || data.filled?.[0]?.price) - data.filled?.[0]?.price) / data?.filled?.[0]?.price * 100).toFixed(2)}%)</span> */}
                       </td>
                       <td
                         className={`${
-                          (data.side == "no" ? 100 - data?.last : data?.last) >=
+                          (data.side == "no" ? 100 - data?.odd : data?.odd) >=
                           data?.filled?.[0]?.price
                             ? "text-green-500"
                             : "text-red-500"
@@ -368,7 +368,7 @@ const Positions = (props) => {
                       >
                         $
                         {toFixedDown(
-                          ((data.side == "no" ? 100 - data?.last : data?.last) *
+                          ((data.side == "no" ? 100 - data?.odd : data?.odd) *
                             data?.quantity) /
                             100,
                           2
@@ -376,8 +376,8 @@ const Positions = (props) => {
                         (
                         {toFixedDown(
                           (((data.side == "no"
-                            ? 100 - data?.last
-                            : data?.last) -
+                            ? 100 - data?.odd
+                            : data?.odd) -
                             data?.filled?.[0]?.price) /
                             data?.filled?.[0]?.price) *
                             100,

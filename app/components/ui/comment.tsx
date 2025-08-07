@@ -153,8 +153,8 @@ export function Comment({
                       sideOffset={5}
                     >
                       {
-                        comment.positions?.map(item => (
-                          <DropdownMenu.Item className="px-2 py-0.5 cursor-pointer hover:bg-[#100f0f] text-[12px] font-normal flex gap-2 items-center justify-between">
+                        comment.positions?.map((item, index) => (
+                          <DropdownMenu.Item key={index} className="px-2 py-0.5 cursor-pointer hover:bg-[#100f0f] text-[12px] font-normal flex gap-2 items-center justify-between">
                             <span 
                               style={{ 
                                 background: item.side == "yes" ? "#152632": "#210d1a", 

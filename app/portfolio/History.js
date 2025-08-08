@@ -220,7 +220,7 @@ const History = () => {
                               m.pnl >= 0 ? "text-green-500" : "text-red-500"
                             }
                           >
-                            ${toFixedDown(m.pnl, 2)}{" "}({toFixedDown((m.pnl/m.entry)*100, 0)}%)
+                            ${toFixedDown(m.pnl, 2)}{" "}({toFixedDown((m.pnl/m.entry)*100, 2)}%)
                           </td>
                           <td>
                             <button className="text-blue-500" onClick={()=>handleTradeOpen(marketId, m.outcome)}>

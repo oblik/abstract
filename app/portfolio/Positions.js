@@ -105,128 +105,128 @@ const Positions = (props) => {
     setShareOpen(true);
   };
 
-  useEffect(() => {
-    let socket = socketContext?.socket;
-    if (!socket) return;
-    const handlePositions = (result) => {
-      const resData = JSON.parse(result);
-      // console.log("resData of pos-update", resData);
-      // getUserPositionHistory()
-      // event data - id image title slug
-      // market id - grouptitle last bid
-      // position data - side quantity filled price
+  // useEffect(() => {
+  //   let socket = socketContext?.socket;
+  //   if (!socket) return;
+  //   const handlePositions = (result) => {
+  //     const resData = JSON.parse(result);
+  //     // console.log("resData of pos-update", resData);
+  //     // getUserPositionHistory()
+  //     // event data - id image title slug
+  //     // market id - grouptitle last bid
+  //     // position data - side quantity filled price
 
-      setPositionHistory((prev) => {
-        const eventIndex = prev.findIndex(
-          (event) => event._id === resData.eventId
-        );
-        if (eventIndex == -1) {
-          const newEvent = {
-            _id: resData.eventId,
-            eventTitle: resData.eventTitle,
-            eventImage: resData.eventImage,
-            eventSlug: resData.eventSlug,
-            positions: [
-              {
-                _id: resData._id,
-                // userId: resData.userId,
-                marketId: resData.marketId,
-                marketGroupTitle: resData.marketGroupTitle,
-                outcomes: resData.marketOutcomes,
-                // createdAt: "$createdAt",
-                side: resData.side,
-                filled: resData.filled,
-                quantity: resData.quantity,
-                last: resData.marketLast,
-              },
-            ],
-          };
-          return [newEvent, ...prev];
-        } else {
-          const positionData = prev[eventIndex].positions.find(
-            (position) => position._id === resData._id
-          );
-          if (isEmpty(positionData)) {
-            const newPosition = {
-              _id: resData._id,
-              marketId: resData.marketId,
-              marketGroupTitle: resData.marketGroupTitle,
-              outcomes: resData.marketOutcomes,
-              side: resData.side,
-              filled: resData.filled,
-              quantity: resData.quantity,
-              last: resData.marketLast,
-            };
-            const updatedEvent = {
-              ...prev[eventIndex],
-              positions: [...prev[eventIndex].positions, newPosition],
-            };
-            return [
-              ...prev.slice(0, eventIndex),
-              updatedEvent,
-              ...prev.slice(eventIndex + 1),
-            ];
-          } else {
-            // let positionIndex = prev[eventIndex].positions.findIndex(position => position._id === resData._id)
-            if (resData.quantity === 0) {
-              const filteredPositions = prev[eventIndex].positions.filter(
-                (p) => p._id !== resData._id
-              );
-              if (filteredPositions.length === 0) {
-                return [
-                  ...prev.slice(0, eventIndex),
-                  ...prev.slice(eventIndex + 1),
-                ];
-              } else {
-                const updatedEvent = {
-                  ...prev[eventIndex],
-                  positions: filteredPositions,
-                };
-                return [
-                  ...prev.slice(0, eventIndex),
-                  updatedEvent,
-                  ...prev.slice(eventIndex + 1),
-                ];
-              }
-            }
+  //     setPositionHistory((prev) => {
+  //       const eventIndex = prev.findIndex(
+  //         (event) => event._id === resData.eventId
+  //       );
+  //       if (eventIndex == -1) {
+  //         const newEvent = {
+  //           _id: resData.eventId,
+  //           eventTitle: resData.eventTitle,
+  //           eventImage: resData.eventImage,
+  //           eventSlug: resData.eventSlug,
+  //           positions: [
+  //             {
+  //               _id: resData._id,
+  //               // userId: resData.userId,
+  //               marketId: resData.marketId,
+  //               marketGroupTitle: resData.marketGroupTitle,
+  //               outcomes: resData.marketOutcomes,
+  //               // createdAt: "$createdAt",
+  //               side: resData.side,
+  //               filled: resData.filled,
+  //               quantity: resData.quantity,
+  //               last: resData.marketLast,
+  //             },
+  //           ],
+  //         };
+  //         return [newEvent, ...prev];
+  //       } else {
+  //         const positionData = prev[eventIndex].positions.find(
+  //           (position) => position._id === resData._id
+  //         );
+  //         if (isEmpty(positionData)) {
+  //           const newPosition = {
+  //             _id: resData._id,
+  //             marketId: resData.marketId,
+  //             marketGroupTitle: resData.marketGroupTitle,
+  //             outcomes: resData.marketOutcomes,
+  //             side: resData.side,
+  //             filled: resData.filled,
+  //             quantity: resData.quantity,
+  //             last: resData.marketLast,
+  //           };
+  //           const updatedEvent = {
+  //             ...prev[eventIndex],
+  //             positions: [...prev[eventIndex].positions, newPosition],
+  //           };
+  //           return [
+  //             ...prev.slice(0, eventIndex),
+  //             updatedEvent,
+  //             ...prev.slice(eventIndex + 1),
+  //           ];
+  //         } else {
+  //           // let positionIndex = prev[eventIndex].positions.findIndex(position => position._id === resData._id)
+  //           if (resData.quantity === 0) {
+  //             const filteredPositions = prev[eventIndex].positions.filter(
+  //               (p) => p._id !== resData._id
+  //             );
+  //             if (filteredPositions.length === 0) {
+  //               return [
+  //                 ...prev.slice(0, eventIndex),
+  //                 ...prev.slice(eventIndex + 1),
+  //               ];
+  //             } else {
+  //               const updatedEvent = {
+  //                 ...prev[eventIndex],
+  //                 positions: filteredPositions,
+  //               };
+  //               return [
+  //                 ...prev.slice(0, eventIndex),
+  //                 updatedEvent,
+  //                 ...prev.slice(eventIndex + 1),
+  //               ];
+  //             }
+  //           }
 
-            const updatedPosition = {
-              ...positionData,
-              quantity: resData.quantity,
-              last: resData.marketLast,
-              filled: resData.filled,
-              price: resData.price,
-              last: resData.marketLast,
-              side: resData.side,
-            };
-            const updatedEvent = {
-              ...prev[eventIndex],
-              positions: [
-                ...prev[eventIndex].positions.filter(
-                  (position) => position._id !== resData._id
-                ),
-                updatedPosition,
-              ],
-            };
-            return [
-              ...prev.slice(0, eventIndex),
-              updatedEvent,
-              ...prev.slice(eventIndex + 1),
-            ];
-            // positionData.quantity = resData.quantity
-            // positionData.last = resData.marketLast
-            // positionData.side = resData.side
-            // positionData.filled = resData.filled
-            // return prev
-          }
-        }
-      });
-    };
-    socket.on("pos-update", handlePositions);
-    return () => {
-      socket.off("pos-update", handlePositions);
-    };
-  }, [socketContext]);
+  //           const updatedPosition = {
+  //             ...positionData,
+  //             quantity: resData.quantity,
+  //             last: resData.marketLast,
+  //             filled: resData.filled,
+  //             price: resData.price,
+  //             last: resData.marketLast,
+  //             side: resData.side,
+  //           };
+  //           const updatedEvent = {
+  //             ...prev[eventIndex],
+  //             positions: [
+  //               ...prev[eventIndex].positions.filter(
+  //                 (position) => position._id !== resData._id
+  //               ),
+  //               updatedPosition,
+  //             ],
+  //           };
+  //           return [
+  //             ...prev.slice(0, eventIndex),
+  //             updatedEvent,
+  //             ...prev.slice(eventIndex + 1),
+  //           ];
+  //           // positionData.quantity = resData.quantity
+  //           // positionData.last = resData.marketLast
+  //           // positionData.side = resData.side
+  //           // positionData.filled = resData.filled
+  //           // return prev
+  //         }
+  //       }
+  //     });
+  //   };
+  //   socket.on("pos-update", handlePositions);
+  //   return () => {
+  //     socket.off("pos-update", handlePositions);
+  //   };
+  // }, [socketContext]);
 
   const marketPositionClaim = async (id) => {
     try {

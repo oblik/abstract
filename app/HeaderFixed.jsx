@@ -15,6 +15,13 @@ import { Button } from "./components/ui/button";
 import SearchComponent from "./components/customComponents/SearchComponent";
 import { useSelector } from "@/store";
 import { availableBalance, PnLFormatted, formatNumber } from "@/lib/utils";
+import {
+  Drawer,
+  DrawerTrigger,
+  DrawerContent,
+  DrawerTitle,
+  DrawerHeader,
+} from "@/app/components/ui/drawer";
 
 export default function HeaderFixed() {
   const router = useRouter();
@@ -47,7 +54,7 @@ export default function HeaderFixed() {
         ${val}
       </span>
     );
-  }  
+  }
 
   return (
     <>
@@ -150,7 +157,7 @@ export default function HeaderFixed() {
       </div>
 
       {/* Search Bar */}
-      <div
+      {/* <div
         className={cn(
           "fixed left-0 bottom-0 w-full h-[80vh] bg-[#181818] z-[56] rounded-t-2xl shadow-2xl transition-transform duration-500 ease-in-out will-change-transform lg:hidden",
           isSearchOpen ? "translate-y-0" : "translate-y-full"
@@ -168,7 +175,32 @@ export default function HeaderFixed() {
         <div className="p-4">
           <SearchComponent />
         </div>
-      </div>
+      </div> */}
+
+      <Drawer open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+        <DrawerContent className="h-[100vh] z-50 rounded-t-2xl bg-[#181818] lg:hidden">
+          {/* Hidden DrawerTitle to satisfy component requirements */}
+          <div hidden>
+            <DrawerHeader>
+              <DrawerTitle>Hidden Title</DrawerTitle>
+            </DrawerHeader>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex justify-between items-center px-4 py-3 border-b border-[#232b3a]">
+            <span className="text-lg font-semibold text-white">Search</span>
+            <button
+              className="text-gray-400 hover:text-white text-2xl"
+              onClick={() => setIsSearchOpen(false)}
+            >
+              &times;
+            </button>
+          </div>
+          <div className="p-4">
+            <SearchComponent />
+          </div>
+        </DrawerContent>
+      </Drawer>
 
       {/* Bottom Nav */}
       <div className="bottom-nav-fixed h-16 flex lg:hidden bg-black border-t border-[#1E1E1E] z-[9999] px-8 md:px-20">

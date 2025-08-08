@@ -178,7 +178,7 @@ export default function HeaderFixed() {
       </div> */}
 
       <Drawer open={isSearchOpen} onOpenChange={setIsSearchOpen}>
-        <DrawerContent className="h-[80vh] z-50 rounded-t-2xl bg-[#181818] lg:hidden">
+        <DrawerContent className="h-[100vh] z-50 rounded-t-2xl bg-[#181818] lg:hidden">
           {/* Hidden DrawerTitle to satisfy component requirements */}
           <div hidden>
             <DrawerHeader>

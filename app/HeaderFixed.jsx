@@ -28,22 +28,10 @@ export default function HeaderFixed() {
 
   // Lock body scroll when drawer is open
   useEffect(() => {
-    if (isOpen || isSearchOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-      document.body.style.overflowY = "auto";
-      // Explicitly allow vertical scrolling
-      document.body.style.position = "";
-      document.body.style.height = "";
-      document.body.style.maxHeight = "";
-    }
+    if (isOpen || isSearchOpen) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
     return () => {
       document.body.style.overflow = "";
-      document.body.style.overflowY = "auto";
-      document.body.style.position = "";
-      document.body.style.height = "";
-      document.body.style.maxHeight = "";
     };
   }, [isOpen, isSearchOpen]);
 
@@ -66,7 +54,7 @@ export default function HeaderFixed() {
       {/* Drawer Overlay */}
       <div
         className={cn(
-          "fixed inset-0 bg-black z-50 transition-opacity duration-500",
+          "fixed inset-0 bg-black z-[99999] transition-opacity duration-200",
           isOpen || isSearchOpen
             ? "opacity-80 pointer-events-auto"
             : "opacity-0 pointer-events-none"
@@ -80,9 +68,10 @@ export default function HeaderFixed() {
       {/* Side Drawer */}
       <div
         className={cn(
-          "fixed top-0 left-0 w-[85vw] max-w-[320px] h-full bg-[#1F1F1F] z-[56] shadow-2xl transition-transform duration-500 ease-in-out will-change-transform",
+          "fixed top-0 left-0 w-[85vw] max-w-[320px] h-full bg-black z-[99999] shadow-2xl transition-transform duration-200 ease-in-out will-change-transform border-r",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
+        style={{ borderRight: '1px solid #282828' }}
       >
         {/* Close Button */}
         {/* <button
@@ -123,7 +112,7 @@ export default function HeaderFixed() {
           {signedIn && (
             <Link
               href="/settings"
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-base hover:bg-[#232b3a] transition"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm hover:bg-[#232b3a] transition"
               onClick={() => setIsOpen(false)}
             >
               Settings
@@ -133,27 +122,27 @@ export default function HeaderFixed() {
             href="https://sonotrade.gitbook.io/sonotrade-docs/#overview"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-base hover:bg-[#232b3a] transition"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm hover:bg-[#232b3a] transition"
           >
             Beginner’s Guide
           </Link>
           <Link
             href="/about"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-base hover:bg-[#232b3a] transition"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm hover:bg-[#232b3a] transition"
             onClick={() => setIsOpen(false)}
           >
             About
           </Link>
           <Link
             href="/"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-base hover:bg-[#232b3a] transition"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm hover:bg-[#232b3a] transition"
             onClick={() => setIsOpen(false)}
           >
             Waitlist
           </Link>
           <Link
             href="/terms"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-base hover:bg-[#232b3a] transition"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm hover:bg-[#232b3a] transition"
             onClick={() => setIsOpen(false)}
           >
             Terms of Use
@@ -164,7 +153,7 @@ export default function HeaderFixed() {
       {/* Search Bar */}
       <div
         className={cn(
-          "fixed left-0 bottom-0 w-full h-[80vh] bg-[#181818] z-[56] rounded-t-2xl shadow-2xl transition-transform duration-500 ease-in-out will-change-transform lg:hidden",
+          "fixed left-0 bottom-0 w-full h-[80vh] bg-[#181818] z-40 rounded-t-2xl shadow-2xl transition-transform duration-500 ease-in-out will-change-transform lg:hidden",
           isSearchOpen ? "translate-y-0" : "translate-y-full"
         )}
         style={{ minHeight: "300px" }}
@@ -183,22 +172,8 @@ export default function HeaderFixed() {
         </div>
       </div>
 
-      {/* Top Header - fixed at the top */}
-      <header className="fixed top-0 left-0 w-full bg-transparent h-12 md:h-16 pt-1 md:pt-2 container mx-auto px-2 md:px-4 lg:px-0 z-[10000]">
-        {/* ...header content here (logo, auth, etc.)... */}
-      </header>
-
-      {/* Main content area with top and bottom padding for header/nav heights */}
-      <div className="app-main-container" style={{
-        paddingTop: '3rem', // header height
-        paddingBottom: '4rem', // bottom nav height
-        boxSizing: 'border-box',
-      }}>
-        {/* ...main content goes here... */}
-      </div>
-
-      {/* Bottom Nav - fixed at the bottom */}
-      <div className="bottom-nav-fixed h-14 flex justify-between items-center lg:hidden fixed left-0 right-0 w-full bg-black border-t border-[#1E1E1E] z-[9999] px-8 md:px-20" style={{ bottom: 'env(safe-area-inset-bottom, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+      {/* Bottom Nav - Restored for mobile */}
+      <div className="bottom-nav-fixed h-14 flex justify-between items-center lg:hidden fixed bottom-0 left-0 right-0 w-full bg-black border-t border-[#1E1E1E] z-50 px-8 md:px-20">
         <Link
           href="/"
           className={cn(

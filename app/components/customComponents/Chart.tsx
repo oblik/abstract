@@ -574,7 +574,7 @@ const Chart: React.FC<ChartProps> = ({
             <div>
                 <CardHeader className="space-y-0 p-0">
                     {/* 先显示标题 */}
-                    <CardTitle style={{ lineHeight: "1.5" }} className="pt-3 sm:pb-0 pb-2 sm:pt-0">
+                    <CardTitle style={{ lineHeight: "1.5" }} className="pt-3 sm:pb-1 pb-2 sm:pt-0">
                         <div style={{ display: "flex", alignItems: "center" }}>
                             <div
                                 style={{
@@ -611,9 +611,9 @@ const Chart: React.FC<ChartProps> = ({
                     <CardDescription className="py-0 flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2">
                         {/* First line - Volume, Date, and Toggle */}
                         <div className="flex flex-wrap gap-3 items-center">
-                            <p className="text-[12px] sm:text-[15px]">Vol ${(volume && toTwoDecimal(volume/100)?.toLocaleString()) || "0.00"}</p>
+                            <p className="text-[12px] sm:text-[14px]">Vol ${(volume && toTwoDecimal(volume/100)?.toLocaleString()) || "0.00"}</p>
                             {endDate && (
-                                <p className="flex items-center gap-1 text-[12px] sm:text-[15px]">
+                                <p className="flex items-center gap-1 text-[12px] sm:text-[14px]">
                                     <Clock size={12} className="sm:w-[14px] sm:h-[14px] w-[12px] h-[12px]" />{" "}
                                     {new Date(endDate)?.toLocaleString("en-US", {
                                         day: "numeric",

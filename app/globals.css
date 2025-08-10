@@ -57,7 +57,8 @@ body {
 
 html,
 body {
-  height: 100%;
+    height: auto;
+    text-wrap: balance;
   margin: 0;
   padding: 0;
   overflow-x: hidden;

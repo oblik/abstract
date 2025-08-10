@@ -309,7 +309,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
       >
         <div>
           <CardHeader className="p-0">
-            <CardTitle style={{ lineHeight: "1.5" }} className="pt-3 sm:pb-0 pb-2 sm:pt-0">
+            <CardTitle style={{ lineHeight: "1.5" }} className="pt-3 sm:pb-1 pb-2 sm:pt-0">
               <div style={{ display: "flex", alignItems: "center" }}>
                 <div
                   style={{
@@ -343,9 +343,9 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
             </CardTitle>
             <CardDescription className="py-2 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
               <div className="flex pb-1 flex-wrap gap-3 items-center">
-                <p className="text-[12px] sm:text-[15px]">Vol ${toTwoDecimal(volume)?.toLocaleString() || ""}</p>
+                <p className="text-[12px] sm:text-[14px]">Vol ${toTwoDecimal(volume)?.toLocaleString() || ""}</p>
                 {endDate && (
-                  <p className="flex items-center text-[12px] sm:text-[15px] gap-1">
+                  <p className="flex items-center text-[12px] sm:text-[14px] gap-1">
                     <Clock size={14} />{" "}
                     {new Date(endDate)?.toLocaleString("en-US", {
                       day: "numeric",

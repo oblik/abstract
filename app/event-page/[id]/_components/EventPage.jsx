@@ -355,7 +355,7 @@ export default function EventPage({ categories }) {
                         endDate={events.endDate}
                         interval={interval}
                       /> */}
-                    <div className="flex justify-center items-center mt-2 sm:mt-0 mb-4 sm:mb-8 md:mb-8 text-xs sm:text-base" style={{ marginTop: '0.5rem', marginBottom: '1rem', transform: 'scale(0.85)', maxWidth: '90vw' }}>
+                    <div className="flex justify-center items-center mt-2 sm:mt-0 mb-4 sm:mb-8 md:mb-8 text-xs sm:text-base" style={{ marginTop: '0.5rem', marginBottom: '1rem', transform: 'scale(0.85)', transformOrigin: 'center', maxWidth: '90vw' }}>
                       <ChartIntervals
                         interval={interval}
                         setInterval={setInterval}
@@ -411,7 +411,7 @@ export default function EventPage({ categories }) {
                       ) : (
                         <>
                           <Accordion type="single" collapsible>
-                            <div className="flex items-center w-full py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider border-t-2 border-b border-[#222] bg-black">
+                            <div className="flex items-center w-full sm:py-2 py-0.5 text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider border-t-2 border-b border-[#222] bg-black">
                               <div className="flex items-center pr-6" style={{ width: 320 }}>
                                 Outcome
                               </div>
@@ -821,7 +821,9 @@ export default function EventPage({ categories }) {
           </a>
         </div>
       </div>
-      <Footer />
+      <div className="hidden sm:block">
+        <Footer />
+      </div>
       <HeaderFixed />
     </>
   );

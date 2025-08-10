@@ -1,3 +1,12 @@
+/* Dynamic viewport height for iOS Safari compatibility */
+
+@media (max-width: 640px) {
+  .app-main-container {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+}
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "@radix-ui/colors/black-alpha.css";

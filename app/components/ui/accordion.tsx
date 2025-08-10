@@ -216,24 +216,24 @@ const AccordionTrigger = React.forwardRef<
             triggerRef.current = node;
           }}
           className={cn(
-            "h-full md:h-[86px] w-full flex flex-1 items-center justify-between py-4 font-medium data-[state=closed]:hover:bg-[#0a0a0a] transition-colors duration-300 flex-col md:flex-row !gap-3",
+            "h-full md:h-[86px] w-full flex flex-1 items-center justify-between sm:py-4 py-2 font-medium data-[state=closed]:hover:bg-[#0a0a0a] transition-colors duration-300 flex-col md:flex-row !gap-3",
             className
           )}
           {...props}
         >
           {/* Mobile layout - single row with title, volume, and odds */}
           <div className="flex md:hidden items-center justify-between w-full">
-            <div className="flex items-center pr-6">
+            <div className="flex items-center pr-0">
               {/* Icon on the left, if present in children[0] */}
               {Array.isArray(children) && children[0] ? (
-                <span className="flex-shrink-0">{children[0]}</span>
+                <span>{children[0]}</span>
               ) : null}
               <span className="flex flex-col items-start justify-center h-full">
                 {/* Market name: children[1] or children if not array */}
-                <span className="text-[16px] lg:text-sm text-left">
+                <span className="sm:text-[16px] text-[14px] lg:text-sm text-left">
                   {Array.isArray(children) ? children[1] : children}
                 </span>
-                <span className="text-xs text-gray-400 mt-0.5 text-left">
+                <span className="sm:text-xs text-[12px] text-gray-400 mt-0.5 text-left">
                   Vol $1,498.27
                 </span>
               </span>
@@ -248,7 +248,7 @@ const AccordionTrigger = React.forwardRef<
 
           {/* Desktop layout - matches header structure exactly */}
           <div className="hidden md:flex items-center w-full">
-            <div className="flex items-center pr-6" style={{ width: 320 }}>
+            <div className="flex items-center sm:pr-6 pr-4" style={{ width: 320 }}>
               {/* Icon on the left, if present in children[0] */}
               {Array.isArray(children) && children[0] ? (
                 <span className="flex-shrink-0">{children[0]}</span>
@@ -258,7 +258,7 @@ const AccordionTrigger = React.forwardRef<
                 <span className="text-[16px] lg:text-sm text-left">
                   {Array.isArray(children) ? children[1] : children}
                 </span>
-                <span className="text-xs text-gray-400 mt-0.5 text-left">
+                <span className="text-[12px] sm:text-xs text-gray-400 mt-0.5 text-left">
                   Vol $1,498.27
                 </span>
               </span>
@@ -278,7 +278,7 @@ const AccordionTrigger = React.forwardRef<
             <div className="relative group w-full md:w-auto">
               <Button
                 variant="ghost"
-                className="w-full md:w-[140px] px-8 py-2.5 !bg-[#0d1a26] text-[#7dfdfe] hover:text-[#7dfdfe] rounded-md border border-transparent relative z-10"
+                className="w-full md:w-[140px] px-8 sm:py-2.5 py-2.5 !bg-[#0d1a26] text-[#7dfdfe] hover:text-[#7dfdfe] rounded-md border border-transparent relative z-10"
                 onClick={(e) => {
                   e.stopPropagation();
                   if (isMultiMarket && setIsDrawerOpen && setActiveView) {
@@ -380,11 +380,11 @@ const AccordionTrigger = React.forwardRef<
           </div>
 
           {/* Mobile buttons - shown only on mobile */}
-          <div className="flex md:hidden items-center gap-2.5 w-full mt-2">
+          <div className="flex md:hidden items-center gap-2.5 w-full sm:mt-2 mt-0.1">
             <div className="relative group w-full">
               <Button
                 variant="ghost"
-                className="w-full px-8 py-2.5 !bg-[#0d1a26] text-[#7dfdfe] hover:text-[#7dfdfe] rounded-md border border-transparent relative z-10"
+                className="w-full px-8 sm:py-2.5 py-2 !bg-[#0d1a26] text-[#7dfdfe] hover:text-[#7dfdfe] rounded-md border border-transparent relative z-10"
                 onClick={(e) => {
                   e.stopPropagation();
                   if (isMultiMarket && setIsDrawerOpen && setActiveView) {

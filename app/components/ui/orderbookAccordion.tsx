@@ -397,13 +397,13 @@ const OrderbookAccordionContent = React.forwardRef<
             <TabsList className="flex justify-start w-1/4 min-w-[150px]">
               <TabsTrigger
                 value="Yes"
-                className="flex-1 px-2 py-2 text-[13px] sm:text-base transition-all duration-300 border-b-2 border-transparent"
+                className="flex-1 px-2 py-2 text-[12px] sm:text-base transition-all duration-300 border-b-2 border-transparent"
               >
                 Trade {capitalize(selectedMarket?.outcome?.[0]?.title || "Yes")}
               </TabsTrigger>
               <TabsTrigger
                 value="No"
-                className="flex-1 px-2 py-2 text-[13px] sm:text-base transition-all duration-300 border-b-2 border-transparent"
+                className="flex-1 px-2 py-2 text-[12px] sm:text-base transition-all duration-300 border-b-2 border-transparent"
               >
                 Trade {capitalize(selectedMarket?.outcome?.[1]?.title || "No")}
               </TabsTrigger>
@@ -434,12 +434,12 @@ const OrderbookAccordionContent = React.forwardRef<
                   ) : (
                     <>
                       <div className="flex items-center h-[35px] w-full justify-between">
-                        <div className="w-[30%] p-3">
+                        <div className="text-[12px] sm:text-base w-[30%] p-3">
                           {activeView === "Yes" ? `Trade ${capitalize(selectedMarket?.outcome?.[0]?.title) || "Yes"}` : `Trade ${capitalize(selectedMarket?.outcome?.[1]?.title) || "No"}`}
                         </div>
-                        <div className="w-[20%] text-[13px] sm:text-base text-center">Price</div>
-                        <div className="w-[25%]  text-[13px] sm:text-base text-center">Shares</div>
-                        <div className="w-[25%]  text-[13px] sm:text-base text-center">Total</div>
+                        <div className="w-[20%] text-[12px] sm:text-base text-center">Price</div>
+                        <div className="w-[25%]  text-[12px] sm:text-base text-center">Shares</div>
+                        <div className="w-[25%]  text-[12px] sm:text-base text-center">Total</div>
                       </div>
                       <div className="w-full overflow-hidden h-[fit-content]">
                         <div
@@ -462,7 +462,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                   return (
                                     <div
                                       key={index}
-                                      className="flex items-center h-[35px] w-full justify-between duration-300 ease-in-out bg-black text-white hover:bg-[#240000] z-20 relative cursor-pointer"
+                                      className="flex items-center text-[12px] sm:text-base h-[35px] w-full justify-between duration-300 ease-in-out bg-black text-white hover:bg-[#240000] z-20 relative cursor-pointer"
                                       onClick={() => setSelectedOrder({ 
                                         side: activeView, 
                                         row, 
@@ -515,33 +515,33 @@ const OrderbookAccordionContent = React.forwardRef<
                               {/* Asks badge */}
                               {asks.length > 0 && (
                                 <div className="flex w-full">
-                                  <Badge className="w-[50px] text-xs text-white bg-[#ff0000] mb-1 absolute bottom-0 left-5 z-30">
+                                  <Badge className="w-[50px] text-xs text-white bg-[#ff0000] mb-1 absolute bottom-0 left-5 z-30 flex items-center justify-center px-3">
                                     Asks
                                   </Badge>
                                 </div>
                               )}{" "}
                             </div>
     
-                            {asks && bids && asks.length > 0 && bids.length > 0 && (
-                              <div className="flex items-center h-[35px] w-full p-3">
-                                <div className="w-[30%]">Last: 
-                                  {selectedMarket?.last ? (
-                                    activeView == "Yes" ? selectedMarket?.last || 0 : 100 - (selectedMarket?.last || 0)
-                                  ) : "--"}
-                                ¢</div>
-                                <div className="w-[20%] text-center">
-                                  Spread: {calcSpread(bids, asks)}
-                                </div>
-                                <div className="w-[25%]"></div>
-                                <div className="w-[25%]"></div>
+                            <div className="flex text-[12px] sm:text-base items-center h-[35px] w-full p-3">
+                              <div className="w-[30%]">Last: 
+                                {selectedMarket?.last ? (
+                                  activeView == "Yes" ? selectedMarket?.last || 0 : 100 - (selectedMarket?.last || 0)
+                                ) : "--"}
+                              ¢</div>
+                              <div className="text-[12px] sm:text-base w-[30%] text-center">
+                                {asks.length > 0 && bids.length > 0 ? (
+                                  <>Spread: {calcSpread(bids, asks)}</>
+                                ) : null}
                               </div>
-                            )}
+                              <div className="w-[25%]"></div>
+                              <div className="w-[25%]"></div>
+                            </div>
     
                             {/* Bids badge */}
                             <div className="relative w-full">
                               {bids.length > 0 && (
                                 <div className="flex w-full">
-                                  <Badge className="w-[50px] text-xs text-white bg-[#00c735] mt-1 mb-1 absolute top-0 left-5 z-30">
+                                  <Badge className="w-[50px] text-xs text-white bg-[#00c735] mt-1 mb-1 absolute top-0 left-5 z-30 flex items-center justify-center px-3">
                                     Bids
                                   </Badge>
                                 </div>
@@ -555,7 +555,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                   return (
                                     <div
                                       key={index}
-                                      className="flex items-center h-[35px] w-full justify-between bg-black text-white duration-300 ease-in-out hover:bg-[#001202] z-20 relative cursor-pointer"
+                                      className="flex items-center text-[12px] sm:text-base h-[35px] w-full justify-between bg-black text-white duration-300 ease-in-out hover:bg-[#001202] z-20 relative cursor-pointer"
                                       onClick={() => setSelectedOrder({ 
                                         side: activeView, 
                                         row, 

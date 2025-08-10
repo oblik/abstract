@@ -28,10 +28,22 @@ export default function HeaderFixed() {
 
   // Lock body scroll when drawer is open
   useEffect(() => {
-    if (isOpen || isSearchOpen) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "";
+    if (isOpen || isSearchOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.overflowY = "auto";
+      // Explicitly allow vertical scrolling
+      document.body.style.position = "";
+      document.body.style.height = "";
+      document.body.style.maxHeight = "";
+    }
     return () => {
       document.body.style.overflow = "";
+      document.body.style.overflowY = "auto";
+      document.body.style.position = "";
+      document.body.style.height = "";
+      document.body.style.maxHeight = "";
     };
   }, [isOpen, isSearchOpen]);
 
@@ -171,8 +183,22 @@ export default function HeaderFixed() {
         </div>
       </div>
 
-      {/* Bottom Nav - Restored for mobile */}
-      <div className="bottom-nav-fixed h-14 flex justify-between items-center lg:hidden fixed bottom-0 left-0 right-0 w-full bg-black border-t border-[#1E1E1E] z-[9999] px-8 md:px-20">
+      {/* Top Header - fixed at the top */}
+      <header className="fixed top-0 left-0 w-full bg-transparent h-12 md:h-16 pt-1 md:pt-2 container mx-auto px-2 md:px-4 lg:px-0 z-[10000]">
+        {/* ...header content here (logo, auth, etc.)... */}
+      </header>
+
+      {/* Main content area with top and bottom padding for header/nav heights */}
+      <div className="app-main-container" style={{
+        paddingTop: '3rem', // header height
+        paddingBottom: '4rem', // bottom nav height
+        boxSizing: 'border-box',
+      }}>
+        {/* ...main content goes here... */}
+      </div>
+
+      {/* Bottom Nav - fixed at the bottom */}
+      <div className="bottom-nav-fixed h-14 flex justify-between items-center lg:hidden fixed left-0 right-0 w-full bg-black border-t border-[#1E1E1E] z-[9999] px-8 md:px-20" style={{ bottom: 'env(safe-area-inset-bottom, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         <Link
           href="/"
           className={cn(

@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
         <meta name="description" content="The Music Stock Market" />
         <meta itemProp="name" content="Sonotrade" />
         <meta itemProp="description" content="The Music Stock Market" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"></meta>
+        <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
         <meta
           itemProp="image"
           content="https://www.sonotrade.co/images/SONOTRADE.png"
@@ -29,13 +29,38 @@ export default function RootLayout({ children }) {
       </head>
 
       <body className={`antialiased`}>
-        <StoreProvider>
-          <SnackbarClient>
-           <ClientLayoutEffect />
-           <WalletProvider>{children}</WalletProvider>
-          </SnackbarClient>
-        </StoreProvider>
-        <ToastContainer />
+        {/* Mobile: fixed header and nav as siblings, main content scrolls on body */}
+        {typeof window !== 'undefined' && window.innerWidth <= 640 ? (
+          <>
+            {/* Top header - fixed at top */}
+            {/* @ts-ignore */}
+            {require('./Header').default()}
+            {require('./NavigationBar').default()}
+            {/* Main content - normal children, scrolls on body */}
+            <div style={{ paddingTop: '3rem', paddingBottom: '4rem', minHeight: '100vh', boxSizing: 'border-box' }}>
+              <StoreProvider>
+                <SnackbarClient>
+                 <ClientLayoutEffect />
+                 {children}
+                </SnackbarClient>
+              </StoreProvider>
+              <ToastContainer />
+            </div>
+            {/* Bottom nav - fixed at bottom */}
+            {/* @ts-ignore */}
+
+          </>
+        ) : (
+          <>
+            <StoreProvider>
+              <SnackbarClient>
+               <ClientLayoutEffect />
+               {children}
+              </SnackbarClient>
+            </StoreProvider>
+            <ToastContainer />
+          </>
+        )}
       </body>
     </html>
   );

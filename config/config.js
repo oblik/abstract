@@ -25,7 +25,7 @@ var key = {};
 } else {
   key = {
     frontUrl: "http://localhost:3000",
-    backendURL: "https://sonotradesdemo.wearedev.team",
+    backendURL: "http://localhost:3001",
     txLink: "https://amoy.polygonscan.com/",
     getLoginInfo: "https://freeipapi.com/api/json",
     // rpcUrl: "https://polygon-amoy-bor-rpc.publicnode.com",

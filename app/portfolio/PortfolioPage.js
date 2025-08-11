@@ -129,7 +129,7 @@ export default function PortfolioPage({ categories }) {
   });
   const [gasAmt, setGasAmt] = useState({ gasCost: 0, marketGasCost: 0 });
 
-  var { currency, amount, walletAddress, minDeposit } = depositData;
+  var { currency, amount, minDeposit } = depositData;
 
   useEffect(() => {
     getPnl();
@@ -298,6 +298,10 @@ export default function PortfolioPage({ categories }) {
       let respData = await getCoinList();
       if (respData.success) {
         setCoin(respData?.result);
+        const solCoin = respData.result.find((c) => c.symbol === "SOL");
+        if (solCoin && solCoin.cnvPrice) {
+          setTokenValue(solCoin.cnvPrice);
+        }
       }
     } catch (error) {
       console.error("Error getting coin list:", error);
@@ -327,14 +331,6 @@ export default function PortfolioPage({ categories }) {
     }
     const feeInUSD = feeInSol * tokenValue;
     setGasAmt({ gasCost: feeInSol, marketGasCost: feeInUSD });
-
-    const accountInfo = await connection.getAccountInfo(PYTH_PRICE_ACCOUNT);
-    if (!accountInfo) throw new Error("Pyth price account not found");
-
-    const priceData = parsePriceData(accountInfo.data);
-    console.log("📈 SOL/USD price:", priceData.price);
-
-    setTokenValue(priceData.price);
   };
 
   const getAddress = async (address) => {
@@ -596,8 +592,8 @@ export default function PortfolioPage({ categories }) {
         );
         // Loop through and compare
         for (let i = 0; i < preTokenBalances.length; i++) {
-          const pre = preTokenBalances[i];
-          const post = postTokenBalances[i];
+          const pre = preTokenBalances[0];
+          const post = postTokenBalances[0];
 
           if (!pre || !post) continue;
 
@@ -616,15 +612,16 @@ export default function PortfolioPage({ categories }) {
               Math.abs(change) / 10 ** pre.uiTokenAmount.decimals;
             depositdata = {
               hash: tx,
-              from: pre.owner,
+              from: provider.publicKey.toBase58(),
               to: config?.adminAdd.toString(),
               amount: tokenAmt,
               usdAmt: tokenAmt,
               symbol: "USDC",
             };
+            console.log(depositdata,"depositdata");
           }
         }
-
+        console.log(depositdata, "depositdata");
         var { message, status } = await userDeposit(depositdata, dispatch);
         if (status) {
           toastAlert("success", message, "deposit");
@@ -865,11 +862,11 @@ export default function PortfolioPage({ categories }) {
                       <span className="cursor-pointer">
                         {walletData?.balance
                           ? PnLFormatted(
-                              formatNumber(
-                                walletData?.balance - walletData?.locked,
-                                2
-                              )
+                            formatNumber(
+                              walletData?.balance - walletData?.locked,
+                              2
                             )
+                          )
                           : 0}
                       </span>
                     </TooltipTrigger>
@@ -890,12 +887,12 @@ export default function PortfolioPage({ categories }) {
                   <span className="mt-2 text-3xl font-semibold">
                     {walletData?.balance
                       ? // ? PnLFormatted(formatNumber(walletData?.balance - walletData?.locked, 2))
-                        PnLFormatted(
-                          formatNumber(
-                            walletData?.balance + walletData?.position,
-                            2
-                          )
+                      PnLFormatted(
+                        formatNumber(
+                          walletData?.balance + walletData?.position,
+                          2
                         )
+                      )
                       : 0}
                   </span>
                   <span className="text-sm text-gray-500 mt-1">
@@ -1018,11 +1015,10 @@ export default function PortfolioPage({ categories }) {
                                   return (
                                     <div key={i} className="wallet_coin_list">
                                       <div
-                                        className={`flex items-center justify-between my-3 border px-3 py-1 rounded cursor-pointer transition ${
-                                          isSelected
-                                            ? "border-[#4f99ff] bg-[#1a1a1a]"
-                                            : "border-[#3d3d3d] hover:bg-[#1e1e1e]"
-                                        }`}
+                                        className={`flex items-center justify-between my-3 border px-3 py-1 rounded cursor-pointer transition ${isSelected
+                                          ? "border-[#4f99ff] bg-[#1a1a1a]"
+                                          : "border-[#3d3d3d] hover:bg-[#1e1e1e]"
+                                          }`}
                                         onClick={() =>
                                           setDepositData((prev) => ({
                                             ...prev,
@@ -1282,9 +1278,9 @@ export default function PortfolioPage({ categories }) {
                                     {currency == "USDC"
                                       ? `${depsoitAmt} USDC`
                                       : `${formatNumber(
-                                          depsoitAmt * tokenValue,
-                                          4
-                                        )} USDC`}
+                                        depsoitAmt * tokenValue,
+                                        4
+                                      )} USDC`}
                                     {/* tokenAmt */}
                                   </span>
                                 </div>
@@ -1338,9 +1334,9 @@ export default function PortfolioPage({ categories }) {
                                         $ {""}
                                         {gasAmt?.marketGasCost
                                           ? formatNumber(
-                                              gasAmt?.marketGasCost,
-                                              6
-                                            )
+                                            gasAmt?.marketGasCost,
+                                            6
+                                          )
                                           : 0}{" "}
                                         {/* Gwei */}
                                       </span>
@@ -1482,17 +1478,15 @@ export default function PortfolioPage({ categories }) {
                     PROFIT/LOSS
                   </span>
                   <span
-                    className={`mt-2 text-3xl font-semibold ${
-                      profitAmount >= 0 ? "text-green-400" : "text-red-400"
-                    }`}
+                    className={`mt-2 text-3xl font-semibold ${profitAmount >= 0 ? "text-green-400" : "text-red-400"
+                      }`}
                   >
                     {PnLFormatted(formatNumber(profitAmount, 2))}
                   </span>
                   <span className="text-sm text-gray-500 mt-1">
                     <span
-                      className={`${
-                        profitAmount >= 0 ? "text-green-400" : "text-red-400"
-                      }`}
+                      className={`${profitAmount >= 0 ? "text-green-400" : "text-red-400"
+                        }`}
                     >
                       $0.00 (0.00%)
                     </span>{" "}

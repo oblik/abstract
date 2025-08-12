@@ -313,6 +313,7 @@ const OrderbookAccordionContent = React.forwardRef<
                     findOrder.action = resData.action
                     findOrder.userSide = resData.userSide
                     findOrder.timeInForce = resData.timeInForce
+                    findOrder.expiration = resData.expiration
                     // findOrder.status = resData.status
                     return prev;
                   } else if (["completed", "cancelled", "expired"].includes(resData.status)) {
@@ -330,6 +331,7 @@ const OrderbookAccordionContent = React.forwardRef<
                     action: resData.action,
                     userSide: resData.userSide,
                     timeInForce: resData.timeInForce,
+                    expiration: resData.expiration,
                     marketId: {
                       _id: resData.marketId._id,
                       groupItemTitle: resData.marketId.groupItemTitle,

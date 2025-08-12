@@ -248,7 +248,7 @@ export default function Withdraw() {
                                 }
 
                             </fieldset>
-
+{/* 
                             <div className="flex items-center space-x-2 mt-4">
                                 <Checkbox.Root
                                     className="CheckboxRoot"
@@ -262,7 +262,7 @@ export default function Withdraw() {
                                 <label className="Label" htmlFor="c1">
                                     Send USDC.e (don’t swap to native USDC)
                                 </label>
-                            </div>
+                            </div> */}
 
                             <Button type="button" className="mt-4 w-full" onClick={handleClick}>Withdraw
                                 {loader && (

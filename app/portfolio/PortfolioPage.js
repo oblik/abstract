@@ -618,7 +618,7 @@ export default function PortfolioPage({ categories }) {
               usdAmt: tokenAmt,
               symbol: "USDC",
             };
-            console.log(depositdata,"depositdata");
+            console.log(depositdata, "depositdata");
           }
         }
         console.log(depositdata, "depositdata");

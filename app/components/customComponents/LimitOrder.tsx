@@ -63,6 +63,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
   const [formValue, setFormValue] = useState<FormState>(initialFormValue);
   const [errors, setErrors] = useState<ErrorState>(errorState);
   const [showCustomDialog, setShowCustomDialog] = useState(false);
+  console.log('showCustomDialog: ', showCustomDialog);
   const [isExpirationEnabled, setIsExpirationEnabled] = useState(false);
   const [customDate, setCustomDate] = useState<any>("");
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
@@ -202,6 +203,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
     if (success) {
       toastAlert("success", "Order placed successfully!", "order-success");
       setFormValue({ ...formValue, price: "", amount: "" });
+      setIsExpirationEnabled(false);
     } else {
       toastAlert("error", message, "order-failed");
     }

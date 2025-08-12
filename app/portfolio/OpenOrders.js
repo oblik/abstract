@@ -202,7 +202,7 @@ const OpenOrders = () => {
                                                 </td>
                                                 <td>${toFixedDown((data.price * data.quantity) / 100, 2)}</td>
                                                 <td>{momentFormat(data.createdAt, "DD/MM/YYYY HH:mm")}</td>
-                                                <td>{data.timeInForce == "GTC" ? "Good 'til canceled" : momentFormat(data.expiration, "DD/MM/YYYY HH:mm")}</td>
+                                                <td>{data.timeInForce == "GTC" ? "Good 'til canceled" : momentFormat(data.expiration, "MMM D, YYYY · hh:mm A")}</td>
                                                 <td>
                                                     <button className="text-red-500" onClick={() => handleCancelOrder(data._id)}>
                                                         <X size={20} />

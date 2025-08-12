@@ -193,12 +193,11 @@ const OpenOrders = () => {
                                                 <td>{data.quantity}</td>
                                                 <td>{data.action == "sell" ? (100 - data.price) : data.price}¢</td>
                                                 <td>
-                                                    {!isEmpty(data.currentPrice)
-                                                        ? data.userSide === "no"
+                                                    {(isEmpty(data.currentPrice) || data.currentPrice == 0)
+                                                        ? "--"
+                                                        : data.userSide === "no"
                                                             ? `${100 - data.currentPrice}¢`
-                                                            : `${data.currentPrice}¢`
-                                                        : '-'}
-
+                                                            : `${data.currentPrice}¢`}
                                                 </td>
                                                 <td>${toFixedDown((data.price * data.quantity) / 100, 2)}</td>
                                                 <td>{momentFormat(data.createdAt, "DD/MM/YYYY HH:mm")}</td>

@@ -64,6 +64,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
   const [errors, setErrors] = useState<ErrorState>(errorState);
   const [showCustomDialog, setShowCustomDialog] = useState(false);
   console.log('showCustomDialog: ', showCustomDialog);
+  console.log("git reset test")
   const [isExpirationEnabled, setIsExpirationEnabled] = useState(false);
   const [customDate, setCustomDate] = useState<any>("");
   const [daysLeft, setDaysLeft] = useState<number | null>(null);

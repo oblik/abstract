@@ -8,6 +8,7 @@ import { signIn } from "@/store/slices/auth/sessionSlice";
 import { setUser } from "@/store/slices/auth/userSlice";
 import { setWallet } from "@/store/slices/wallet/dataSlice";
 import { setAuthToken } from "@/lib/cookies";
+import { subscribe } from "@/config/socketConnectivity";
 
 export const register = async (data: any) => {
   try {
@@ -30,6 +31,7 @@ export const googleLogin = async (reqBody: any, dispatch: any) => {
       data: reqBody,
     });
     const { message, result } = respData.data;
+    subscribe(result.user._id)
     dispatch(signIn(result.token));
     dispatch(setUser(result.user));
     dispatch(setWallet(result.wallet));
@@ -58,6 +60,7 @@ export const walletLogin = async (reqBody: any, dispatch: any) => {
     });
     const { message, result } = respData.data;
     if(!isEmpty(result?.user?.email) && result?.user?.status == "verified" ){
+      subscribe(result.user._id);
       dispatch(signIn(result?.token));
       dispatch(setUser(result?.user));
       dispatch(setWallet(result?.wallet));
@@ -87,6 +90,7 @@ export const verifyEmail = async (data: any, dispatch: any) => {
       data,
     });
     const { message, result } = respData.data;
+    subscribe(result.user._id);
     dispatch(signIn(result.token));
     dispatch(setUser(result.user));
     dispatch(setWallet(result.wallet));

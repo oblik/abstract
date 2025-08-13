@@ -271,7 +271,6 @@ export default function Authentication() {
       setError(errMsg);
       if (isEmpty(errMsg)) {
         let { success, message, errors } = await register(userData);
-        console.log(errors, "errorserrors");
         if (success) {
           toastAlert("success", message, "login");
           setVerifyStatus(true);

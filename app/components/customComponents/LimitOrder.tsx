@@ -63,10 +63,9 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
   const [formValue, setFormValue] = useState<FormState>(initialFormValue);
   const [errors, setErrors] = useState<ErrorState>(errorState);
   const [showCustomDialog, setShowCustomDialog] = useState(false);
-  console.log('showCustomDialog: ', showCustomDialog);
-  console.log("git reset test")
   const [isExpirationEnabled, setIsExpirationEnabled] = useState(false);
   const [customDate, setCustomDate] = useState<any>("");
+  const [orderBtn, setOrderBtn] = useState<boolean>(true);
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
   const [userPosition, setUserPosition] = useState<number>(0);
   const [expirationSeconds, setExpirationSeconds] = useState<number | null>(
@@ -181,6 +180,8 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
   };
 
   const handlePlaceOrder = async (action: any) => {
+    try{
+      setOrderBtn(false);
     let activeTab = activeView?.toLowerCase();
     if (!limitOrderValidation()) {
       return;
@@ -208,7 +209,12 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
     } else {
       toastAlert("error", message, "order-failed");
     }
-  };
+  }catch (error) {
+      console.error("Error placing order:", error);
+  }finally {
+      setOrderBtn(true);
+    }
+  }
 
   const handlePercentageClick = (percentage: number) => {
     if (userPosition <= 0) {
@@ -454,6 +460,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
           <Button
             className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300"
             onClick={() => handlePlaceOrder(buyorsell)}
+            disabled={orderBtn ? false : true}
           >
             {`${buyorsell === "buy" ? "Buy" : "Sell"} ${
               activeView == "Yes"

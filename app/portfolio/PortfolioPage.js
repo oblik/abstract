@@ -816,7 +816,7 @@ export default function PortfolioPage({ categories }) {
       toastAlert("error", "Connect Your Wallet", "deposit");
     }
   };
-
+console.log(isConnected, txopen, "datata");
   return (
     <>
       <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">

@@ -264,7 +264,7 @@ export default function Withdraw() {
                                 </label>
                             </div> */}
 
-                            <Button type="button" className="mt-4 w-full" onClick={handleClick}>Withdraw
+                            <Button type="button" disabled={loader} className="mt-4 w-full" onClick={handleClick}>Withdraw
                                 {loader && (
                                     <i
                                         className="fas fa-spinner fa-spin ml-2"

@@ -22,6 +22,7 @@ import ChartIntervals from "@/app/components/customComponents/ChartIntervals";
 import { SelectSeparator } from "@/app/components/ui/select";
 import Link from "next/link";
 import { TradingCard } from "@/app/components/customComponents/TradingCard";
+import { capitalize } from "@/lib/stringCase";
 import {
   Drawer,
   DrawerTrigger,
@@ -699,9 +700,9 @@ export default function EventPage({ categories }) {
                     {markets?.length <= 1 && (
                       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
                         <DrawerTrigger className="w-full py-2 font-semibold bg-black border-t border-[#1E1E1E] text-black rounded-lg mt-10">
-                          <div className="flex items-center justify-between gap-2.5 w-full px-4 mt-0">
+                          <div className="flex items-center justify-between gap-2.5 mb-2 w-full px-4 mt-0">
                             <div className="flex-1 !bg-[#0D1A26] rounded-lg h-10 text-[#7DFDFE] text-base font-medium leading-tight inline-flex items-center justify-center gap-2 whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
-                              Yes
+                              {capitalize(markets?.[0]?.outcome?.[0]?.title || "Yes")}
                               {markets?.length === 1 && (
                                 <span className="ml-0 pl-0 text-xl text-[#7DFDFE] font-semibold">
                                {getLowestAskPrice(markets[0]?._id) !== null && getLowestAskPrice(markets[0]?._id) !== undefined ? `${getLowestAskPrice(markets[0]?._id)}¢` : '--'}
@@ -709,7 +710,7 @@ export default function EventPage({ categories }) {
                               )}
                             </div>
                             <div className="flex-1 !bg-[#210D1A] rounded-lg h-10 text-[#EC4899] text-base font-medium leading-tight inline-flex items-center justify-center gap-2 whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
-                              No
+                              {capitalize(markets?.[0]?.outcome?.[1]?.title || "No")}
                               {markets?.length === 1 && (
                                 <span className="ml-0 pl-0 text-xl text-[#EC4899] font-semibold">
                                {getHighestBidPrice(markets[0]?._id) !== null && getHighestBidPrice(markets[0]?._id) !== undefined ? `${getHighestBidPrice(markets[0]?._id)}¢` : '--'}

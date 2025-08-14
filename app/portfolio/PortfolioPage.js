@@ -66,6 +66,8 @@ import Withdraw from "./withdraw";
 import { getUserPnL } from "@/services/portfolio";
 import { NavigationBar } from "@/app/components/ui/navigation-menu";
 import { getCategories } from "@/services/market";
+import { trunc } from "@/lib/roundOf";
+
 import {
   Tooltip,
   TooltipTrigger,
@@ -828,7 +830,7 @@ export default function PortfolioPage({ categories }) {
       toastAlert("error", "Connect Your Wallet", "deposit");
     }
   };
-console.log(isConnected, txopen, "datata");
+  const leftPNLPercent = trunc((walletData.pnl1D/(walletData?.balance + walletData?.position))*100 ,2)
   return (
     <>
       <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
@@ -908,7 +910,9 @@ console.log(isConnected, txopen, "datata");
                       : 0}
                   </span>
                   <span className="text-sm text-gray-500 mt-1">
-                    <span className="text-green-500">$0.00 (0.00%)</span> Today
+                  <span className={walletData.pnl1D>0?"text-green-500":"text-red-500"}>{walletData.pnl1D<0 && "-"}${Math.abs(trunc(walletData.pnl1D,2))} 
+                  <span className={leftPNLPercent<0?"text-red-500":"text-green-500"}>({leftPNLPercent}%)</span> 
+                  </span> Today
                   </span>
                 </div>
                 {/* <Badge className="z-10 text-sm text-white bg-[#00c735] font-normal">

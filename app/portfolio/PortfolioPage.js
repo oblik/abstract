@@ -260,6 +260,7 @@ export default function PortfolioPage({ categories }) {
         setOpen(false);
         getAddress();
         toastAlert("success", "Wallet Connected successfully!!", "wallet");
+        setCheck(true)
       } catch (err) {
         console.log(err, "errerr");
         if (err?.code === 4001) {
@@ -419,6 +420,16 @@ export default function PortfolioPage({ categories }) {
   const balanceChange = (value) => {
     if (currency == "USDC") {
       setDepositAmt(formatNumber(tokenbalance * (value / 100), 4));
+    } else if (currency == "SOL" && value == 100) {
+      setDepositAmt(
+        Math.max(
+          formatNumber(balance * (value / 100), 4) - 0.001,
+          0
+        )
+      );
+      if (balance <= 0.001) {
+        toastAlert("error", "Insufficient SOL balance for network fees.", "wallet");
+      }
     } else {
       setDepositAmt(formatNumber(balance * (value / 100), 4));
     }
@@ -801,6 +812,7 @@ export default function PortfolioPage({ categories }) {
       getSolanaTxFee();
       setTxOpen(false);
       getCoinData();
+      setCheck(false)
       setloader(false);
     } else if (
       !isEmpty(data?.walletAddress) &&
@@ -938,7 +950,7 @@ console.log(isConnected, txopen, "datata");
                         Deposit
                       </Button>
                     </Dialog.Trigger>
-                    {isConnected == true && txopen == false && (
+                    {isConnected == true && txopen == false && check == false && (
                       <Dialog.Portal>
                         <Dialog.Overlay className="DialogOverlay" />
                         <Dialog.Content className="DialogContent">

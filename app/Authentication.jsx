@@ -374,6 +374,7 @@ export default function Authentication() {
   async function logout() {
     disconnectWallet();
     document.cookie = "user-token" + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    localStorage.removeItem("eventData");
     dispatch(reset());
     dispatch(signOut());
     toastAlert("success", "Logged out successfully", "logout");

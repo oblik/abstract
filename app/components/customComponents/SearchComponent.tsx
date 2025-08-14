@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter,usePathname } from "next/navigation";
 import SearchBar from "@/app/components/ui/SearchBar";
 import { getCategories, getEventsByRegex } from "@/services/market";
 import Image from "next/image";
@@ -18,6 +18,7 @@ function useIsMobile() {
 export default function SearchComponent() {
   const router = useRouter();
   const isMobile = useIsMobile();
+  const currentPath = usePathname();
 
   const [selectCategory, setSelectCategory] = useState("");
   const [filterEvent, setFilterEvent] = useState([]);
@@ -40,10 +41,15 @@ export default function SearchComponent() {
   };
 
   const clickEvent = (event) => {
-    //   const eventPath = `/event-page/${event.slug}`;
-    //   console.log("router.asPath", router.asPath);
     setRecentActivity((prev) => {
       const updatedActivity = [event, ...prev];
+      if(currentPath===`/event-page/${event.slug}`){
+        setIsSearchActive(false);
+      }
+      const isExisting = prev.some((item) => item._id === event._id);
+      if (isExisting) {
+        return prev;
+      }
       if (updatedActivity.length > 5) {
         updatedActivity.pop();
       }
@@ -155,7 +161,14 @@ export default function SearchComponent() {
                       <div
                         key={index}
                         className="py-2 rounded-lg border flex items-center justify-between gap-2 hover:bg-[#262626] pl-2 pr-3 cursor-pointer"
-                        onClick={() => router.push(`/event-page/${event.slug}`)}
+                        onClick={() =>{
+                          if (currentPath === `/event-page/${event.slug}`) {
+                            setIsSearchActive(false);
+                            return;
+                          } else {
+                            router.push(`/event-page/${event.slug}`)
+                          }
+                        }}
                       >
                         <div className="flex items-center gap-2">
                           {event.image ? (

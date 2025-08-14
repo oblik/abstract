@@ -45,9 +45,9 @@ const CommentForm = ({ eventId, onCommentAdded }: CommentFormProps) => {
       };
       console.log("reqData: ", reqData);
 
-      const { success, comment } = await postComment(reqData);
+      const { success, message } = await postComment(reqData);
       if (!success) {
-        toastAlert("error", "Failed to post comment. Please try again later.");
+        toastAlert("error",message|| "Failed to post comment. Please try again later.");
         return;
       }
       toastAlert("success", "Comment posted successfully!");

@@ -2,8 +2,11 @@ import React, { memo, useRef, useState, useCallback } from "react";
 import { CommentListProps } from "@/types/comments";
 import { Loader } from "lucide-react";
 import { Comment, ReplyForm } from "./comment";
+import { useSelector } from "@/store";
+
 
 const CommentList: React.FC<CommentListProps> = (props) => {
+    const { signedIn } = useSelector((state) => state.auth?.session);
     const { comments, isLoading, onReply, onDelete, replyingTo, eventId, onReplyAdded, currentUserWallet, hasMore, onLoadMore, isFetching } = props;
 
     const [expandedComments, setExpandedComments] = useState<Record<string, boolean>>({});
@@ -92,8 +95,8 @@ const CommentList: React.FC<CommentListProps> = (props) => {
                     Loading more...
                 </div>
             )}
-            {!hasMore && !isLoading && comments.length === 0 && (
-                <p className="text-center text-gray-400 mt-4">No comments yet. Be the first to comment!</p>
+            {!hasMore && signedIn && !isLoading && comments.length === 0 && (
+                <p className="text-center text-sm text-gray-300 mb-2">No comments yet. Be the first to comment!</p>
             )}
         </div>
         

@@ -407,6 +407,8 @@ export default function PortfolioPage({ categories }) {
           );
         } else if (depsoitAmt > depositBalance) {
           toastAlert("error", "Insufficient Balance", "deposit");
+        } else if (balance <= 0.001) {
+          toastAlert("error", "Your SOL balance is too low to pay the required transaction fee. Please add more SOL to proceed.", "wallet");
         } else if (depsoitAmt > 0) {
           setStep("3");
           getSolanaTxFee();
@@ -430,7 +432,7 @@ export default function PortfolioPage({ categories }) {
         )
       );
       if (balance <= 0.001) {
-        toastAlert("error", "Insufficient SOL balance for network fees.", "wallet");
+        toastAlert("error", "Your SOL balance is too low to pay the required transaction fee. Please add more SOL to proceed.", "wallet");
       }
     } else {
       setDepositAmt(formatNumber(balance * (value / 100), 4));
@@ -827,10 +829,11 @@ export default function PortfolioPage({ categories }) {
         "wallet"
       );
     } else {
-      toastAlert("error", "Connect Your Wallet", "deposit");
+      setOpen(true)
+      // toastAlert("error", "Connect Your Wallet", "deposit");
     }
   };
-  const leftPNLPercent = trunc((walletData.pnl1D/(walletData?.balance + walletData?.position))*100 ,2)
+  const leftPNLPercent = trunc((walletData.pnl1D / (walletData?.balance + walletData?.position)) * 100, 2)
   return (
     <>
       <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
@@ -910,9 +913,9 @@ export default function PortfolioPage({ categories }) {
                       : 0}
                   </span>
                   <span className="text-sm text-gray-500 mt-1">
-                  <span className={walletData.pnl1D>0?"text-green-500":"text-red-500"}>{walletData.pnl1D<0 && "-"}${Math.abs(trunc(walletData.pnl1D,2))} 
-                  <span className={leftPNLPercent<0?"text-red-500":"text-green-500"}>({leftPNLPercent}%)</span> 
-                  </span> Today
+                    <span className={walletData.pnl1D > 0 ? "text-green-500" : "text-red-500"}>{walletData.pnl1D < 0 && "-"}${Math.abs(trunc(walletData.pnl1D, 2))}
+                      <span className={leftPNLPercent < 0 ? "text-red-500" : "text-green-500"}>({leftPNLPercent}%)</span>
+                    </span> Today
                   </span>
                 </div>
                 {/* <Badge className="z-10 text-sm text-white bg-[#00c735] font-normal">

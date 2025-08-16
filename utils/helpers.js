@@ -44,6 +44,11 @@ export function sellFunction(data, sharesToSell) {
       remainingShares -= maxSharesForPrice;
     }
   }
+  
+  // Guard against division by zero when no shares are sold
+  if (totalSharesSold === 0) {
+    return { totalValue, averagePrice: 0 };
+  }
 
   const averagePrice = totalValue / totalSharesSold;
 
@@ -84,6 +89,11 @@ export function buyFunction(data, amountInUSD) {
     }
   }
 
+  // Guard against division by zero when no shares are bought
+  if (totalShares === 0) {
+    return { totalShares, averagePrice: 0 };
+  }
+
   const averagePrice = totalCost / totalShares;
 
   return {
@@ -92,7 +102,7 @@ export function buyFunction(data, amountInUSD) {
   };
 }
 
-export const getAccumalativeValue = (arr, length) => {
+export const getAccumulativeValue = (arr, length) => {
   if (!Array.isArray(arr)) {
     return 0;
   }
@@ -104,7 +114,7 @@ export const getAccumalativeValue = (arr, length) => {
   return total;
 };
 
-export const getAccumalativeValueReverse = (arr, length) => {
+export const getAccumulativeValueReverse = (arr, length) => {
   if (!Array.isArray(arr)) {
     return 0;
   }

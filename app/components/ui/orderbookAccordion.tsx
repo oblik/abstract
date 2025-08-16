@@ -8,8 +8,8 @@ import { FillBid } from "@/app/components/ui/fillBid";
 import { Badge } from "@/app/components/ui/badge";
 import {
   decimalToPercentage,
-  getAccumalativeValue,
-  getAccumalativeValueReverse,
+  getAccumulativeValue,
+  getAccumulativeValueReverse,
   toTwoDecimal,
 } from "@/utils/helpers";
 import { useContext, useEffect, useState } from "react";
@@ -468,7 +468,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                         row, 
                                         bidOrAsk: "ask", 
                                         ordCost: Number(
-                                          getAccumalativeValueReverse(
+                                          getAccumulativeValueReverse(
                                             asks || [],
                                             orderBookLength - (index + 1)
                                           ) / 100
@@ -478,7 +478,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                       <div className="w-[30%]">
                                         <FillAsk
                                           value={
-                                            (getAccumalativeValueReverse(
+                                            (getAccumulativeValueReverse(
                                               asks || [],
                                               orderBookLength - (index + 1)
                                             ) /
@@ -503,7 +503,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                       <div className="w-[25%] text-center">
                                         {"$" +
                                           Number(
-                                            getAccumalativeValueReverse(
+                                            getAccumulativeValueReverse(
                                               asks || [],
                                               orderBookLength - (index + 1)
                                             ) / 100
@@ -561,7 +561,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                         row, 
                                         bidOrAsk: "bid", 
                                         ordCost: Number(
-                                          getAccumalativeValue(
+                                          getAccumulativeValue(
                                             asks || [],
                                             orderBookLength - (index + 1)
                                           ) / 100
@@ -571,7 +571,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                       <div className="w-[30%]">
                                         <FillBid
                                           value={
-                                            (getAccumalativeValue(
+                                            (getAccumulativeValue(
                                               bids || [],
                                               index
                                             ) /
@@ -596,7 +596,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                       <div className="w-[25%] text-center">
                                         {"$" +
                                           Number(
-                                            getAccumalativeValue(
+                                            getAccumulativeValue(
                                               bids || [],
                                               index
                                             ) / 100

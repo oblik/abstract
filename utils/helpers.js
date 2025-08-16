@@ -44,6 +44,11 @@ export function sellFunction(data, sharesToSell) {
       remainingShares -= maxSharesForPrice;
     }
   }
+  
+  // Guard against division by zero when no shares are sold
+  if (totalSharesSold === 0) {
+    return { totalValue, averagePrice: 0 };
+  }
 
   const averagePrice = totalValue / totalSharesSold;
 
@@ -82,6 +87,11 @@ export function buyFunction(data, amountInUSD) {
       totalCost += maxSharesForPrice * price;
       remainingAmount -= maxSharesForPrice * price;
     }
+  }
+
+  // Guard against division by zero when no shares are bought
+  if (totalShares === 0) {
+    return { totalShares, averagePrice: 0 };
   }
 
   const averagePrice = totalCost / totalShares;

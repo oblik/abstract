@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Ye from "/public/images/Ye.png";
 // import Polymarket from "/public/images/polymarket.png";
 import Image from "next/image";
@@ -90,6 +90,7 @@ const Graph: React.FC<GraphProps> = ({
   const [hoveredChance, setHoveredChance] = useState<number | undefined>(
     undefined
   );
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // State to track screen width
   const [screenWidth, setScreenWidth] = useState<number>(
@@ -284,6 +285,7 @@ const Graph: React.FC<GraphProps> = ({
         <CardContent className="p-0">
           <ChartContainer
             className="h-[300px] w-full p-0 m-0 flex justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none pb-0 mb-0" // Shorter on mobile
+            ref={containerRef}
             config={chartConfig}
           >
             <LineChart
@@ -294,9 +296,11 @@ const Graph: React.FC<GraphProps> = ({
                   const value = e.activePayload[0].payload.asset1;
                   setHoveredChance(value);
                 }
+                // no dynamic radius
               }}
               onMouseLeave={() => {
                 setHoveredChance(undefined);
+                // no dynamic radius
               }}
               className="pl-0"
               margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
@@ -332,6 +336,7 @@ const Graph: React.FC<GraphProps> = ({
                   stroke={asset.color}
                   strokeWidth={2}
                   dot={<CustomDot color={asset.color} />}
+                  activeDot={{ r: 3, fill: asset.color, stroke: "#fff", strokeWidth: 2 }}
                   label={false}
                   connectNulls
                 />

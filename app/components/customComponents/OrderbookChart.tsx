@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Button } from "@/app/components/ui/button";
 import { Legend, Line, LineChart, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 import { ArrowRightLeft } from "lucide-react";
@@ -89,6 +89,7 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
   const [hoveredChance, setHoveredChance] = useState<number | undefined>(
           undefined
       );
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // State to track screen width
   const [screenWidth, setScreenWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1024);
@@ -262,7 +263,7 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
         </div>
           <CardContent className="pt-0 pb-0 pl-0 pr-0">
             <div className="w-full p-0 m-0 pb-0" style={{ width: '100%', paddingBottom: 0 }}>
-              <ChartContainer className="h-[300px] w-full p-0 m-0 flex justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none pb-0 mb-0" style={{ marginBottom: 0, paddingBottom: 0, overflow: 'visible' }} config={chartConfig}>
+              <ChartContainer ref={containerRef} className="h-[300px] w-full p-0 m-0 flex justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none pb-0 mb-0" style={{ marginBottom: 0, paddingBottom: 0, overflow: 'visible' }} config={chartConfig}>
                 <LineChart 
                   data={chartData} 
                   className="pl-0" 
@@ -273,9 +274,11 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
                     if (e.activePayload && e.activePayload.length > 0) {
                       setHoveredChance(e.activePayload[0].value);
                     }
+                    // no dynamic radius
                   }}
                   onMouseLeave={() => {
                     setHoveredChance(undefined);
+                    // no dynamic radius
                   }}
                 >
                   <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#1a1a1a" />
@@ -335,7 +338,7 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
                     stroke={selectedYes ? "#7DFDFE" : "#EC4899"}
                     strokeWidth={1}
                     dot={<CustomDot />}
-                    activeDot={{ r: 4, fill: selectedYes ? "#7DFDFE" : "#EC4899", stroke: "#fff", strokeWidth: 2 }}
+                    activeDot={{ r: 3, fill: selectedYes ? "#7DFDFE" : "#EC4899", stroke: "#fff", strokeWidth: 2 }}
                     label={false}
                     connectNulls={false}
                     isAnimationActive={false}
@@ -344,7 +347,7 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
                   />
                 </LineChart>
               </ChartContainer>
-              <div className="flex justify-center items-center mt-4 mb-2" style={{ position: 'relative', zIndex: 20, pointerEvents: 'auto' }}>
+              <div className="flex justify-center items-center mt-2 sm:mt-0 mb-4 sm:mb-8 md:mb-8 text-xs sm:text-base" style={{ marginTop: '0.5rem', marginBottom: '1rem', transform: 'scale(0.85)', transformOrigin: 'center', maxWidth: '90vw' }}>
                 <ChartIntervals interval={interval} setInterval={setInterval} />
               </div>
             </div>

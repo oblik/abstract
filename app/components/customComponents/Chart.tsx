@@ -841,10 +841,10 @@ const Chart: React.FC<ChartProps> = ({
                                             name={asset.fullLabel || asset.label}
 
                                             dot={<CustomDot color={asset.color}/>} 
-                                            activeDot={{ 
-                                                r: 6, 
-                                                fill: asset.color, 
-                                                stroke: "#fff", 
+                                            activeDot={{
+                                                r: 3,
+                                                fill: asset.color,
+                                                stroke: "#fff",
                                                 strokeWidth: 2,
                                                 style: { filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.3))' }
                                             }}

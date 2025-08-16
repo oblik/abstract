@@ -410,12 +410,7 @@ const OrderbookAccordionContent = React.forwardRef<
               {
                 forecast && <TabsTrigger
                 value="Graph"
-                className={cn(
-                  "flex-1 p-2 transition-colors duration-300",
-                  forecastGraph
-                    ? "bg-transparent text-pink-500"
-                    : "bg-transparent text-white hover:bg-transparent"
-                )}
+                className="flex-1 px-2 py-2 text-[12px] sm:text-base transition-all duration-300 border-b-2 border-transparent"
               >
                 Graph
               </TabsTrigger>

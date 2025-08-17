@@ -157,12 +157,13 @@ export default function SlideshowLintingCarousel() {
                         ))}
                       {/* Black fadeout at the bottom (lower opacity, more distance) */}
                       <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent rounded-b-md z-30" />
-                      <SelectSeparator className="z-35 my-2" />            
                     </div>
                     
                   )}
                     {/* Event Description at the bottom */}
-                  <div className="flex flex-col items-start gap-1 mb-1 mt-3">
+                  <div className="flex flex-col items-start gap-1 mb-1 mt-2">
+                      <SelectSeparator className="z-400 my-2" />            
+
                       {event.endDate && (
                       <div className="text-xs text-gray-400 flex mt-1 mb-1 items-center gap-1">
                         <svg  width="14" height="14" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="11" r="8"/><path d="M12 6v6l4 2"/></svg>

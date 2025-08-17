@@ -178,7 +178,7 @@ export default function Home({ infoCardCms, categories, tags }) {
             }
 
             {/* Event Cards Section */}
-            <div className={"flex pb-6 justify-center w-full mt-0"}>
+            <div className={"flex pb-6 justify-center w-full mt-1"}>
               <div className="w-full">
                 <EventLinting
                   selectCategory={selectCategory}

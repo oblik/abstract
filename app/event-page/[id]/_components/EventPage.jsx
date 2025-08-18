@@ -54,6 +54,7 @@ import { toFixedDown } from "@/lib/roundOf";
 export default function EventPage({ categories }) {
   const param = useParams();
   const id = param.id;
+  const disContainer = document.getElementById("event-discription")
   const socketContext = useContext(SocketContext);
   const [events, setEvents] = useState([]);
   const [eventsLoading, setEventsLoading] = useState(true);
@@ -75,6 +76,8 @@ export default function EventPage({ categories }) {
   const [showFullText, setShowFullText] = useState(false);
   const [selectCategory, setSelectedCategory] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState({});
+  const [showMore, setShowMore] = useState(false);
+
 
   // Helper functions for price calculation (same as TradingCard)
   const descending = (a, b) => Number(b[0]) - Number(a[0]);
@@ -214,6 +217,20 @@ export default function EventPage({ categories }) {
       console.error("Error fetching PriceHistory:", error);
     }
   };
+
+  const checkOverflow =(container)=> {
+    if (container.scrollHeight > container.clientHeight) {
+      setShowMore(true);
+      setShowFullText(false);
+    } else {
+      setShowMore(false);
+      setShowFullText(true);
+    }
+  }
+
+  useEffect(() => {
+    if(!isEmpty(disContainer)) checkOverflow(disContainer);
+  },[disContainer])
 
   // Get Books Data
   useEffect(() => {
@@ -555,19 +572,21 @@ export default function EventPage({ categories }) {
                       </h3>
                       <SelectSeparator className="my-4" />
                       <div className="sm:text-base pb-0 text-[14px]">
-                        {events?.description?.length > 250 ? (
+                        {/* {events?.description?.length > 250 ? ( */}
                           <div className="space-y-0">
                             <div
+                              id="event-discription"
                               className={`line-clamp-5 transition-all duration-300 ${
                                 showFullText ? "line-clamp-none" : ""
                               }`}
                               style={{ whiteSpace: "pre-line" }}
                             >
-                              {showFullText
+                              {events?.description}
+                              {/* {showFullText
                                 ? events?.description
-                                : events?.description?.slice(0, 250) + " ..."}
+                                : events?.description?.slice(0, 250) + " ..."} */}
                             </div>
-                            <div className="flex items-center justify-between">
+                            {showMore &&<div className="flex items-center justify-between">
                               <Button
                                 variant="link"
                                 onClick={() => setShowFullText(!showFullText)}
@@ -575,11 +594,11 @@ export default function EventPage({ categories }) {
                               >
                                 {showFullText ? "Show Less" : "Show More"}
                               </Button>
-                            </div>
+                            </div>}
                           </div>
-                        ) : (
+                         {/* ) : (
                           events?.description
-                        )}
+                         )} */}
                       </div>
 
                       {events?.status === "closed" && (

@@ -197,7 +197,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 <div className="relative w-full mb-1 group">
                   <Button
                     onClick={handleYesClick}
-                    className="w-full h-12 sm:h-10 bg-[#0d1a26] text-[#7dfdfe] hover:bg-[#0d1a26] transition-colors duration-300 rounded-md border border-transparent relative z-10 capitalize"
+                    className="w-full h-12 sm:h-10 bg-[#0d1a26] text-[#7dfdfe] hover:bg-[#0d1a26] transition-colors duration-300 rounded-md border border-transparent relative z-10"
                   >
                     {yesButtonLabel}
                   </Button>
@@ -240,7 +240,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 <div className="relative w-full mb-1 group">
                   <Button
                     onClick={handleNoClick}
-                    className="w-full h-12 sm:h-10 bg-[#210d1a] text-[#ec4899] hover:bg-[#210d1a] transition-colors duration-300 rounded-md border border-transparent relative z-10 capitalize"
+                    className="w-full h-12 sm:h-10 bg-[#210d1a] text-[#ec4899] hover:bg-[#210d1a] transition-colors duration-300 rounded-md border border-transparent relative z-10 "
                   >
                     {noButtonLabel}
                   </Button>

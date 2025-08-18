@@ -47,6 +47,7 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
   const { signedIn } = useSelector((state) => state?.auth.session);
   const user = useSelector((state) => state?.auth.user);
   const asset = useSelector((state) => state?.wallet?.data);
+  const [orderBtn, setOrderBtn] = useState<boolean>(true);
 
   // state
   const [formValue, setFormValue] = useState<FormState>(initialFormValue);
@@ -167,29 +168,40 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
   }, [activeView, buyorsell, marketId]);
 
   const handlePlaceOrder = async (action: any) => {
-    let activeTab = activeView?.toLowerCase();
-    if (!marketOrderValidation()) {
-      return;
+    try{
+      setOrderBtn(false);
+      let activeTab = activeView?.toLowerCase();
+      if (!marketOrderValidation()) {
+        return;
+      }
+      let data = {
+        price: 0,
+        side: action === "buy" ? activeTab : activeTab === "yes" ? "no" : "yes",
+        userSide: activeTab,
+        action: action,
+        capped: action === "sell" ? true : false,
+        marketId,
+        userId: user?._id,
+        ordVal: action === "buy" ? Number(ordVal) * 100: 0,
+        quantity: action === "sell" ? Number(amount): 0,
+        type: "market",
+      };
+      const { success, message } = await placeOrder(data);
+      if (success) {
+        toastAlert("success", "Order placed successfully!", "order-success");
+        setFormValue(initialFormValue);
+      } else {
+        toastAlert("error", message, "order-failed");
+      }
+      
+
+    }catch(err){
+      console.error("Error placing order:", err);
+
+    }finally{
+      setOrderBtn(true);
     }
-    let data = {
-      price: 0,
-      side: action === "buy" ? activeTab : activeTab === "yes" ? "no" : "yes",
-      userSide: activeTab,
-      action: action,
-      capped: action === "sell" ? true : false,
-      marketId,
-      userId: user?._id,
-      ordVal: action === "buy" ? Number(ordVal) * 100: 0,
-      quantity: action === "sell" ? Number(amount): 0,
-      type: "market",
-    };
-    const { success, message } = await placeOrder(data);
-    if (success) {
-      toastAlert("success", "Order placed successfully!", "order-success");
-      setFormValue(initialFormValue);
-    } else {
-      toastAlert("error", message, "order-failed");
-    }
+
   };
 
   useEffect(() => {
@@ -321,6 +333,7 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
           <Button
             className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300"
             onClick={() => handlePlaceOrder(buyorsell)}
+            disabled={orderBtn ? false : true}
           >
             {`${buyorsell === "buy" ? "Buy" : "Sell"} ${activeView == "Yes" ? (firstLetterCase(outcomes?.[0]?.title || "yes")) : firstLetterCase(outcomes?.[1]?.title || "no")}
             `}

@@ -95,7 +95,7 @@ export default function SlideshowLintingCarousel() {
                             />
                           </div>
                           <div
-                            className="text-xl font-bold text-white max-w-[400px] leading-tight line-clamp-2 flex items-center"
+                            className="text-xl font-bold text-black max-w-[400px] leading-tight line-clamp-2 flex items-center"
                             style={{display: "flex", alignItems: "center" }}
                             title={event.title}
                           >
@@ -117,7 +117,7 @@ export default function SlideshowLintingCarousel() {
                               style={{ textDecoration: 'none' }}
                             >
                               <div
-                                className="flex items-center justify-between w-full bg-black rounded-md px-2 pl-0 py-1 hover:bg-[#0f0f0f] transition-colors cursor-pointer"
+                                className="flex items-center justify-between w-full bg-white rounded-md px-2 pl-0 py-1 hover:bg-[#0f0f0f] transition-colors cursor-pointer"
                               >
                                 <span className="text-sm text-gray-300 max-w-[220px]">
                                   {event.marketId.length === 1
@@ -125,7 +125,7 @@ export default function SlideshowLintingCarousel() {
                                     : (market.groupItemTitle || market.outcome?.[0]?.title || (idx === 0 ? "Yes" : "No"))}
                                 </span>
                                 <span className="flex items-center gap-2 ml-2">
-                                  <span className="text-white text-sm font-bold">
+                                  <span className="text-black text-sm font-bold">
                                     {market.odd !== undefined && market.odd !== null ? market.odd : "--"}%
                                   </span>
                                   {/* Yes/No buttons */}
@@ -168,7 +168,7 @@ export default function SlideshowLintingCarousel() {
                                     </div>
                                   </div>
                                 </span>
-                                <div className="pointer-events-none absolute mb-1 left-0 right-0 bottom-0 h-24 bg-gradient-to-t from-black/50 to-transparent rounded-b-md z-30" />
+                                <div className="pointer-events-none absolute mb-1 left-0 right-0 bottom-0 h-24 bg-gradient-to-t from-white/50 to-transparent rounded-b-md z-30" />
                               </div>
                             </Link>
                           ))}
@@ -182,9 +182,9 @@ export default function SlideshowLintingCarousel() {
                     <div className="flex w-max flex-col items-start gap-1 mb-1 mt-3">
                         {event.endDate && (
                         <div className="text-xs text-gray-400 flex mt-1 mb-1 items-center gap-1">
-                          <svg  width="14" height="14" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="11" r="8"/><path d="M12 6v6l4 2"/></svg>
+                          <svg  width="14" height="14" fill="none" stroke="black" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="11" r="8"/><path d="M12 6v6l4 2"/></svg>
 
-                          <span className="text-white">Market Closes </span>
+                          <span className="text-black">Market Closes </span>
                           {new Date(event.endDate).toLocaleString("en-US", {
                             day: "numeric",
                             month: "short",
@@ -196,8 +196,8 @@ export default function SlideshowLintingCarousel() {
                       )}
                       <div className="text-xs mt-1 mb-1 text-gray-400 flex items-center gap-1">
                         {/* Volume icon */}
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="white"><path d="M4 20h2v-6H4zM8 20h2v-10H8zM12 20h2v-14h-2zM16 20h2v-8h-2z"/></svg>
-                        <span className="text-white">Volume </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="black"><path d="M4 20h2v-6H4zM8 20h2v-10H8zM12 20h2v-14h-2zM16 20h2v-8h-2z"/></svg>
+                        <span className="text-black">Volume </span>
                         <span> ${((event.marketId?.reduce((acc, mark) => acc + (mark.volume || 0), 0) || 0)/100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                       </div>
                     </div>
@@ -205,7 +205,7 @@ export default function SlideshowLintingCarousel() {
                       <div className="w-full pb-6 mt-1 text-xs break-words leading-relaxed" style={{ lineHeight: '1.7' }}>
                         <div className="w-full block" style={{ wordBreak: 'break-word' }}>
                           <p className="w-full text-gray-400 line-clamp-2">
-                            <span className="text-white">Rules </span>
+                            <span className="text-black">Rules </span>
                             {event.description}
                           </p>
                         </div>

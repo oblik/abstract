@@ -90,7 +90,7 @@ export function MultipleOptionCard({
     <Card
       className="flex flex-col w-full h-[180px] justify-between lg:rounded-lg rounded-[11.5px]"
       style={{
-        backgroundColor: "#000000",
+        backgroundColor: "#ffffffff",
         position: "relative",
         zIndex: 1001,
         boxShadow: "0 2px 6px 0 rgba(220,220,255,0.13)",
@@ -117,7 +117,7 @@ export function MultipleOptionCard({
               />
             </div>
 
-            <div className="pl-2 text-[13px]" style={{ marginRight: "8px" }}>
+            <div className="pl-2 text-black text-[13px]" style={{ marginRight: "8px" }}>
               {question}
             </div>
           </div>
@@ -126,7 +126,7 @@ export function MultipleOptionCard({
 
       <CardContent className="pb-0 sm:pl-3 sm:pr-3 pl-3 pr-3 pt-2 sm:pt-3">
         <div className="relative group">
-          <ScrollArea className="sm:h-[75px] h-[70px] group-hover:h-[78px] overflow-hidden top-0 ease-in-out absolute bottom-full left-0 w-full border bg-[#0f0f0f] pb-0 transition-all z-10 duration-200 rounded-sm">
+          <ScrollArea className="sm:h-[75px] h-[70px] group-hover:h-[78px] border-[#4d4d4d] overflow-hidden top-0 ease-in-out absolute bottom-full left-0 w-full border bg-[#ededed] pb-0 transition-all z-10 duration-200 rounded-sm">
             <div className="space-y-1 top-0 pr-2 flex flex-col items-center justify-center px-2 w-full">
               {options?.map((option, index) => {
                 const question =
@@ -148,7 +148,7 @@ export function MultipleOptionCard({
                   >
                     {/* Artist Name Display */}
                     <div
-                      className="text-[12px] w-full mb-0 text-bold pb-0 pt-1"
+                      className="text-[12px] text-[#5c5c5c] w-full mb-0 text-bold pb-0 pt-1"
                       style={{ width: "31%", textAlign: "center" }}
                     >
                       {question}
@@ -242,26 +242,6 @@ export function MultipleOptionCard({
               </CardDescription>
             )}
           </span>
-          <div className="flex gap-2 items-center justify-end">
-            {forecast && (
-              <div className="">
-                <Image
-                  src={SpotifyLogo}
-                  alt="Spotify"
-                  width={20}
-                  height={20}
-                  className="opacity-70 hover:opacity-100 transition-opacity duration-200"
-                />
-              </div>
-            )}
-            {/* <Button
-              className="p-1 h-6 w-6  z-10 rounded"
-              variant="ghost"
-              onClick={handleBookmarkClick}
-            >
-              {bookmarked ? <BookmarkFilledIcon /> : <BookmarkIcon />}
-            </Button> */}
-          </div>
         </div>
       </CardFooter>
     </Card>

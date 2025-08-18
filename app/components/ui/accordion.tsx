@@ -530,7 +530,7 @@ const AccordionContent = React.forwardRef<
               <div className="relative">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="bg-black text-white">
+                    <tr className="bg-white text-black">
                       <th className="text-black p-2 border-b pr-0 mr-0 border-gray-700">
                         Progress
                       </th>
@@ -547,7 +547,7 @@ const AccordionContent = React.forwardRef<
                     {selectedOrderBook[0].map((row, index) => (
                       <tr
                         key={index}
-                        className=" duration-300 ease-in-out bg-black text-white hover:bg-[#0a0a0a]"
+                        className=" duration-300 ease-in-out bg-white text-black hover:bg-[#0a0a0a]"
                       >
                         <td className="p-0 pr-0 mr-0 w-[60%]">
                           <FillAsk value={row.fill} className="w-full" />
@@ -561,17 +561,17 @@ const AccordionContent = React.forwardRef<
                 </table>
 
                 <div className="absolute left-3 flex flex-col gap-10">
-                  <Badge className="w-[50px] text-xs text-white bg-[#ff0000] -translate-y-7">
+                  <Badge className="w-[50px] text-xs text-black bg-[#ff0000] -translate-y-7">
                     Asks
                   </Badge>
-                  <Badge className="w-[50px] z-10 text-xs text-white bg-[#00c735] -translate-y-4">
+                  <Badge className="w-[50px] z-10 text-xs text-black bg-[#00c735] -translate-y-4">
                     Bids
                   </Badge>
                 </div>
 
                 <table className="w-full text-left mt-0">
                   <thead>
-                    <tr className="bg-black text-transparent">
+                    <tr className="bg-white text-transparent">
                       <th className="text-black p-2 border-b pr-0 mr-0 border-gray-700">
                         Progress
                       </th>
@@ -588,7 +588,7 @@ const AccordionContent = React.forwardRef<
                     {selectedOrderBook[1].map((row, index) => (
                       <tr
                         key={index}
-                        className="bg-black text-white hover:bg-[#0a0a0a] duration-300 ease-in-out"
+                        className="bg-white text-black hover:bg-[#0a0a0a] duration-300 ease-in-out"
                       >
                         <td className="hover:bg-[#0a0a0a] p-0 pr-0 mr-0 w-[60%]">
                           <FillBid

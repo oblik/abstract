@@ -822,8 +822,8 @@ export default function PortfolioPage({ categories }) {
 
   return (
     <>
-      <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
-        <div className="sticky top-0 z-50 w-[100%] backdrop-blur-md bg-black/90 border-b border-[#222] lg:mb-4 mb-0" style={{ borderBottomWidth: '1px' }}>
+      <div className="text-black bg-white h-auto items-center justify-items-center p-0 m-0">
+        <div className="sticky top-0 z-50 w-[100%] backdrop-blur-md bg-white/90 border-b border-[#222] lg:mb-4 mb-0" style={{ borderBottomWidth: '1px' }}>
           <Header />
           <NavigationBar
             menuItems={categories}
@@ -848,7 +848,7 @@ export default function PortfolioPage({ categories }) {
           {/* 2. Key metrics card area */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             <div
-              className="flex-1 bg-black rounded-lg p-4 border relative"
+              className="flex-1 bg-white rounded-lg p-4 border relative"
               style={{ boxShadow: "0 2px 6px 0 rgba(220,220,255,0.13)" }}
             >
               <div className="absolute top-4 right-4 bg-[#051505] text-green-400 text-xs px-2 py-1 rounded-md border border-green-400 flex items-center">
@@ -902,7 +902,7 @@ export default function PortfolioPage({ categories }) {
                     <span className="text-green-500">$0.00 (0.00%)</span> Today
                   </span>
                 </div>
-                {/* <Badge className="z-10 text-sm text-white bg-[#00c735] font-normal">
+                {/* <Badge className="z-10 text-sm text-black bg-[#00c735] font-normal">
                   {walletData?.balance
                     ? 
                       PnLFormatted(
@@ -935,7 +935,7 @@ export default function PortfolioPage({ categories }) {
                     <Dialog.Trigger asChild>
                       <Button
                         onClick={() => iniDepsotClick()}
-                        className="w-full flex-1 h-10 px-4 py-2 rounded-md border border-white bg-white text-black hover:bg-gray-300 hover:border-gray-300 transition-colors duration-300 text-sm font-medium flex items-center justify-center"
+                        className="w-full flex-1 h-10 px-4 py-2 rounded-md border border-black bg-white text-black hover:bg-gray-300 hover:border-gray-300 transition-colors duration-300 text-sm font-medium flex items-center justify-center"
                       >
                         <span className="mr-2 text-lg">+</span>
                         Deposit
@@ -986,7 +986,7 @@ export default function PortfolioPage({ categories }) {
                                   >
                                     Wallet {shortText(address)}
                                     {copied && (
-                                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs text-white bg-black px-2 py-0.5 rounded shadow">
+                                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs text-black bg-white px-2 py-0.5 rounded shadow">
                                         Copied!
                                       </span>
                                     )}
@@ -1404,8 +1404,8 @@ export default function PortfolioPage({ categories }) {
 
                 <Dialog.Root open={txopen} onOpenChange={setTxOpen}>
                   <Dialog.Portal>
-                    <Dialog.Overlay className="DialogOverlay fixed inset-0 bg-black/50 z-40" />
-                    <Dialog.Content className="DialogContent fixed z-50 top-1/2 left-1/2 w-[90vw] max-w-md transform -translate-x-1/2 -translate-y-1/2 bg-gray-900 text-white p-6 rounded-2xl shadow-lg">
+                    <Dialog.Overlay className="DialogOverlay fixed inset-0 bg-white/50 z-40" />
+                    <Dialog.Content className="DialogContent fixed z-50 top-1/2 left-1/2 w-[90vw] max-w-md transform -translate-x-1/2 -translate-y-1/2 bg-gray-900 text-black p-6 rounded-2xl shadow-lg">
                       <Dialog.Title className="DialogTitle text-xl font-semibold text-center mb-4">
                         Transaction Completed
                       </Dialog.Title>
@@ -1459,7 +1459,7 @@ export default function PortfolioPage({ categories }) {
 
                       <Dialog.Close asChild>
                         <button
-                          className="modal_close_btn absolute top-4 right-4 text-white hover:text-gray-400"
+                          className="modal_close_btn absolute top-4 right-4 text-black hover:text-gray-400"
                           aria-label="Close"
                         >
                           <Cross2Icon />
@@ -1473,7 +1473,7 @@ export default function PortfolioPage({ categories }) {
               </div>
             </div>
             <div
-              className="flex-1 bg-black rounded-lg p-4 flex flex-col justify-between border relative"
+              className="flex-1 bg-white rounded-lg p-4 flex flex-col justify-between border relative"
               style={{ boxShadow: "0 2px 6px 0 rgba(220,220,255,0.13)" }}
             >
               <div className="flex items-start justify-between flex-wrap">
@@ -1528,13 +1528,13 @@ export default function PortfolioPage({ categories }) {
             <TabsContent value="positions">
               {/* <div className="flex space-x-4 mb-3">
                 <SearchBar placeholder="Search" />
-                <select className="border bg-[#131212] border-[#262626] bg-black rounded p-1 text-sm">
+                <select className="border bg-[#131212] border-[#262626] bg-white rounded p-1 text-sm">
                   <option>Current value</option>
                   <option>Initial value</option>
                   <option>Return ($)</option>
                   <option>Return %</option>
                 </select>
-                <select className="border border-[#262626] bg-black rounded p-1 text-sm">
+                <select className="border border-[#262626] bg-white rounded p-1 text-sm">
                   <option>All</option>
                   <option>Live</option>
                   <option>Ended</option>
@@ -1763,7 +1763,7 @@ export default function PortfolioPage({ categories }) {
             <TabsContent value="openorders">
               {/* <div className="flex space-x-4 mb-3">
                 <SearchBar placeholder="Search" />
-                <select className="border bg-[#131212] border-[#262626] bg-black rounded p-1 text-sm">
+                <select className="border bg-[#131212] border-[#262626] bg-white rounded p-1 text-sm">
                   <option>Market</option>
                   <option>Filled Quantity</option>
                   <option>Total Quantity</option>
@@ -1807,14 +1807,14 @@ export default function PortfolioPage({ categories }) {
                   }}
                   className="custom_datepicker"
                 />
-                <select className="border border-[#262626] bg-black rounded p-1 text-sm">
+                <select className="border border-[#262626] bg-white rounded p-1 text-sm">
                   <option>All</option>
                   <option>All Trades</option>
                   <option>Buy</option>
                   <option>Sell</option>
                   <option>Reward</option>
                 </select>
-                <select className="border bg-[#131212] border-[#262626] bg-black rounded p-1 text-sm">
+                <select className="border bg-[#131212] border-[#262626] bg-white rounded p-1 text-sm">
                   <option>Newest</option>
                   <option>Oldest</option>
                   <option>Value</option>

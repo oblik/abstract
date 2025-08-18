@@ -162,7 +162,7 @@ export function TradingCardSingle({
                           <span className="text-muted-foreground">
                             Potential return if
                           </span>
-                          <span className="text-white"> Yes </span>
+                          <span className="text-black"> Yes </span>
                           <span className="text-muted-foreground"> wins</span>
                         </div>
                         <span className="text-foreground">$500.00</span>{" "}
@@ -171,7 +171,7 @@ export function TradingCardSingle({
                     </div>
 
                     <div className="pt-4">
-                      <Button className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300">
+                      <Button className="w-full border border-black bg-transparent text-black hover:bg-white hover:text-black transition-colors duration-300">
                         Place Trade
                       </Button>
                     </div>
@@ -205,7 +205,7 @@ export function TradingCardSingle({
                           <span className="text-muted-foreground">
                             Potential return if
                           </span>
-                          <span className="text-white"> No </span>
+                          <span className="text-black"> No </span>
                           <span className="text-muted-foreground"> wins</span>
                         </div>
                         <span className="text-foreground">$500.00</span>{" "}
@@ -214,7 +214,7 @@ export function TradingCardSingle({
                     </div>
 
                     <div className="pt-4">
-                      <Button className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300">
+                      <Button className="w-full border border-black bg-transparent text-black hover:bg-white hover:text-black transition-colors duration-300">
                         Place Trade
                       </Button>
                     </div>
@@ -258,7 +258,7 @@ export function TradingCardSingle({
                           <span className="text-muted-foreground">
                             Average price return per
                           </span>
-                          <span className="text-white"> Yes</span>
+                          <span className="text-black"> Yes</span>
                         </div>
                         <span className="text-foreground">$500.00</span>{" "}
                         {/* Replace with actual number */}
@@ -275,7 +275,7 @@ export function TradingCardSingle({
                     </div>
 
                     <div className="pt-4">
-                      <Button className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300">
+                      <Button className="w-full border border-black bg-transparent text-black hover:bg-white hover:text-black transition-colors duration-300">
                         Place Trade
                       </Button>
                     </div>
@@ -293,7 +293,7 @@ export function TradingCardSingle({
                           <span className="text-muted-foreground">
                             Average price return per
                           </span>
-                          <span className="text-white"> No</span>
+                          <span className="text-black"> No</span>
                         </div>
                         <span className="text-foreground">$500.00</span>{" "}
                         {/* Replace with actual number */}
@@ -310,7 +310,7 @@ export function TradingCardSingle({
                     </div>
 
                     <div className="pt-4">
-                      <Button className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300">
+                      <Button className="w-full border border-black bg-transparent text-black hover:bg-white hover:text-black transition-colors duration-300">
                         Place Trade
                       </Button>
                     </div>

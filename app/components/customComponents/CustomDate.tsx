@@ -49,7 +49,7 @@ const CustomDateComponent: React.FC<CustomDateProps> = (props) => {
   return (
     <Dialog.Root open={showCustomDialog} onOpenChange={setShowCustomDialog}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/50 z-40" />
+        <Dialog.Overlay className="fixed inset-0 bg-white/50 z-40" />
         <Dialog.Content className="fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#181818] p-6 rounded-lg w-full max-w-md shadow-lg">
           <Dialog.Title className="text-lg font-bold mb-4 text-center">
             Set Custom Expiry

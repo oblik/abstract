@@ -77,7 +77,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
     }
     if (active && payload && payload.length) {
         return (
-            <div className="bg-transparent p-2 border border-transparent rounded shadow text-white">
+            <div className="bg-transparent p-2 border border-transparent rounded shadow text-black">
                 <p className="text-sm font-semibold">{formattedLabel}</p>
                 {payload.map(
                     (entry, index) =>
@@ -142,7 +142,7 @@ const ChartWidget: React.FC<ChartProps> = ({
         const tooltipTitle = inverted ? title2 : title1;
         if (active && payload && payload.length) {
             return (
-                <div className="bg-transparent p-2 border border-transparent rounded shadow text-white">
+                <div className="bg-transparent p-2 border border-transparent rounded shadow text-black">
                     <p className="text-sm font-semibold">{formattedLabel}</p>
                     {payload.map(
                         (entry, index) =>
@@ -627,7 +627,7 @@ const ChartWidget: React.FC<ChartProps> = ({
                                         key={event.slug} 
                                         // href={`/event-page/${event.slug}`}
                                         onClick={()=>route.push(`/event-page/${event.slug}`)}
-                                        className="w-[90px] rounded-full bg-transparent border border-[#262626] text-white hover:bg-[#262626] hover:text-white active:bg-[#262626] active:text-white text-center px-2 py-1 block text-sm"
+                                        className="w-[90px] rounded-full bg-transparent border border-[#262626] text-black hover:bg-[#262626] hover:text-black active:bg-[#262626] active:text-black text-center px-2 py-1 block text-sm"
                                     >
                                         {momentFormat(event?.endDate,"D MMM")}
                                     </div>
@@ -663,14 +663,14 @@ const ChartWidget: React.FC<ChartProps> = ({
                             <div className="flex items-center gap-2">
                               <button
                                 type="button"
-                                className={'bg-black'}
+                                className={'bg-white'}
                                 onClick={() => setInverted((prev) => !prev)}
                                 title="Invert graph"
                               >
                                 <ArrowRightLeft size={15} />
                               </button>
                               {displayTitle && (
-                                <span className="text-m font-light ml-2 text-white">
+                                <span className="text-m font-light ml-2 text-black">
                                   {displayTitle}
                                 </span>
                               )}

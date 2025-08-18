@@ -417,7 +417,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
             <div className="flex justify-between text-sm">
               <div>
                 <span className="text-muted-foreground">Total return if</span>
-                <span className="text-white">
+                <span className="text-black">
                   {" "}
                   {` ${
                     activeView == "Yes"
@@ -449,7 +449,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
       <div className="pt-4">
         {signedIn ? (
           <Button
-            className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300"
+            className="w-full border border-black bg-transparent text-black hover:bg-white hover:text-black transition-colors duration-300"
             onClick={() => handlePlaceOrder(buyorsell)}
           >
             {`${buyorsell === "buy" ? "Buy" : "Sell"} ${
@@ -459,7 +459,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
             }`}
           </Button>
         ) : (
-          <Button className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300">
+          <Button className="w-full border border-black bg-transparent text-black hover:bg-white hover:text-black transition-colors duration-300">
             Login
           </Button>
         )}

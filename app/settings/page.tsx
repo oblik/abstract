@@ -97,8 +97,8 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
-      <div  className="sticky top-0 z-50 w-[100%] bg-black lg:bg-transparent backdrop-blur-0 lg:backdrop-blur-md border-b border-[#222] lg:mb-4 mb-0 pb-2" style={{ borderBottomWidth: '1px' }}>
+    <div className="text-black bg-white h-auto items-center justify-items-center p-0 m-0">
+      <div  className="sticky top-0 z-50 w-[100%] bg-white lg:bg-transparent backdrop-blur-0 lg:backdrop-blur-md border-b border-[#222] lg:mb-4 mb-0 pb-2" style={{ borderBottomWidth: '1px' }}>
         <Header />
       </div>
 

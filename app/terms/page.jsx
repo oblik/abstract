@@ -183,9 +183,9 @@ export default function Home() {
   }, [selectCategory]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-black text-white h-auto items-center justify-items-center p-0 m-0">
+    <div className="min-h-screen flex flex-col bg-white text-black h-auto items-center justify-items-center p-0 m-0">
       {/* Header */}
-      <div  className="sticky top-0 z-50 w-[100%] bg-black lg:bg-transparent backdrop-blur-0 lg:backdrop-blur-md border-b border-[#222] lg:mb-4 mb-0 pb-2" style={{ borderBottomWidth: '1px' }}>
+      <div  className="sticky top-0 z-50 w-[100%] bg-white lg:bg-transparent backdrop-blur-0 lg:backdrop-blur-md border-b border-[#222] lg:mb-4 mb-0 pb-2" style={{ borderBottomWidth: '1px' }}>
         <Header />
         <NavigationBar
           menuItems={navigationItems}
@@ -197,7 +197,7 @@ export default function Home() {
       {/* <Header /> */}
 
       {/* Features Section */}
-      <section className="py-10 bg-black">
+      <section className="py-10 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold">Terms & Conditions</h2>
           <h3 className="text-2xl font-semibold my-4">

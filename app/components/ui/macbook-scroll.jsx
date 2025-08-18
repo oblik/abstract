@@ -102,7 +102,7 @@ export const MacbookScroll = ({ src, showGradient, title, badge }) => {
 
         <div className="h-2 w-20 mx-auto inset-x-0 absolute bottom-0 bg-gradient-to-t from-[#272729] to-[#050505] rounded-tr-3xl rounded-tl-3xl" />
         {showGradient && (
-          <div className="h-40 w-full absolute bottom-0 inset-x-0 bg-gradient-to-t dark:from-black from-white via-white dark:via-black to-transparent z-50" />
+          <div className="h-40 w-full absolute bottom-0 inset-x-0 bg-gradient-to-t dark:from-black from-black via-black dark:via-black to-transparent z-50" />
         )}
         {badge && <div className="absolute bottom-4 left-4">{badge}</div>}
       </div>
@@ -134,7 +134,7 @@ export const Lid = ({
           }}
           className="absolute inset-0 bg-[#010101] rounded-lg flex items-center justify-center"
         >
-          <span className="text-white">
+          <span className="text-black">
             {/* <AceternityLogo /> */}
           </span>
         </div>
@@ -235,7 +235,7 @@ export const Keypad = () => {
         </KBtn>
         <KBtn>
           <div className="h-4 w-4 rounded-full  bg-gradient-to-b from-20% from-neutral-900 via-black via-50% to-neutral-900 to-95% p-px">
-            <div className="bg-black h-full w-full rounded-full" />
+            <div className="bg-white h-full w-full rounded-full" />
           </div>
         </KBtn>
       </Row>
@@ -534,7 +534,7 @@ export const KBtn = ({
     <div
       className={cn(
         "p-[0.5px] rounded-[4px]",
-        backlit && "bg-white/[0.2] shadow-xl shadow-white"
+        backlit && "bg-white/[0.2] shadow-xl shadow-black"
       )}
     >
       <div
@@ -551,7 +551,7 @@ export const KBtn = ({
           className={cn(
             "text-neutral-200 text-[5px] w-full flex justify-center items-center flex-col",
             childrenClassName,
-            backlit && "text-white"
+            backlit && "text-black"
           )}
         >
           {children}

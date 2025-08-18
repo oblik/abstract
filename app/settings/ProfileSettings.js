@@ -165,7 +165,7 @@ export default function ProfileSettings() {
                 </p>
                 <Button
                     onClick={() => router.push("/")}
-                    className="text-white px-4 py-2 hover:bg-gray-800 transition duration-300 h-[95%] bg-blue-500"
+                    className="text-black px-4 py-2 hover:bg-gray-800 transition duration-300 h-[95%] bg-blue-500"
                 >
                     Back to Home
                 </Button>
@@ -222,7 +222,7 @@ export default function ProfileSettings() {
                     id="username"
                     value={username}
                     onChange={handleUsernameChange}
-                    className="bg-black border-[#252525] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+                    className="bg-white border-[#252525] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
                     placeholder="Set a unique username (letters, numbers, underscore only)"
                     disabled={isDisable}
                 />
@@ -239,7 +239,7 @@ export default function ProfileSettings() {
                     id="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="bg-black border-[#252525] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none "
+                    className="bg-white border-[#252525] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none "
                     placeholder="Your name (optional)"
                 />
                 </div>
@@ -250,7 +250,7 @@ export default function ProfileSettings() {
                     id="bio"
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
-                    className="w-full bg-black border border-[#252525] rounded-md p-2 text-white"
+                    className="w-full bg-white border border-[#252525] rounded-md p-2 text-black"
                     placeholder="Tell us about yourself... (optional)"
                     rows={3}
                 />
@@ -260,7 +260,7 @@ export default function ProfileSettings() {
                 <Button
                     type="submit"
                     disabled={saving || !!usernameError || saved}
-                    className="border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300"
+                    className="border border-black bg-transparent text-black hover:bg-white hover:text-black transition-colors duration-300"
                 >
                     {saving ? (
                     "Saving..."

@@ -457,7 +457,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                   return (
                                     <div
                                       key={index}
-                                      className="flex items-center text-[12px] sm:text-base h-[35px] w-full justify-between duration-300 ease-in-out bg-black text-white hover:bg-[#240000] z-20 relative cursor-pointer"
+                                      className="flex items-center text-[12px] sm:text-base h-[35px] w-full justify-between duration-300 ease-in-out bg-white text-black hover:bg-[#240000] z-20 relative cursor-pointer"
                                       onClick={() => setSelectedOrder({ 
                                         side: activeView, 
                                         row, 
@@ -510,7 +510,7 @@ const OrderbookAccordionContent = React.forwardRef<
                               {/* Asks badge */}
                               {asks.length > 0 && (
                                 <div className="flex w-full">
-                                  <Badge className="w-[50px] text-xs text-white bg-[#ff0000] mb-1 absolute bottom-0 left-5 z-30 flex items-center justify-center px-3">
+                                  <Badge className="w-[50px] text-xs text-black bg-[#ff0000] mb-1 absolute bottom-0 left-5 z-30 flex items-center justify-center px-3">
                                     Asks
                                   </Badge>
                                 </div>
@@ -536,7 +536,7 @@ const OrderbookAccordionContent = React.forwardRef<
                             <div className="relative w-full">
                               {bids.length > 0 && (
                                 <div className="flex w-full">
-                                  <Badge className="w-[50px] text-xs text-white bg-[#00c735] mt-1 mb-1 absolute top-0 left-5 z-30 flex items-center justify-center px-3">
+                                  <Badge className="w-[50px] text-xs text-black bg-[#00c735] mt-1 mb-1 absolute top-0 left-5 z-30 flex items-center justify-center px-3">
                                     Bids
                                   </Badge>
                                 </div>
@@ -550,7 +550,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                   return (
                                     <div
                                       key={index}
-                                      className="flex items-center text-[12px] sm:text-base h-[35px] w-full justify-between bg-black text-white duration-300 ease-in-out hover:bg-[#001202] z-20 relative cursor-pointer"
+                                      className="flex items-center text-[12px] sm:text-base h-[35px] w-full justify-between bg-white text-black duration-300 ease-in-out hover:bg-[#001202] z-20 relative cursor-pointer"
                                       onClick={() => setSelectedOrder({ 
                                         side: activeView, 
                                         row, 

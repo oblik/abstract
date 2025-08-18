@@ -102,7 +102,7 @@ export function ImageCard({
     >
       {/* Dark Overlay */}
       <div
-        className="absolute inset-0 bg-black bg-opacity-25 z-0"
+        className="absolute inset-0 bg-white bg-opacity-25 z-0"
         style={{
           pointerEvents: "none", // Prevents the overlay from blocking clicks
         }}

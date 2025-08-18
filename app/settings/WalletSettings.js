@@ -129,7 +129,7 @@ export default function WalletSettings() {
               <div className="text-center">
                 <Button
                   type="submit"
-                  className="border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300"
+                  className="border border-black bg-transparent text-black hover:bg-white hover:text-black transition-colors duration-300"
                   onClick={handleSaveChanges}
                 >
                   Save Changes

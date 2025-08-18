@@ -183,14 +183,14 @@ export default function Home() {
     }, [selectCategory]);
     
   return (
-    <div className="min-h-screen flex flex-col bg-black text-white h-auto items-center justify-items-center p-0 m-0">
+    <div className="min-h-screen flex flex-col bg-white text-black h-auto items-center justify-items-center p-0 m-0">
       {/* Header */}
       {/* <Link href="/">
       <header className="mbp-header pl-4 pt-4 pb-8">
         <Image src={SONOTRADE} alt="SONOTRADE Logo" width={220} priority />
       </header>
       </Link> */}
-      <div  className="sticky top-0 z-50 w-[100%] bg-black lg:bg-transparent backdrop-blur-0 lg:backdrop-blur-md border-b border-[#222] lg:mb-4 mb-0 pb-2" style={{ borderBottomWidth: '1px' }}>
+      <div  className="sticky top-0 z-50 w-[100%] bg-white lg:bg-transparent backdrop-blur-0 lg:backdrop-blur-md border-b border-[#222] lg:mb-4 mb-0 pb-2" style={{ borderBottomWidth: '1px' }}>
         <Header />
         <NavigationBar
           menuItems={navigationItems}
@@ -220,7 +220,7 @@ export default function Home() {
       </main>
 
       {/* Features Section */}
-      <section className="py-10 bg-black">
+      <section className="py-10 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           {FEATURES.map((feature, index) => (
             <FeatureItem

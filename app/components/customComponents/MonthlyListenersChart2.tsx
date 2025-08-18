@@ -138,7 +138,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
     
     if (active && payload && payload.length) {
       return (
-        <div className="bg-transparent p-2 border border-transparent rounded shadow text-white">
+        <div className="bg-transparent p-2 border border-transparent rounded shadow text-black">
           <p className="text-sm font-semibold">{formattedLabel}</p>
           {payload.map(
             (entry, index) =>

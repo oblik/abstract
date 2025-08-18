@@ -135,7 +135,7 @@ const WithdrawTable = () => {
                                 >
                                     {shortText(withdraw?.from)}
                                     {copiedRowId === index && (
-                                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs text-white bg-black px-2 py-0.5 rounded shadow">
+                                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs text-black bg-white px-2 py-0.5 rounded shadow">
                                             Copied!
                                         </span>
                                     )}
@@ -146,7 +146,7 @@ const WithdrawTable = () => {
                                 >
                                     {shortText(withdraw?.to)}
                                     {copiedRowId1 === index && (
-                                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs text-white bg-black px-2 py-0.5 rounded shadow">
+                                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs text-black bg-white px-2 py-0.5 rounded shadow">
                                             Copied!
                                         </span>
                                     )}
@@ -170,7 +170,7 @@ const WithdrawTable = () => {
                                     {withdraw?.status === "rejected" ?
                                         <>
                                             {withdraw?.reason?.length > 5 ? `${withdraw?.reason.slice(0, 5)}...` : withdraw?.reason}
-                                            <div className="absolute z-10 hidden group-hover:block bottom-full left-1/2 -translate-x-1/2 mb-1 w-48 p-2 text-sm text-white bg-black rounded shadow-lg">
+                                            <div className="absolute z-10 hidden group-hover:block bottom-full left-1/2 -translate-x-1/2 mb-1 w-48 p-2 text-sm text-black bg-white rounded shadow-lg">
                                                 {withdraw?.reason}
                                             </div>
                                         </> : "-"}

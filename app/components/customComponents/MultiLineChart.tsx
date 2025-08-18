@@ -160,7 +160,7 @@ export default function MultiLineChart({
   const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-transparent p-2 border border-transparent rounded shadow text-white">
+        <div className="bg-transparent p-2 border border-transparent rounded shadow text-black">
           <p className="text-sm font-semibold">{label}</p>
           {payload.map(
             (entry, index) =>

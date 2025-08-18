@@ -109,7 +109,7 @@ export function TradingCard({ title, volume, image, activeView, setActiveView })
                     </div>
 
                     <div className="pt-4">
-                      <Button className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300">
+                      <Button className="w-full border border-black bg-transparent text-black hover:bg-white hover:text-black transition-colors duration-300">
                         Place Trade
                       </Button>
                     </div>
@@ -152,7 +152,7 @@ export function TradingCard({ title, volume, image, activeView, setActiveView })
                     </div>
 
                     <div className="pt-4">
-                      <Button className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300">
+                      <Button className="w-full border border-black bg-transparent text-black hover:bg-white hover:text-black transition-colors duration-300">
                         Place Trade
                       </Button>
                     </div>
@@ -201,7 +201,7 @@ export function TradingCard({ title, volume, image, activeView, setActiveView })
                     </div>
 
                     <div className="pt-4">
-                      <Button className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300">
+                      <Button className="w-full border border-black bg-transparent text-black hover:bg-white hover:text-black transition-colors duration-300">
                         Place Trade
                       </Button>
                     </div>
@@ -236,7 +236,7 @@ export function TradingCard({ title, volume, image, activeView, setActiveView })
                     </div>
 
                     <div className="pt-4">
-                      <Button className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300">
+                      <Button className="w-full border border-black bg-transparent text-black hover:bg-white hover:text-black transition-colors duration-300">
                         Place Trade
                       </Button>
                     </div>

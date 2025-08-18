@@ -14,8 +14,8 @@ export const Footer: React.FC = () => {
   }, []);
 
   return (
-    // Footer with black background and white text
-    <div className="w-full py-10 lg:py-20 bg-black text-white">
+    // Footer with black background and black text
+    <div className="w-full py-10 lg:py-20 bg-white text-black">
       <div className="mx-auto px-4">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
@@ -25,7 +25,7 @@ export const Footer: React.FC = () => {
               <h2 className="text-2xl md:text-4xl tracking-tighter font-regular">
                 Sonotrade
               </h2>
-              <p className="text-base md:text-lg leading-relaxed tracking-tight text-white/75">
+              <p className="text-base md:text-lg leading-relaxed tracking-tight text-black/75">
                 The future of music
               </p>
             </div>
@@ -40,7 +40,7 @@ export const Footer: React.FC = () => {
         <div className="mt-10 border-t border-gray-800"></div>
 
         {/* Bottom Section */}
-        <div className="mt-6 pt-6 flex flex-col md:flex-row items-center justify-between text-sm text-white/75">
+        <div className="mt-6 pt-6 flex flex-col md:flex-row items-center justify-between text-sm text-black/75">
           <span>© {currentYear} Sonotrade</span>
           <div className="flex flex-wrap items-center gap-2 mt-4 md:mt-0">
             <Link href="/about" className="hover:underline">

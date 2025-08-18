@@ -217,7 +217,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
         {/* Horizontal category list with arrows */}
         <div className="flex items-center w-full mx-4">
           {/* <button
-            className="p-2 text-white bg-[transparent] mr-2 disabled:opacity-0"
+            className="p-2 text-black bg-[transparent] mr-2 disabled:opacity-0"
             onClick={() => {
               categoryListRef.current?.scrollBy({
                 left: -150,
@@ -239,9 +239,9 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
           >
             <div
               className={cn(
-                "px-3 py-1 rounded-md transition-colors text-xs sm:text-sm font-medium whitespace-nowrap text-left pl-0 cursor-pointer",
+                "px-3 py-1 rounded-md transition-colors text-xs sm:text-sm font-medium blackspace-nowrap text-left pl-0 cursor-pointer",
                 "text-[#666] hover:text-gray-400",
-                selectedCategory === "all" && "text-white"
+                selectedCategory === "all" && "text-black"
               )}
               onClick={() => handleCategoryClick("all")}
               style={{
@@ -255,9 +255,9 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
                 <div
                   key={item.title}
                   className={cn(
-                    "px-3 py-1 rounded-md transition-colors text-xs sm:text-sm font-medium whitespace-nowrap text-left pl-0 cursor-pointer",
+                    "px-3 py-1 rounded-md transition-colors text-xs sm:text-sm font-medium blackspace-nowrap text-left pl-0 cursor-pointer",
                     "text-[#666] hover:text-gray-400",
-                    selectedCategory === item.slug && "text-white"
+                    selectedCategory === item.slug && "text-black"
                   )}
                   onClick={() => router.push(`/?category=${item.slug}`)}
                   style={{
@@ -270,7 +270,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
           </div>
 
           {/* <button
-            className="p-2 text-white bg-[transparent] ml-2 disabled:opacity-0"
+            className="p-2 text-black bg-[transparent] ml-2 disabled:opacity-0"
             onClick={() => {
               categoryListRef.current?.scrollBy({
                 left: 150,
@@ -286,7 +286,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
         </div>
       </div>
       {/* Right fade overlay positioned at the edge of the scroll area */}
-      <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-black to-transparent"></div>
+      <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-white to-transparent"></div>
     </div>
   );
 };

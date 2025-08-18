@@ -245,13 +245,13 @@ const Positions = (props) => {
     <>
       {/* <div className="flex space-x-4 mb-3">
             <SearchBar placeholder="Search" />
-            <select className="border bg-[#131212] border-[#262626] bg-black rounded p-1 text-sm">
+            <select className="border bg-[#131212] border-[#262626] bg-white rounded p-1 text-sm">
                 <option>Current value</option>
                 <option>Initial value</option>
                 <option>Return ($)</option>
                 <option>Return %</option>
             </select>
-            <select className="border border-[#262626] bg-black rounded p-1 text-sm">
+            <select className="border border-[#262626] bg-white rounded p-1 text-sm">
                 <option>All</option>
                 <option>Live</option>
                 <option>Ended</option>
@@ -301,7 +301,7 @@ const Positions = (props) => {
                           {
                             item?.positions.length == 1 && (
                               <button
-                                className="text-gray-400 hover:text-white transition-colors duration-300"
+                                className="text-gray-400 hover:text-black transition-colors duration-300"
                                 onClick={() =>
                                   handleTradeOpen(
                                     item?.positions[0]?.marketId,
@@ -314,7 +314,7 @@ const Positions = (props) => {
                             )
                           }
                           <button
-                            className="text-gray-400 hover:text-white transition-colors duration-300"
+                            className="text-gray-400 hover:text-black transition-colors duration-300"
                             onClick={() => handleShareOpen(item)}
                           >
                             <ShareIcon className="w-5 h-5" />
@@ -401,7 +401,7 @@ const Positions = (props) => {
                           {
                             item?.positions.length > 1 && (
                               <button
-                                className="text-gray-400 hover:text-white transition-colors duration-300"
+                                className="text-gray-400 hover:text-black transition-colors duration-300"
                                 onClick={() =>
                                   handleTradeOpen(data?.marketId, data?.outcomes)
                                 }

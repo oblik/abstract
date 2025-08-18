@@ -32,12 +32,12 @@ const UsernameModal = ({
         <Dialog.Portal>
           <Dialog.Overlay className="DialogOverlay" />
           <Dialog.Content className="DialogContent">
-            <Dialog.Title className="DialogTitle text-lg font-bold mb-4 text-white">
+            <Dialog.Title className="DialogTitle text-lg font-bold mb-4 text-black">
               Update Username
             </Dialog.Title>
-              {/* <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"> */}
+              {/* <div className="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50"> */}
               {/* <div className="rounded-lg p-6 w-96 shadow-lg"> */}
-              {/* <h2 className="text-lg font-bold mb-4 text-white">Update Username</h2> */}
+              {/* <h2 className="text-lg font-bold mb-4 text-black">Update Username</h2> */}
               <p className="text-sm text-gray-400 mb-4">
                 Please enter your username to comment.
               </p>
@@ -46,7 +46,7 @@ const UsernameModal = ({
                 value={username}
                 onChange={(e) => {setUsername(e.target.value), setError("")}}
                 placeholder="Enter your username"
-                className="w-full px-3 py-2 bg-gray-700 text-white rounded mb-4  focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+                className="w-full px-3 py-2 bg-gray-700 text-black rounded mb-4  focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
               />
               {error && (
                 <p className="text-red-500 text-sm mb-4">{error}</p>
@@ -54,13 +54,13 @@ const UsernameModal = ({
               <div className="flex justify-end gap-2">
                 <button
                   onClick={onClose}
-                  className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors"
+                  className="px-4 py-2 bg-gray-700 text-black rounded hover:bg-gray-600 transition-colors"
                 >
                   Close
                 </button>
                 <button
                   onClick={handleSave}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                  className="px-4 py-2 bg-blue-500 text-black rounded hover:bg-blue-600 transition-colors"
                 >
                   Save
                 </button>

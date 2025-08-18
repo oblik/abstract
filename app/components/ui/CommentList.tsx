@@ -107,7 +107,7 @@ const CommentList: React.FC<CommentListProps> = (props) => {
                                 <>
                                     <button
                                         onClick={() => toggleReplies(comment._id)}
-                                        className="text-xs text-gray-400 hover:text-white ml-10 mt-0 sm:mt-1 flex items-center"
+                                        className="text-xs text-gray-400 hover:text-black ml-10 mt-0 sm:mt-1 flex items-center"
                                     >
                                         {expandedComments[comment._id] ? 'Hide' : 'Show'} {repliesForComment.length} {repliesForComment.length === 1 ? 'reply' : 'replies'}
                                     </button>

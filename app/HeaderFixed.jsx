@@ -62,7 +62,7 @@ export default function HeaderFixed() {
       {/* Drawer Overlay */}
       <div
         className={cn(
-          "fixed inset-0 bg-black z-[99999] transition-opacity duration-200",
+          "fixed inset-0 bg-white z-[99999] transition-opacity duration-200",
           isOpen || isSearchOpen
             ? "opacity-80 pointer-events-auto"
             : "opacity-0 pointer-events-none"
@@ -76,14 +76,14 @@ export default function HeaderFixed() {
       {/* Side Drawer */}
       <div
         className={cn(
-          "fixed top-0 left-0 w-[85vw] max-w-[320px] h-full bg-black z-[99999] shadow-2xl transition-transform duration-200 ease-in-out will-change-transform border-r",
+          "fixed top-0 left-0 w-[85vw] max-w-[320px] h-full bg-white z-[99999] shadow-2xl transition-transform duration-200 ease-in-out will-change-transform border-r",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
         style={{ borderRight: '1px solid #282828' }}
       >
         {/* Close Button */}
         {/* <button
-          className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl"
+          className="absolute top-4 right-4 text-gray-400 hover:text-black text-2xl"
           onClick={() => setIsOpen(false)}
         >
           &times;
@@ -120,7 +120,7 @@ export default function HeaderFixed() {
           {signedIn && (
             <Link
               href="/settings"
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm hover:bg-[#232b3a] transition"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-black text-sm hover:bg-[#232b3a] transition"
               onClick={() => setIsOpen(false)}
             >
               Settings
@@ -130,27 +130,27 @@ export default function HeaderFixed() {
             href="https://sonotrade.gitbook.io/sonotrade-docs/#overview"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm hover:bg-[#232b3a] transition"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-black text-sm hover:bg-[#232b3a] transition"
           >
             Beginner’s Guide
           </Link>
           <Link
             href="/about"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm hover:bg-[#232b3a] transition"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-black text-sm hover:bg-[#232b3a] transition"
             onClick={() => setIsOpen(false)}
           >
             About
           </Link>
           <Link
             href="/"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm hover:bg-[#232b3a] transition"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-black text-sm hover:bg-[#232b3a] transition"
             onClick={() => setIsOpen(false)}
           >
             Waitlist
           </Link>
           <Link
             href="/terms"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm hover:bg-[#232b3a] transition"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-black text-sm hover:bg-[#232b3a] transition"
             onClick={() => setIsOpen(false)}
           >
             Terms of Use
@@ -170,9 +170,9 @@ export default function HeaderFixed() {
 
           {/* Main Content */}
           <div className="flex justify-between items-center px-4 py-3 border-b border-[#232b3a]">
-            <span className="text-lg font-semibold text-white">Search</span>
+            <span className="text-lg font-semibold text-black">Search</span>
             <button
-              className="text-gray-400 hover:text-white text-2xl"
+              className="text-gray-400 hover:text-black text-2xl"
               onClick={() => setIsSearchOpen(false)}
             >
               &times;
@@ -185,12 +185,12 @@ export default function HeaderFixed() {
       </Drawer>
 
       {/* Bottom Nav */}
-      <div className="bottom-nav-fixed h-16 flex lg:hidden bg-black border-t border-[#1E1E1E] z-[9999] px-8 md:px-20">
+      <div className="bottom-nav-fixed h-16 flex lg:hidden bg-white border-t border-[#1E1E1E] z-[9999] px-8 md:px-20">
         <Link
           href="/"
           className={cn(
             "w-9 h-9 flex flex-col items-center gap-1",
-            activeMenu === "home" ? "text-white" : "text-gray-500"
+            activeMenu === "home" ? "text-black" : "text-gray-500"
           )}
           onClick={() => setActiveMenu("home")}
         >
@@ -198,7 +198,7 @@ export default function HeaderFixed() {
           <span className="text-xs font-normal">Home</span>
         </Link>
         <button
-          className="w-9 h-9 flex flex-col items-center gap-1 text-gray-500 hover:text-white focus:text-white"
+          className="w-9 h-9 flex flex-col items-center gap-1 text-gray-500 hover:text-black focus:text-black"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -217,7 +217,7 @@ export default function HeaderFixed() {
           href={"/profile/@" + user.uniqueId}
           className={cn(
             "w-9 h-9 flex flex-col items-center gap-1",
-            activeMenu === "profile" ? "text-white" : "text-zinc-600"
+            activeMenu === "profile" ? "text-black" : "text-zinc-600"
           )}
           onClick={() => setActiveMenu("profile")}
         >
@@ -230,7 +230,7 @@ export default function HeaderFixed() {
             setIsOpen(!isOpen);
             setIsSearchOpen(false);
           }}
-          className="w-9 h-9 flex flex-col items-center gap-1 text-gray-500 hover:text-white focus:text-white"
+          className="w-9 h-9 flex flex-col items-center gap-1 text-gray-500 hover:text-black focus:text-black"
         >
           {!isOpen ? (
             <HamburgerMenuIcon className="w-6 h-6" />

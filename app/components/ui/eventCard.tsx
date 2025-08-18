@@ -83,9 +83,9 @@ const EventCard: React.FC<EventCardProps> = ({
 
   return (
     <Card
-      className="flex flex-col justify-between w-full h-[180px] hover:bg-[#0a0a0a] transition-colors duration-300"
+      className="flex flex-col justify-between w-full h-[180px] transition-colors duration-300"
       style={{
-        backgroundColor: "#000000ff",
+        backgroundColor: "#ffffffff",
         boxShadow: "0 2px 6px 0 rgba(220,220,255,0.13)",
       }}
     >
@@ -111,7 +111,7 @@ const EventCard: React.FC<EventCardProps> = ({
             </div>
 
             <div
-              className="pl-1 text-[14px] sm:text-[13px] line-clamp-2"
+              className="pl-1 text-black text-[14px] sm:text-[13px] line-clamp-2"
               style={{
                 paddingLeft: "8px",
                 marginRight: "8px",

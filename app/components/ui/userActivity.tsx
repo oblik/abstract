@@ -15,7 +15,7 @@ export function Transition(): React.ReactElement {
       <div className="flex flex-col justify-between w-full">
         {/* Username and Yes count */}
         <div className="flex items-center space-x-2">
-          <p className="text-sm font-semibold text-white">Angel Mo</p>
+          <p className="text-sm font-semibold text-black">Angel Mo</p>
           <p className="text-xs text-[#7dfdfe]">• 274136 Yes</p>
                   {/* Date */}
           <div className="text-sm font-semibold">
@@ -25,7 +25,7 @@ export function Transition(): React.ReactElement {
 
         {/* Comment text */}
         <div className="mt-1">
-          <p className="text-xs text-white">Hi its a yes its a yes</p>
+          <p className="text-xs text-black">Hi its a yes its a yes</p>
         </div>
 
       </div>

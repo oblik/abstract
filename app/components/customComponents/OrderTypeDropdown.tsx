@@ -18,7 +18,7 @@ const OrderTypeDropdown: React.FC<OrderTypeProps> = (props) => {
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button
-          className="flex items-center gap-2 p-2 text-[14px] font-normal rounded-md border border-[#222] bg-black active:bg-[#181818] focus:outline-none focus:ring-2 focus:ring-[#7dfdfe]"
+          className="flex items-center gap-2 p-2 text-[14px] font-normal rounded-md border border-[#222] bg-white active:bg-[#181818] focus:outline-none focus:ring-2 focus:ring-[#7dfdfe]"
           aria-label="Customise options"
           style={{ minHeight: '40px', touchAction: 'manipulation' }}
         >

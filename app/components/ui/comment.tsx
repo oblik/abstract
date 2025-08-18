@@ -120,7 +120,7 @@ export function Comment({
       <div className="flex-1 min-w-0">
         {/* Username and time */}
         <div className="flex items-center mb-1 flex-wrap gap-2">
-          <span className="font-bold text-[13px] sm:text-base text-white truncate">
+          <span className="font-bold text-[13px] sm:text-base text-black truncate">
             <Link href={`/profile/@${comment?.userId?.uniqueId}`}>
               {comment?.userId?.userName || "Unknown user"}
             </Link>
@@ -162,7 +162,7 @@ export function Comment({
         </div>
 
         {/* Comment content */}
-        <p className="text-[12px] sm:text-sm text-white whitespace-pre-wrap break-words">
+        <p className="text-[12px] sm:text-sm text-black blackspace-pre-wrap break-words">
           {comment.content}
         </p>
 
@@ -171,7 +171,7 @@ export function Comment({
           {onReply && signedIn && !comment.parentId && (
             <button
               onClick={() => onReply(comment._id)}
-              className="text-xs text-gray-400 hover:text-white font-normal"
+              className="text-xs text-gray-400 hover:text-black font-normal"
             >
               {comment.reply_count ? `Reply (${comment.reply_count})` : "Reply"}
             </button>
@@ -353,14 +353,14 @@ export function ReplyForm({
             value={reply}
             onChange={(e) => setReply(e.target.value)}
             placeholder="Add reply..."
-            className="flex-1 px-2 sm:px-4 py-2 sm:py-3 bg-[#0f0f0f] border border-input rounded-md sm:rounded-xl text-white focus:border-input focus:outline-none text-xs sm:text-sm min-w-0 !pr-16 lg:pr-32 transition-all duration-200 placeholder:text-xs sm:placeholder:text-sm"
+            className="flex-1 px-2 sm:px-4 py-2 sm:py-3 bg-[#0f0f0f] border border-input rounded-md sm:rounded-xl text-black focus:border-input focus:outline-none text-xs sm:text-sm min-w-0 !pr-16 lg:pr-32 transition-all duration-200 placeholder:text-xs sm:placeholder:text-sm"
             disabled={isSubmitting}
             maxLength={300}
           />
           <Button
             type="submit"
             disabled={isSubmitting || !reply.trim()}
-            className="absolute right-2 top-2 bottom-2 h-auto px-2 sm:px-4 bg-transparent border-none text-white hover:bg-[#232326] hover:text-white transition-colors duration-300 rounded-md flex justify-end"
+            className="absolute right-2 top-2 bottom-2 h-auto px-2 sm:px-4 bg-transparent border-none text-black hover:bg-[#232326] hover:text-black transition-colors duration-300 rounded-md flex justify-end"
           >
             {isSubmitting ? "Posting..." : "Reply"}
           </Button>

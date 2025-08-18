@@ -146,8 +146,8 @@ export default function PortfolioPage() {
   };
 
   return (
-    <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
-      <div className="sticky top-0 z-50 w-[100%] bg-black lg:bg-transparent backdrop-blur-0 lg:backdrop-blur-md border-b border-[#222] lg:mb-4 mb-0 pb-2" style={{ borderBottomWidth: '1px' }}>
+    <div className="text-black bg-white h-auto items-center justify-items-center p-0 m-0">
+      <div className="sticky top-0 z-50 w-[100%] bg-white lg:bg-transparent backdrop-blur-0 lg:backdrop-blur-md border-b border-[#222] lg:mb-4 mb-0 pb-2" style={{ borderBottomWidth: '1px' }}>
         <Header />
         {/* <NavigationComponent menuItems={navigationItems} showLiveTag={true} /> */}
       </div>
@@ -177,7 +177,7 @@ export default function PortfolioPage() {
                 {profileData?.username ||
                   (wallet ? `${wallet?.slice(0, 6)}...${wallet?.slice(-4)}` : "")}
               </h2>
-              <p className="text-sm text-gray-400 whitespace-normal break-all">{wallet}</p>
+              <p className="text-sm text-gray-400 blackspace-normal break-all">{wallet}</p>
             </div>
           </div>
           <Button
@@ -258,7 +258,7 @@ export default function PortfolioPage() {
             <select
               value={amountFilter}
               onChange={(e) => setAmountFilter(e.target.value)}
-              className="border border-gray-700 bg-black rounded p-1 text-sm"
+              className="border border-gray-700 bg-white rounded p-1 text-sm"
             >
               <option>All</option>
               <option>Above 1 USDC</option>

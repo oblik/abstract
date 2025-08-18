@@ -57,7 +57,7 @@ export default function Header() {
           href="https://sonotrade.gitbook.io/sonotrade-docs/#overview"
           target="_blank"
           rel="noopener noreferrer"
-          className="ml-4 text-white text-sm font-semibold px-3 py-1 rounded hover:text-gray-400 transition-colors whitespace-nowrap"
+          className="ml-4 text-black text-sm font-semibold px-3 py-1 rounded hover:text-gray-400 transition-colors blackspace-nowrap"
         >
           Beginner’s Guide
         </Link>

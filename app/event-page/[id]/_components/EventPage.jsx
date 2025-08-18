@@ -263,9 +263,9 @@ export default function EventPage({ categories }) {
 
   return (
     <>
-      {/* <div className="overflow-hidden text-white bg-black sm:pr-10 sm:pl-10 pr-0 pl-0 justify-center h-auto items-center justify-items-center m-0"> */}
-      <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
-        <div className="fixed top-0 left-0 z-50 w-[100%] backdrop-blur-md bg-black/80 border-b border-[#222] lg:mb-4 mb-0" style={{ borderBottomWidth: '1px' }}>
+      {/* <div className="overflow-hidden text-black bg-white sm:pr-10 sm:pl-10 pr-0 pl-0 justify-center h-auto items-center justify-items-center m-0"> */}
+      <div className="text-black bg-white h-auto items-center justify-items-center p-0 m-0">
+        <div className="fixed top-0 left-0 z-50 w-[100%] backdrop-blur-md bg-white/80 border-b border-[#222] lg:mb-4 mb-0" style={{ borderBottomWidth: '1px' }}>
           <Header />
           <div className="hidden lg:block">
             <NavigationBar
@@ -416,7 +416,7 @@ export default function EventPage({ categories }) {
                       ) : (
                         <>
                           <Accordion type="single" collapsible>
-                            <div className="flex items-center w-full sm:py-2 py-0.5 text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider border-t-2 border-b border-[#222] bg-black">
+                            <div className="flex items-center w-full sm:py-2 py-0.5 text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider border-t-2 border-b border-[#222] bg-white">
                               <div className="flex items-center pr-6" style={{ width: 320 }}>
                                 Outcome
                               </div>
@@ -515,7 +515,7 @@ export default function EventPage({ categories }) {
                             className="flex justify-between items-center px-4 py-3 border-b border-[#2a2a2a] hover:bg-[#1d1d1d] cursor-pointer"
                           >
                             <div>
-                              <h3 className="text-[15px] sm:text-[16px] font-bold text-white flex items-center gap-2">
+                              <h3 className="text-[15px] sm:text-[16px] font-bold text-black flex items-center gap-2">
                                 {market.groupItemTitle}
                               </h3>
                               <p className="text-gray-400 text-sm">
@@ -577,7 +577,7 @@ export default function EventPage({ categories }) {
                               className={`line-clamp-5 transition-all duration-300 ${
                                 showFullText ? "line-clamp-none" : ""
                               }`}
-                              style={{ whiteSpace: "pre-line" }}
+                              style={{ blackSpace: "pre-line" }}
                             >
                               {showFullText
                                 ? events?.description
@@ -619,16 +619,16 @@ export default function EventPage({ categories }) {
                     {/* Discord Community Section - Web only, under comments */}
                     <div className="hidden sm:flex w-full max-w-7xl mx-auto mt-5 mb-5 justify-center">
                       <div
-                        className="bg-black rounded-md px-4 py-5 sm:px-6 sm:py-8 flex flex-col items-center w-full max-w-xs sm:max-w-xl border border-[#222] shadow-sm gap-2"
+                        className="bg-white rounded-md px-4 py-5 sm:px-6 sm:py-8 flex flex-col items-center w-full max-w-xs sm:max-w-xl border border-[#222] shadow-sm gap-2"
                         style={{ boxShadow: '0 2px 6px 0 rgba(220,220,255,0.13)' }}
                       >
-                        <h3 className="text-base sm:text-xl font-bold mb-1 text-white">Join our Discord community</h3>
+                        <h3 className="text-base sm:text-xl font-bold mb-1 text-black">Join our Discord community</h3>
                         <p className="text-xs sm:text-sm text-gray-300 mb-2 text-center">Connect with other traders, get support, and stay up to date with the latest news and features.</p>
                         <a
                           href="https://discord.com/invite/sonotrade"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="bg-[#5865F2] hover:bg-[#4752c4] text-white font-semibold px-2 py-2 rounded-md transition-colors duration-200 text-xs sm:text-sm flex items-center gap-1"
+                          className="bg-[#5865F2] hover:bg-[#4752c4] text-black font-semibold px-2 py-2 rounded-md transition-colors duration-200 text-xs sm:text-sm flex items-center gap-1"
                         >
                           <img src="/images/discordnew.png" alt="Discord" width={16} height={16} className="mr-1" />
                           Join Discord
@@ -692,7 +692,7 @@ export default function EventPage({ categories }) {
               <div className="lg:hidden justify-center pt-5 pb-8 items-center mt-0 fixed bottom-[24px] left-0 w-full z-50">
                 {isDrawerOpen && (
                   <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                    className="fixed inset-0 bg-white bg-opacity-50 z-40"
                     onClick={() => setIsDrawerOpen(false)}
                   ></div>
                 )}
@@ -703,9 +703,9 @@ export default function EventPage({ categories }) {
                     {/* Only show drawer trigger for single markets */}
                     {markets?.length <= 1 && (
                       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-                        <DrawerTrigger className="w-full py-2 font-semibold bg-black border-t border-[#1E1E1E] text-black rounded-lg mt-10">
+                        <DrawerTrigger className="w-full py-2 font-semibold bg-white border-t border-[#1E1E1E] text-black rounded-lg mt-10">
                           <div className="flex items-center justify-between gap-2.5 mb-2 w-full px-4 mt-0">
-                            <div className="flex-1 !bg-[#0D1A26] rounded-lg h-10 text-[#7DFDFE] text-base font-medium leading-tight inline-flex items-center justify-center gap-2 whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
+                            <div className="flex-1 !bg-[#0D1A26] rounded-lg h-10 text-[#7DFDFE] text-base font-medium leading-tight inline-flex items-center justify-center gap-2 blackspace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
                               {capitalize(markets?.[0]?.outcome?.[0]?.title || "Yes")}
                               {markets?.length === 1 && (
                                 <span className="ml-0 pl-0 text-xl text-[#7DFDFE] font-semibold">
@@ -713,7 +713,7 @@ export default function EventPage({ categories }) {
                                 </span>
                               )}
                             </div>
-                            <div className="flex-1 !bg-[#210D1A] rounded-lg h-10 text-[#EC4899] text-base font-medium leading-tight inline-flex items-center justify-center gap-2 whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
+                            <div className="flex-1 !bg-[#210D1A] rounded-lg h-10 text-[#EC4899] text-base font-medium leading-tight inline-flex items-center justify-center gap-2 blackspace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
                               {capitalize(markets?.[0]?.outcome?.[1]?.title || "No")}
                               {markets?.length === 1 && (
                                 <span className="ml-0 pl-0 text-xl text-[#EC4899] font-semibold">
@@ -810,16 +810,16 @@ export default function EventPage({ categories }) {
       {/* Discord Community Section - Mobile only at bottom */}
       <div className="flex sm:hidden w-full max-w-7xl mx-auto mt-5 mb-5 justify-center">
         <div
-          className="bg-black rounded-md px-4 py-5 flex flex-col items-center w-full max-w-xs border border-[#222] shadow-sm gap-2"
+          className="bg-white rounded-md px-4 py-5 flex flex-col items-center w-full max-w-xs border border-[#222] shadow-sm gap-2"
           style={{ boxShadow: '0 2px 6px 0 rgba(220,220,255,0.13)' }}
         >
-          <h3 className="text-base font-bold mb-1 text-white">Join our Discord community</h3>
+          <h3 className="text-base font-bold mb-1 text-black">Join our Discord community</h3>
           <p className="text-xs text-gray-300 mb-2 text-center">Connect with other traders, get support, and stay up to date with the latest news and features.</p>
           <a
             href="https://discord.com/invite/sonotrade"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-[#5865F2] hover:bg-[#4752c4] text-white font-semibold px-2 py-2 rounded-md transition-colors duration-200 text-xs flex items-center gap-1"
+            className="bg-[#5865F2] hover:bg-[#4752c4] text-black font-semibold px-2 py-2 rounded-md transition-colors duration-200 text-xs flex items-center gap-1"
           >
             <img src="/images/discordnew.png" alt="Discord" width={16} height={16} className="mr-1" />
             Join Discord

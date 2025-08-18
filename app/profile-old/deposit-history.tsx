@@ -124,7 +124,7 @@ const DepositTable = () => {
                 >
                   {shortText(deposit?.from)}
                   {copiedRowId === index && (
-                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs text-white bg-black px-2 py-0.5 rounded shadow">
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs text-black bg-white px-2 py-0.5 rounded shadow">
                       Copied!
                     </span>
                   )}
@@ -135,7 +135,7 @@ const DepositTable = () => {
                 >
                   {shortText(deposit?.to)}
                   {copiedRowId1 === index && (
-                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs text-white bg-black px-2 py-0.5 rounded shadow">
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs text-black bg-white px-2 py-0.5 rounded shadow">
                       Copied!
                     </span>
                   )}

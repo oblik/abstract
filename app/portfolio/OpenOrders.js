@@ -136,7 +136,7 @@ const OpenOrders = () => {
         <>
             {/* <div className="flex space-x-4 mb-3">
             <SearchBar placeholder="Search" />
-            <select className="border bg-[#131212] border-[#262626] bg-black rounded p-1 text-sm">
+            <select className="border bg-[#131212] border-[#262626] bg-white rounded p-1 text-sm">
                 <option>Market</option>
                 <option>Filled Quantity</option>
                 <option>Total Quantity</option>

@@ -52,7 +52,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     console.log('OrderbookChart Tooltip payload:', payload); // Debug log
     const entry = payload[0]; // Only use the first entry
     return (
-      <div className="bg-transparent p-2 border border-transparent rounded shadow text-white">
+      <div className="bg-transparent p-2 border border-transparent rounded shadow text-black">
         <p className="text-sm font-semibold">{formattedLabel}</p>
         {entry.value !== null && (
           <p style={{ color: entry.color }} className="text-sm">

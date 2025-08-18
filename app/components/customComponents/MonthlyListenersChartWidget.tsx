@@ -134,12 +134,12 @@ const MonthlyListenersChartWidget: React.FC<MultiListenersChart2Props> = ({
     
     if (active && payload && payload.length) {
       return (
-        <div className="bg-transparent p-2 border border-transparent rounded shadow text-white">
+        <div className="bg-transparent p-2 border border-transparent rounded shadow text-black">
           <p className="text-sm font-semibold">{formattedLabel}</p>
           {payload.map(
             (entry, index) =>
               entry.value !== null && (
-                <p key={index} style={{ color: "white" }} className="text-sm">
+                <p key={index} style={{ color: "black" }} className="text-sm">
                   Forecast {isCustomData ? `${entry.value}` : `${entry.value?.toFixed(1)}`}
                 </p>
               )

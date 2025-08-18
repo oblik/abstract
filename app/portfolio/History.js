@@ -145,14 +145,14 @@ const History = () => {
           }}
           className="custom_datepicker"
         />
-        <select className="border border-[#262626] bg-black rounded p-1 text-sm">
+        <select className="border border-[#262626] bg-white rounded p-1 text-sm">
           <option>All</option>
           <option>All Trades</option>
           <option>Buy</option>
           <option>Sell</option>
           <option>Reward</option>
         </select>
-        <select className="border bg-[#131212] border-[#262626] bg-black rounded p-1 text-sm">
+        <select className="border bg-[#131212] border-[#262626] bg-white rounded p-1 text-sm">
           <option>Newest</option>
           <option>Oldest</option>
           <option>Value</option>

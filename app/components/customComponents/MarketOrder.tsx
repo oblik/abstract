@@ -294,7 +294,7 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
         <div className="flex justify-between text-sm">
           <div>
             <span className="text-muted-foreground">Total return if</span>
-            <span className="text-white">  {`${activeView == "Yes" ? (firstLetterCase(outcomes?.[0]?.title || "yes")) : firstLetterCase(outcomes?.[1]?.title || "no")}
+            <span className="text-black">  {`${activeView == "Yes" ? (firstLetterCase(outcomes?.[0]?.title || "yes")) : firstLetterCase(outcomes?.[1]?.title || "no")}
             `} </span>
             <span className="text-muted-foreground"> wins</span>
           </div>
@@ -319,18 +319,18 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
       <div className="pt-4">
         {signedIn ? (
           <Button
-            className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300"
+            className="w-full border border-black bg-transparent text-black hover:bg-white hover:text-black transition-colors duration-300"
             onClick={() => handlePlaceOrder(buyorsell)}
           >
             {`${buyorsell === "buy" ? "Buy" : "Sell"} ${activeView == "Yes" ? (firstLetterCase(outcomes?.[0]?.title || "yes")) : firstLetterCase(outcomes?.[1]?.title || "no")}
             `}
           </Button>
         ) : (
-          <Button className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300">
+          <Button className="w-full border border-black bg-transparent text-black hover:bg-white hover:text-black transition-colors duration-300">
             Login
           </Button>
         )}
-          {/* <Button className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300" disabled>
+          {/* <Button className="w-full border border-black bg-transparent text-black hover:bg-white hover:text-black transition-colors duration-300" disabled>
             Order cannot placed right now
           </Button> */}
       </div>

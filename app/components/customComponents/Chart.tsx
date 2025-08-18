@@ -75,7 +75,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
     }
     if (active && payload && payload.length) {
         return (
-            <div className="bg-transparent p-2 border border-transparent rounded shadow text-white">
+            <div className="bg-transparent p-2 border border-transparent rounded shadow text-black">
                 <p className="text-sm font-semibold">{formattedLabel}</p>
                 {payload.map(
                     (entry, index) =>
@@ -140,7 +140,7 @@ const Chart: React.FC<ChartProps> = ({
         
         if (active && payload && payload.length) {
             return (
-                <div className="bg-transparent p-2 border border-transparent rounded shadow text-white">
+                <div className="bg-transparent p-2 border border-transparent rounded shadow text-black">
                     <p className="text-sm font-semibold">{formattedLabel}</p>
                     {payload.map(
                         (entry, index) =>
@@ -681,7 +681,7 @@ const Chart: React.FC<ChartProps> = ({
                                         key={event.slug} 
                                         // href={`/event-page/${event.slug}`}
                                         onClick={()=>route.push(`/event-page/${event.slug}`)}
-                                        className="w-[90px] rounded-full bg-transparent border border-[#262626] text-white hover:bg-[#262626] hover:text-white active:bg-[#262626] active:text-white text-center px-2 py-1 block text-sm"
+                                        className="w-[90px] rounded-full bg-transparent border border-[#262626] text-black hover:bg-[#262626] hover:text-black active:bg-[#262626] active:text-black text-center px-2 py-1 block text-sm"
                                     >
                                         {momentFormat(event?.endDate,"D MMM")}
                                     </div>

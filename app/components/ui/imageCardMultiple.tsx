@@ -76,7 +76,7 @@ export function ImageCardMultiple({
       }}
     >
       {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black bg-opacity-25 z-0" />
+      <div className="absolute inset-0 bg-white bg-opacity-25 z-0" />
 
       {/* Centered MultipleOptionCard */}
       <div  style={{ cursor: "pointer" }}

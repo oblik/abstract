@@ -72,8 +72,8 @@ const InfoCards = ({ infoCardCms }) => {
                     </CarouselItem>
                   ))}
               </CarouselContent>
-              <CarouselPrevious className="text-white" />
-              <CarouselNext className="text-white" />
+              <CarouselPrevious className="text-black" />
+              <CarouselNext className="text-black" />
             </Carousel>
           </div>
         </div>
@@ -92,10 +92,10 @@ const SubcategoryBar = ({
       <div className="flex justify-start gap-2 sm:gap-3 overflow-x-auto flex-nowrap pb-5">
         <Button
           className={cn(
-            "px-3 py-1 h-[30px] rounded-md transition-colors text-sm font-medium whitespace-nowrap border-[1px] hover:bg-transparent",
+            "px-3 py-1 h-[30px] rounded-md transition-colors text-sm font-medium blackspace-nowrap border-[1px] hover:bg-transparent",
             selectedSubcategory === "all"
               ? "text-[#7dfdfe] bg-[#0d1a26] border-[#7dfdfe]"
-              : "text-muted-foreground border-[#222] bg-black hover:text-gray-300"
+              : "text-muted-foreground border-[#222] bg-white hover:text-gray-300"
           )}
           onClick={() => setSelectedSubcategory("all")}
         >
@@ -104,10 +104,10 @@ const SubcategoryBar = ({
         {subcategories?.map((subcategory) => (
           <Button
             key={subcategory.slug}
-            className={cn("px-3 py-1 h-[30px] rounded-md transition-colors text-sm font-medium whitespace-nowrap border-[1px] hover:bg-transparent",
+            className={cn("px-3 py-1 h-[30px] rounded-md transition-colors text-sm font-medium blackspace-nowrap border-[1px] hover:bg-transparent",
               selectedSubcategory === subcategory.slug
                 ? "text-[#7dfdfe] bg-[#0d1a26] border-[#7dfdfe]"
-                : "text-muted-foreground border-[#222] bg-black hover:text-gray-300"
+                : "text-muted-foreground border-[#222] bg-white hover:text-gray-300"
             )}
             onClick={() => setSelectedSubcategory(subcategory.slug)}
           >
@@ -116,7 +116,7 @@ const SubcategoryBar = ({
         ))}
       </div>
       {/* Right fade overlay positioned at the edge of the scroll area */}
-      <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-black to-transparent">
+      <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-white to-transparent">
       </div>
     </div>
   </div>
@@ -149,9 +149,9 @@ export default function Home({ infoCardCms, categories, tags }) {
 
   return (
     <>
-      <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
+      <div className="text-black bg-white h-auto items-center justify-items-center p-0 m-0">
       {/* Fixed header/navbar */}
-      <div className="fixed top-0 left-0 z-50 w-full backdrop-blur-md bg-black/80 border-b border-[#222]" style={{ borderBottomWidth: '1px' }}>
+      <div className="fixed top-0 left-0 z-50 w-full backdrop-blur-md bg-white/80 border-b border-[#222]" style={{ borderBottomWidth: '1px' }}>
         <Header />
         <NavigationBar
           menuItems={categories}
@@ -194,16 +194,16 @@ export default function Home({ infoCardCms, categories, tags }) {
             {/* Discord Community Section */}
             <div className="w-full max-w-7xl mx-auto mt-5 mb-5 flex justify-center">
               <div
-                className="bg-black rounded-md px-4 py-5 sm:px-6 sm:py-8 flex flex-col items-center w-full max-w-xs sm:max-w-xl border border-[#222] shadow-sm gap-2"
+                className="bg-white rounded-md px-4 py-5 sm:px-6 sm:py-8 flex flex-col items-center w-full max-w-xs sm:max-w-xl border border-[#222] shadow-sm gap-2"
                 style={{ boxShadow: '0 2px 6px 0 rgba(220,220,255,0.13)' }}
               >
-                <h3 className="text-base sm:text-xl font-bold mb-1 text-white">Join our Discord community</h3>
+                <h3 className="text-base sm:text-xl font-bold mb-1 text-black">Join our Discord community</h3>
                 <p className="text-xs sm:text-sm text-gray-300 mb-2 text-center">Connect with other traders, get support, and stay up to date with the latest news and features.</p>
                 <a
                   href="https://discord.com/invite/sonotrade"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-[#5865F2] hover:bg-[#4752c4] text-white font-semibold px-2 py-2 rounded-md transition-colors duration-200 text-xs sm:text-sm flex items-center gap-1"
+                  className="bg-[#5865F2] hover:bg-[#4752c4] text-black font-semibold px-2 py-2 rounded-md transition-colors duration-200 text-xs sm:text-sm flex items-center gap-1"
                 >
                   <Image src={DiscordLogo} alt="Discord" width={16} height={16} className="mr-1" />
                   Join Discord

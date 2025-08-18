@@ -144,7 +144,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
             (entry, index) =>
               entry.value !== null && (
                 <p key={index} style={{ color: entry.color }} className="text-sm">
-                  {entry.name} {isCustomData ? `${entry.value}M` : `${entry.value?.toFixed(1)}M`}
+                  Forecast {isCustomData ? `${entry.value}` : `${entry.value?.toFixed(1)}`}
                 </p>
               )
           )}
@@ -232,7 +232,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
         ? chartData[chartData.length - 1]?.asset1
         : undefined;
 
-  const chanceColor = '#7DFDFE';
+  const chanceColor = '#ffffffff';
 
   const CustomDot = (props: any) => {
     const { cx, cy, payload, index } = props;
@@ -240,7 +240,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
     
     if (!isLastPoint) return null;
     
-    const dotColor = "#7DFDFE";
+    const dotColor = "#d0d0d0ff";
     
     return (
       <g>
@@ -313,18 +313,18 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
               <div style={{ display: "flex", alignItems: "center" }}>
                 <div
                   style={{
-                    width: screenWidth < 640 ? "50px" : "75px",
-                    height: screenWidth < 640 ? "50px" : "75px",
+                    width: screenWidth < 640 ? "50px" : "65px",
+                    height: screenWidth < 640 ? "50px" : "65px",
                     overflow: "hidden",
                     borderRadius: "10px",
                     flexShrink: 0,
                   }}
                 >
                   <Image
-                    src="/images/logo_icon.png"
+                    src={image || "/images/logo_icon.png"}
                     alt="Event"
-                    width={screenWidth < 640 ? 50 : 75}
-                    height={screenWidth < 640 ? 50 : 75}
+                    width={screenWidth < 640 ? 50 : 65}
+                    height={screenWidth < 640 ? 50 : 65}
                     style={{ 
                       width: "100%", 
                       height: "100%", 
@@ -362,7 +362,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
               <div className="flex items-center justify-between mt-6 mb-6 w-full">
                 <div className="flex items-center">
                   <span className="text-3xl lg:text-4xl font-semibold" style={{ color: chanceColor }}>
-                    {displayChance !== undefined && displayChance !== null ? displayChance.toFixed(1) : '0.0'}M
+                    {displayChance !== undefined && displayChance !== null ? Number(displayChance).toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
                   </span>
                   <span className="text-lg font-light ml-2" style={{ color: chanceColor }}>forecast</span>
 
@@ -431,7 +431,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                     />
                     <YAxis
                       domain={[0, 'dataMax']}                    
-                      tickFormatter={(tick) => customData ? `${tick}M` : `${tick}M`}
+                      tickFormatter={(tick) => customData ? `${tick}` : `${tick}`}
                       tickLine={false}
                       axisLine={false}
                       tickMargin={8}
@@ -449,10 +449,10 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                     <Line
                       type="stepAfter"
                       dataKey="asset1"
-                      stroke="#7DFDFE"
+                      stroke="#ffffffff"
                       strokeWidth={1}
                       dot={<CustomDot />}
-                      activeDot={{ r: 4, fill: "#7DFDFE", stroke: "#fff", strokeWidth: 2 }}
+                      activeDot={{ r: 4, fill: "#d0d0d0ff", stroke: "#fff", strokeWidth: 2 }}
                       label={false}
                       connectNulls
                       isAnimationActive={false}

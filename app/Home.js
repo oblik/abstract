@@ -46,8 +46,8 @@ const InfoCards = ({ infoCardCms }) => {
   };
 
   return (
-    <div className="-mt-4 lg:block hidden">
-      <div className="justify-center mb-4 mt-2 pt-0 w-full flex">
+    <div className="mt-0 lg:block hidden">
+      <div className="justify-center mb-6 mt-5 pt-0 w-full flex">
         <div className="w-full flex flex-col items-center justify-center">
           {/* Desktop view */}
           <div className="hidden md:grid md:grid-cols-4 gap-4 justify-items-center items-center">
@@ -150,17 +150,20 @@ export default function Home({ infoCardCms, categories, tags }) {
   return (
     <>
       <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
-        <div className="sticky top-0 z-50 w-[100%] backdrop-blur-md bg-black/90 border-b border-[#222] lg:mb-4 mb-0" style={{ borderBottomWidth: '1px' }}>
-          <Header />
-          <NavigationBar
-            menuItems={categories}
-            showLiveTag={true}
-            setSelectedCategory={setSelectedCategory}
-            selectedCategory={selectCategory}
-          />
-        </div>
+      {/* Fixed header/navbar */}
+      <div className="fixed top-0 left-0 z-50 w-full backdrop-blur-md bg-black/80 border-b border-[#222]" style={{ borderBottomWidth: '1px' }}>
+        <Header />
+        <NavigationBar
+          menuItems={categories}
+          showLiveTag={true}
+          setSelectedCategory={setSelectedCategory}
+          selectedCategory={selectCategory}
+        />
+      </div>
+      {/* Spacer to prevent content from being hidden behind the fixed header/navbar */}
+      <div style={{ height: '112px', minHeight: '112px', width: '100%' }} className="lg:mb-4 mb-0" />
 
-        <div className="container mx-auto px-0 sm:px-4 max-w-full overflow-hidden">
+        <div className="container mx-auto px-0 sm:px-2 max-w-full overflow-hidden">
           <div className="px-1 sm:px-0">
             <SubcategoryBar
               subcategories={subcategoryList}

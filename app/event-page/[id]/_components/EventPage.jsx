@@ -265,7 +265,7 @@ export default function EventPage({ categories }) {
     <>
       {/* <div className="overflow-hidden text-white bg-black sm:pr-10 sm:pl-10 pr-0 pl-0 justify-center h-auto items-center justify-items-center m-0"> */}
       <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
-        <div className="sticky top-0 z-50 w-[100%] backdrop-blur-md bg-black/90 border-b border-[#222] lg:mb-4 mb-0" style={{ borderBottomWidth: '1px' }}>
+        <div className="fixed top-0 left-0 z-50 w-[100%] backdrop-blur-md bg-black/80 border-b border-[#222] lg:mb-4 mb-0" style={{ borderBottomWidth: '1px' }}>
           <Header />
           <div className="hidden lg:block">
             <NavigationBar
@@ -277,6 +277,8 @@ export default function EventPage({ categories }) {
             />
           </div>
         </div>
+        {/* Spacer to prevent content from being hidden behind the fixed header/navbar */}
+        <div style={{ height: '112px', minHeight: '112px', width: '100%' }} className="lg:mb-4 mb-0" />
         <div className="container mx-auto px-0 sm:px-4 max-w-full overflow-hidden">
           {eventsLoading ? (
             <div className="flex justify-center items-center h-[80vh] w-[80vw]">
@@ -307,6 +309,8 @@ export default function EventPage({ categories }) {
                       />
                     ) : (
                       <Chart
+                        title1={event.marketId?.[0]?.outcome?.[0]?.title || "Yes"}
+                        title2={event.marketId?.[0]?.outcome?.[1]?.title || "No"}
                         id={id}
                         title={events?.title}
                         volume={

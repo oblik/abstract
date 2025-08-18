@@ -53,7 +53,9 @@ interface ChartProps {
     market: MarketData[];
     interval: string;
     chance?: number;
-    series?: any
+    series?: any;
+    title1?: string;
+    title2?: string;
 }
 
 const CustomTooltip: React.FC<CustomTooltipProps> = ({
@@ -98,11 +100,14 @@ const ChartWidget: React.FC<ChartProps> = ({
     market,
     interval,
     chance,
-    series
+    series,
+    title1,
+    title2
 }) => {
     const [chartDataYes, setChartDataYes] = useState<any[]>([]);
     const [chartDataNo, setChartDataNo] = useState<any[]>([]);
     const [selectedYes, setSelectedYes] = useState<boolean>(true);
+    const [inverted, setInverted] = useState(false);
     const [chartData, setChartData] = useState<any[]>([]);
     const [chartConfig, setChartConfig] = useState<any>([]);
     const [assetKeys, setAssetKeys] = useState<any>([]);
@@ -134,7 +139,7 @@ const ChartWidget: React.FC<ChartProps> = ({
                 hour12: true
             });
         }
-        
+        const tooltipTitle = inverted ? title2 : title1;
         if (active && payload && payload.length) {
             return (
                 <div className="bg-transparent p-2 border border-transparent rounded shadow text-white">
@@ -143,7 +148,7 @@ const ChartWidget: React.FC<ChartProps> = ({
                         (entry, index) =>
                             entry.value !== null && (
                                 <p key={index} style={{ color: entry.color }} className="text-sm">
-                                    {entry.name} {entry.value?.toFixed(1)}%
+                                    {tooltipTitle} {entry.value?.toFixed(1)}%
                                 </p>
                             )
                     )}
@@ -190,16 +195,25 @@ const ChartWidget: React.FC<ChartProps> = ({
     }, []);
 
     useEffect(() => {
-        if (selectedYes) {
-            setChartData(chartDataYes);
-            // setChartConfig({
-            //     asset1: { label: "Yes", color: "#7dfdfe" },
-            // });
-        } else {
-            setChartData(chartDataNo);
-            // setChartConfig({ asset1: { label: "No", color: "#ec4899" } });
+        let data = selectedYes ? chartDataYes : chartDataNo;
+        if (inverted && data && data.length > 0) {
+            // Invert the data by subtracting each value from 100
+            if (market.length <= 1) {
+                data = data.map((point: any) => ({ ...point, asset1: 100 - point.asset1 }));
+            } else {
+                data = data.map((point: any) => {
+                    const newPoint = { ...point };
+                    Object.keys(newPoint).forEach(key => {
+                        if (key.startsWith('asset')) {
+                            newPoint[key] = 100 - newPoint[key];
+                        }
+                    });
+                    return newPoint;
+                });
+            }
         }
-    }, [selectedYes, chartDataYes, chartDataNo]);
+        setChartData(data);
+    }, [selectedYes, chartDataYes, chartDataNo, inverted, market.length]);
 
     // Add getIntervalDate function for consistent interval handling
     const getIntervalDate = (interval: string) => {
@@ -448,19 +462,37 @@ const ChartWidget: React.FC<ChartProps> = ({
         }
     },[series,id])
 
-    // Calculate the current displayed chance value and color
-    const displayChance =
-        hoveredChance !== undefined
-            ? hoveredChance // Data is already in 0-100 range
-            : selectedYes
-                ? chance
-                : chance == 0
-                    ? 0
-                    : chance !== undefined
-                        ? 100 - chance
-                        : undefined;
 
-    const chanceColor = selectedYes ? "#7dfdfe" : "#ec4899";
+    // Calculate the current displayed chance value and color
+    let displayChance: number | undefined;
+    if (market.length <= 1) {
+        if (hoveredChance !== undefined && typeof hoveredChance === 'number') {
+            displayChance = hoveredChance;
+        } else if (typeof chance === 'number') {
+            displayChance = inverted ? 100 - chance : chance;
+        } else if (chance == 0) {
+            displayChance = 0;
+        } else {
+            displayChance = undefined;
+        }
+    } else {
+        if (hoveredChance !== undefined) {
+            displayChance = hoveredChance;
+        } else if (typeof chance === 'number') {
+            displayChance = chance;
+        } else if (chance == 0) {
+            displayChance = 0;
+        } else {
+            displayChance = undefined;
+        }
+    }
+
+    let chanceColor = selectedYes ? "#7dfdfe" : "#ec4899";
+    let displayTitle = title1;
+    if (inverted) {
+        chanceColor = "#ec4899";
+        displayTitle = title2;
+    }
     const [activeDate, setActiveDate] = useState("Jun 18");
     const [multiDisplayChance, setMultiDisplayChance] = useState<any>([]);
     useEffect(() => {
@@ -561,31 +593,6 @@ const ChartWidget: React.FC<ChartProps> = ({
 
                     {/* 显示 Vol 和时间等信息 */}
                     <CardDescription className="py-0 flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2">
-                        {/* First line - Volume, Date, and Toggle */}
-                        <div className="flex flex-wrap gap-3 items-center">
-                            {/* Toggle switch - hide on mobile when multiple markets */}
-                            {market?.length <= 1 && (
-                                <Button
-                                    variant="ghost"
-                                    onClick={() => setSelectedYes(!selectedYes)}
-                                    size="sm"
-                                    className="h-1 px-0 sm:h-9 sm:px-3"
-                                >
-                                    <ArrowRightLeft />
-                                </Button>
-                            )}
-                            {/* Toggle switch - show on desktop for all markets */}
-                            {market?.length > 1 && (
-                                <Button
-                                    variant="ghost"
-                                    onClick={() => setSelectedYes(!selectedYes)}
-                                    size="sm"
-                                    className="h-1 px-0 sm:h-9 sm:px-3"                               
-                                    >
-                                    <ArrowRightLeft />
-                                </Button>
-                            )}
-                        </div>
                         <div className="flex items-center gap-2 mt-2">
                             {seriesData?.length > 0 && (
                                 <Popover.Root>
@@ -644,14 +651,29 @@ const ChartWidget: React.FC<ChartProps> = ({
                     </CardDescription>
                     {/* Single market chance display - inside CardHeader like MonthlyListenersChart2 */}
                     {market?.length <= 1 && displayChance !== undefined && (
-                        <div className="flex flex-wrap gap-3 items-center w-full">
+                        <div className="flex flex-wrap gap-3 items-center w-full justify-between">
                             <div className="flex items-center">
-                                <span className="text-3xl lg:text-4xl font-semibold" style={{ color: chanceColor }}>
+                                <span className="text-2xl lg:text-3xl font-semibold" style={{ color: chanceColor }}>
                                     {typeof displayChance === 'number' ? displayChance.toFixed(1) : '0.0'}%
                                 </span>
-                                <span className="text-lg font-light ml-2" style={{ color: chanceColor }}>
+                                <span className="text-m font-light ml-2" style={{ color: chanceColor }}>
                                     chance
                                 </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                className={'bg-black'}
+                                onClick={() => setInverted((prev) => !prev)}
+                                title="Invert graph"
+                              >
+                                <ArrowRightLeft size={15} />
+                              </button>
+                              {displayTitle && (
+                                <span className="text-m font-light ml-2 text-white">
+                                  {displayTitle}
+                                </span>
+                              )}
                             </div>
                         </div>
                     )}
@@ -676,20 +698,7 @@ const ChartWidget: React.FC<ChartProps> = ({
                                     
                                 </div>
                             )}
-                            {/* {multiDisplayChance.length > 0 && (
-                                <div className="flex justify-start mb-4">
-                                    {market?.length > 1 && multiDisplayChance.map((item: any, i: number) => (
-                                        <CardTitle
-                                            key={i}
-                                            className="text-4xl"
-                                            style={{ color: item.color }}
-                                        >
-                                            <span>{(item.last)?.toFixed(1)}%</span>
-                                            <span className="text-2xl font-light"> chance</span>
-                                        </CardTitle>
-                                    ))}
-                                </div>
-                            )} */}
+
                         </CardHeader>
                         <CardContent className="p-0">
                             <ChartContainer
@@ -776,14 +785,13 @@ const ChartWidget: React.FC<ChartProps> = ({
                                             key={asset.asset}
                                             type="stepAfter"
                                             dataKey={asset.asset}
-                                            stroke={asset.color}
+                                            stroke={inverted ? "#ec4899" : asset.color}
                                             strokeWidth={2}
                                             name={asset.fullLabel || asset.label}
-
-                                            dot={<CustomDot color={asset.color}/>} 
+                                            dot={<CustomDot color={inverted ? "#ec4899" : asset.color}/>} 
                                             activeDot={{
                                                 r: 3,
-                                                fill: asset.color,
+                                                fill: inverted ? "#ec4899" : asset.color,
                                                 stroke: "#fff",
                                                 strokeWidth: 2,
                                                 style: { filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.3))' }

@@ -578,28 +578,28 @@ const Chart: React.FC<ChartProps> = ({
                         <div style={{ display: "flex", alignItems: "center" }}>
                             <div
                                 style={{
-                                    width: screenWidth < 640 ? "40px" : "40px",
-                                    height: screenWidth < 640 ? "40px" : "40px",
+                                    width: screenWidth < 640 ? "40px" : "65px",
+                                    height: screenWidth < 640 ? "40px" : "65px",
                                     overflow: "hidden",
-                                    borderRadius: "4px",
+                                    borderRadius: "10px",
                                     flexShrink: 0,
                                 }}
                             >
                                 <img
                                     src={image}
                                     alt="Event"
-                                    width={screenWidth < 640 ? 40 : 40}
-                                    height={screenWidth < 640 ? 40 : 40}
-                                    style={{
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "cover",
-                                        transition: "all 0.3s ease",
+                                    width={screenWidth < 640 ? 50 : 65}
+                                    height={screenWidth < 640 ? 50 : 65}
+                                    style={{ 
+                                    width: "100%", 
+                                    height: "100%", 
+                                    objectFit: "cover",
+                                    transition: "all 0.3s ease" 
                                     }}
                                 />
                             </div>
                             <div
-                                className="text-[15px] sm:text-[16px] lg:text-[24px] font-semibold pl-3"
+                                className="text-[19px] lg:text-[26px] sm:text-[20px]"
                                 style={{ paddingLeft: "15px" }}
                             >
                                 {title || ""}

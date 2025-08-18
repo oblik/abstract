@@ -29,7 +29,7 @@ interface PaginationState {
   offset: number;
 }
 
-const DepositTable = () => {
+const DepositTable = ({statusFilter}) => {
   const [Deposit, setDeposit] = useState<Deposit[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState<boolean>(false);
@@ -51,7 +51,8 @@ const DepositTable = () => {
         setLoading(true)
         let data = {
           type: "deposit",
-          id: uniqueId, ...pagination
+          id: uniqueId, ...pagination,
+          statusFilter
         }
         const { success, result } = await transactionHistory(data);
         if (success) {
@@ -66,7 +67,7 @@ const DepositTable = () => {
     };
 
     fetchDepositHistory();
-  }, [uniqueId, pagination]);
+  }, [uniqueId, pagination,statusFilter]);
 
 
   const handleCopy = async (text: string, rowId: number) => {

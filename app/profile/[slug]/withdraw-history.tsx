@@ -32,7 +32,7 @@ interface PaginationState {
     offset: number;
 }
 
-const WithdrawTable = () => {
+const WithdrawTable = ({statusFilter}) => {
     const [Withdraw, setWithdraw] = useState<Deposit[]>([]);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState<boolean>(false);
@@ -54,7 +54,8 @@ const WithdrawTable = () => {
                 setLoading(true)
                 let data = {
                     type: "withdraw",
-                    id: uniqueId, ...pagination
+                    id: uniqueId, ...pagination,
+                    statusFilter
                 }
                 const { success, result } = await transactionHistory(data);
                 if (success) {
@@ -69,7 +70,7 @@ const WithdrawTable = () => {
         };
 
         fetchDepositHistory();
-    }, [uniqueId, pagination]);
+    }, [uniqueId, pagination,statusFilter]);
 
     // if (loading) {
     //     return <div className="text-center py-4">Loading...</div>;

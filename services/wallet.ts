@@ -55,6 +55,7 @@ export const withdrawRequest = async (data: any,dispatch: any) => {
       data,
     });
     const { wallet } = respData.data;
+    console.log(wallet,"walletwallet");
     dispatch(setWallet(wallet));
     return handleResp(respData, "success");
   } catch (error: any) {

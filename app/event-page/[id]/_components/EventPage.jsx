@@ -1,7 +1,7 @@
 "use client";
 import "@/app/globals.css";
 import { useParams } from "next/navigation";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { CheckCircle, ClockIcon, Loader, XCircle } from "lucide-react";
 import Image from "next/image";
 import {
@@ -50,6 +50,7 @@ import Astroworld from "@/public/images/astroworld.png";
 import { NavigationBar } from "@/app/components/ui/navigation-menu";
 import HeaderFixed from "@/app/HeaderFixed";
 import { toFixedDown } from "@/lib/roundOf";
+import { capitalize } from "@/lib/stringCase";
 
 export default function EventPage({ categories }) {
   const param = useParams();
@@ -266,6 +267,35 @@ export default function EventPage({ categories }) {
     }
   };
 
+  const getOutcomeTitle = (arr, id) => {
+    try {
+      const find = arr.find(item => item._id == id);
+      return find?.title ? capitalize(find?.title) : 'Yes';
+    } catch {
+      return '';
+    }
+  }
+
+  const isWinning = useCallback((events, market) => {
+    try {
+      if (isEmpty(events)) return false;
+      if (isEmpty(market)) return false;
+      
+      const outcomeType = events?.outcomeType;
+      if (outcomeType == 'single') {
+        if (events?.marketId.length == 1) {
+          return events?.marketId?.[0]?.outcome?.[0]._id == events?.outcomeId;
+        } else {
+          return events?.outcomeId == market?._id;
+        }
+      } else if (outcomeType == 'multi') {
+        return market?.outcome?.[0]._id == market?.outcomeId;
+      }
+    } catch {
+      return false;
+    }
+  }, [events]);
+
   return (
     <>
       {/* <div className="overflow-hidden text-white bg-black sm:pr-10 sm:pl-10 pr-0 pl-0 justify-center h-auto items-center justify-items-center m-0"> */}
@@ -431,83 +461,123 @@ export default function EventPage({ categories }) {
 
                             {markets &&
                               markets?.length > 0 &&
-                              events?.status != "resolved" &&
                               markets
                                 // .filter((market) => market.status === "active")
-                                ?.map((market, index) => (
-                                  <AccordionItem
-                                    value={`market-${index + 1}`}
-                                    key={index}
-                                  >
-                                    <AccordionTrigger
-                                      marketId="market-1"
-                                      outcomePrice={market?.odd || 0}
-                                      className="flex sm:text-[18px] text-[18px] items-center sm:gap-2 gap-0"
-                                      setSelectedOrderBookData={
-                                        setSelectedOrderBookData
-                                      }
-                                      orderBook={
-                                        books?.find(
-                                          (book) =>
-                                            book.marketId ==
-                                            // JSON?.parse(market?.clobTokenIds)[0]
-                                            market?._id
-                                        ) || {}
-                                      }
-                                      setSelectedIndex={setSelectedIndex}
-                                      index={index}
-                                      isMultiMarket={markets?.length > 1}
-                                      setIsDrawerOpen={setIsDrawerOpen}
-                                      setActiveView={setActiveView}
-                                    >
-                                      <div className="pr-6">
-                                        <img
-                                          src={events?.image}
-                                          alt="Market 1"
-                                          width={42}
-                                          height={42}
-                                          className="rounded-md object-cover"
-                                          style={{
-                                            width: "42px",
-                                            height: "42px",
-                                          }}
-                                        />
+                                ?.map((market, index) => {
+                                  if (market.status == "resolved") {
+                                    return (
+                                      <div className="flex justify-between items-center px-4 py-3 border-b border-[#2a2a2a] hover:bg-[#1d1d1d] cursor-pointer">
+                                        <div>
+                                          <h3 className="text-[15px] sm:text-[16px] font-bold text-white flex items-center gap-2">
+                                            {market.groupItemTitle}
+                                          </h3>
+                                          <p className="text-gray-400 text-sm">
+                                            ${Number(market.volume).toLocaleString()} Vol.
+                                          </p>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          <p
+                                            
+                                            className={`text-sm font-semibold ${
+                                              isWinning(events, market)
+                                                ? "text-green-500"
+                                                : "text-red-500"
+                                            }`}
+                                          >
+                                            {events?.outcomeType == "single" ? capitalize(events.outcome): getOutcomeTitle(market.outcome, market.outcomeId)}
+                                          </p>
+                                          {isWinning(events, market) ? (
+                                            <CheckCircle
+                                              className="w-5 h-5 text-green-500"
+                                              strokeWidth={2.5}
+                                            />
+                                            ) : (
+                                            <XCircle
+                                              className="w-5 h-5 text-red-500"
+                                              strokeWidth={2.5}
+                                            />
+                                            )
+                                          }
+                                        </div>
                                       </div>
-                                      <span className="pt-1">
-                                        {market.groupItemTitle}
-                                      </span>
-                                    </AccordionTrigger>
-                                    <OrderbookAccordionContent
-                                      orderBook={
-                                        books?.find(
-                                          (book) =>
-                                            book.marketId ==
-                                            // JSON?.parse(market?.clobTokenIds)[0]
-                                            market?._id
-                                        ) || {}
-                                      }
-                                      book={books}
-                                      activeView={activeView}
-                                      setActiveView={setActiveView}
-                                      setSelectedOrderBookData={
-                                        setSelectedOrderBookData
-                                      }
-                                      setSelectedIndex={setSelectedIndex}
-                                      index={index}
-                                      selectedMarket={market}
-                                      setSelectedOrder={setSelectedOrder}
-                                      // isResolved={events?.isResolved}
-                                      forecast={events?.forecast}
-                                      forecastGraph={forecastGraph}
-                                      setForecastGraph={setForecastGraph}
-                                    />
-                                  </AccordionItem>
-                                ))}
+                                    )
+                                  }
+
+                                  return (
+                                    <AccordionItem
+                                      value={`market-${index + 1}`}
+                                      key={index}
+                                    >
+                                      <AccordionTrigger
+                                        marketId="market-1"
+                                        outcomePrice={market?.odd || 0}
+                                        className="flex sm:text-[18px] text-[18px] items-center sm:gap-2 gap-0"
+                                        setSelectedOrderBookData={
+                                          setSelectedOrderBookData
+                                        }
+                                        orderBook={
+                                          books?.find(
+                                            (book) =>
+                                              book.marketId ==
+                                              // JSON?.parse(market?.clobTokenIds)[0]
+                                              market?._id
+                                          ) || {}
+                                        }
+                                        setSelectedIndex={setSelectedIndex}
+                                        index={index}
+                                        isMultiMarket={markets?.length > 1}
+                                        setIsDrawerOpen={setIsDrawerOpen}
+                                        setActiveView={setActiveView}
+                                      >
+                                        <div className="pr-6">
+                                          <img
+                                            src={events?.image}
+                                            alt="Market 1"
+                                            width={42}
+                                            height={42}
+                                            className="rounded-md object-cover"
+                                            style={{
+                                              width: "42px",
+                                              height: "42px",
+                                            }}
+                                          />
+                                        </div>
+                                        <span className="pt-1">
+                                          {market.groupItemTitle}
+                                        </span>
+                                      </AccordionTrigger>
+                                      <OrderbookAccordionContent
+                                        orderBook={
+                                          books?.find(
+                                            (book) =>
+                                              book.marketId ==
+                                              // JSON?.parse(market?.clobTokenIds)[0]
+                                              market?._id
+                                          ) || {}
+                                        }
+                                        book={books}
+                                        activeView={activeView}
+                                        setActiveView={setActiveView}
+                                        setSelectedOrderBookData={
+                                          setSelectedOrderBookData
+                                        }
+                                        setSelectedIndex={setSelectedIndex}
+                                        index={index}
+                                        selectedMarket={market}
+                                        setSelectedOrder={setSelectedOrder}
+                                        // isResolved={events?.isResolved}
+                                        forecast={events?.forecast}
+                                        forecastGraph={forecastGraph}
+                                        setForecastGraph={setForecastGraph}
+                                      />
+                                    </AccordionItem>
+                                    )
+                                })}
                           </Accordion>
                         </>
                       )}
 
-                      {events?.status == "resolved" &&
+                      {/* {events?.status == "resolved" &&
                         markets.length >= 2 &&
                         markets.map((market, index) => (
                           <div
@@ -546,7 +616,7 @@ export default function EventPage({ categories }) {
                               )}
                             </div>
                           </div>
-                        ))}
+                        ))} */}
 
                       {/* <ExpandableTextView>
                         <h3 className="sm:text-[18px] text-[16px] font-bold sm:m-4 m-4">
@@ -600,10 +670,8 @@ export default function EventPage({ categories }) {
                           events?.description
                          )} */}
                       </div>
-
-                      {events?.status === "closed" && (
+                      {/* {(events?.outcomeType === "single" && events?.status === "closed") && (
                         <div className="flex items-start gap-3 p-4 my-3 rounded-md border border-red-500 bg-[#2a1414] text-red-300">
-                          {/* <XCircle className="w-5 h-5 mt-0.5 text-red-400" /> */}
                           <div>
                             <p className=" font-semibold">Market Closed</p>
                             <p className="text-sm text-red-400">
@@ -612,7 +680,7 @@ export default function EventPage({ categories }) {
                             </p>
                           </div>
                         </div>
-                      )}
+                      )} */}
                     </div>
 
                     {/* 评论区 Comment Section */}

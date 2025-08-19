@@ -466,7 +466,7 @@ export default function EventPage({ categories }) {
                                 ?.map((market, index) => {
                                   if (market.status == "resolved") {
                                     return (
-                                      <div className="flex justify-between items-center px-4 py-3 border-b border-[#2a2a2a] hover:bg-[#1d1d1d] cursor-pointer">
+                                      <div key={index} className="flex justify-between items-center px-4 py-3 border-b border-[#2a2a2a] hover:bg-[#1d1d1d] cursor-pointer">
                                         <div>
                                           <h3 className="text-[15px] sm:text-[16px] font-bold text-white flex items-center gap-2">
                                             {market.groupItemTitle}

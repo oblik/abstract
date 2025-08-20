@@ -271,6 +271,18 @@ const OrderbookAccordionContent = React.forwardRef<
       getOpenOrders();
     }, [selectedMarket]);
 
+    const  matchPriceAndQuantity = (data:any, targetPrice:number)=> {
+      let totalQty = 0;
+    
+      for (let [price, qty] of data) {
+        let p = Number(price);
+        if (p <= targetPrice) {
+          totalQty += qty;
+        }
+      }
+      return [targetPrice, totalQty];
+    }
+
     const onOrderCancel = async (orderId: any,success: any) => {
       try {
         if(success) {
@@ -373,7 +385,7 @@ const OrderbookAccordionContent = React.forwardRef<
       };
       fetchEvents();
     }, [id]);
-    console.log(activeView, forecastGraph, "forecastGraph");
+
     return (
       <AccordionPrimitive.Content
         ref={ref}
@@ -465,7 +477,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                       className="flex items-center h-[35px] w-full justify-between duration-300 ease-in-out bg-black text-white hover:bg-[#240000] z-20 relative cursor-pointer"
                                       onClick={() => setSelectedOrder({ 
                                         side: activeView, 
-                                        row, 
+                                        row:matchPriceAndQuantity(asks || [], Number(row[0])), 
                                         bidOrAsk: "ask", 
                                         ordCost: Number(
                                           getAccumalativeValueReverse(
@@ -558,7 +570,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                       className="flex items-center h-[35px] w-full justify-between bg-black text-white duration-300 ease-in-out hover:bg-[#001202] z-20 relative cursor-pointer"
                                       onClick={() => setSelectedOrder({ 
                                         side: activeView, 
-                                        row, 
+                                        row:matchPriceAndQuantity(bids || [], Number(row[0])), 
                                         bidOrAsk: "bid", 
                                         ordCost: Number(
                                           getAccumalativeValue(

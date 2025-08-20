@@ -386,6 +386,7 @@ export default function Authentication() {
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
+      if(signedIn){
         const res = await window.solana.connect({ onlyIfTrusted: true });
         const newPublicKey = res?.publicKey?.toString()?.toLowerCase();
         const savedAddress = data?.walletAddress?.toLowerCase();
@@ -420,6 +421,7 @@ export default function Authentication() {
         }
   
         previousWalletRef.current = newPublicKey;
+      }
       } catch (err) {
         // console.warn("Phantom not connected yet");
       }
@@ -427,7 +429,7 @@ export default function Authentication() {
   
     return () => clearInterval(interval);
   }, [data?.walletAddress, isConnected]);
-
+console.log(data?.walletAddress,isConnected,"data");
   return (
     <>
       {/* {signedIn && (

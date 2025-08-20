@@ -394,7 +394,7 @@ const Positions = (props) => {
 
                       <td>
                         <div className="flex justify-start items-center gap-2">
-                          {props.isPrivate && data.claim && (
+                          {props.isPrivate && data.claim && data.profit == true && (
                             <Button
                               size="sm"
                               className="bg-[#37ce37] text-[#fff] hover:text-[#000]"

@@ -115,6 +115,7 @@ export default function PortfolioPage({ categories }) {
   const [startDate, endDate] = dateRange;
   const [selectCategory, setSelectedCategory] = useState("all");
   const [navigationItems, setNavigationItems] = useState([]);
+  const [todayReal, setTodayReal] = useState(0);
 
   const PRIORITY_FEES = {
     low: 5000,
@@ -143,6 +144,7 @@ export default function PortfolioPage({ categories }) {
       console.log("success,result", success, result);
       if (success) {
         setProfitAmount(result?.totalPnl / 100);
+        setTodayReal(result?.totalPnl / 100);
       }
     } catch (err) {
       console.log("error ", err);
@@ -834,6 +836,7 @@ export default function PortfolioPage({ categories }) {
     }
   };
   const leftPNLPercent = trunc((walletData.pnl1D / (walletData?.balance + walletData?.position)) * 100, 2)
+  const todayRealPercent = trunc((todayReal / profitAmount) * 100, 2)
   return (
     <>
       <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
@@ -1503,15 +1506,12 @@ export default function PortfolioPage({ categories }) {
                     {PnLFormatted(formatNumber(profitAmount, 2))}
                   </span>
                   <span className="text-sm text-gray-500 mt-1">
-                    <span
-                      className={`${profitAmount >= 0 ? "text-green-400" : "text-red-400"
-                        }`}
-                    >
-                      $0.00 (0.00%)
-                    </span>{" "}
-                    Today
+                    <span className={todayReal > 0 ? "text-green-500" : "text-red-500"}>{todayReal < 0 && "-"}${Math.abs(trunc(todayReal, 2))}
+                      <span className={todayRealPercent > 0 ? "text-green-500" : "text-red-500"}>({todayRealPercent}%)</span>
+                    </span> Today
                   </span>
                 </div>
+                
                 <div className="justify-center items-center">
                   <ChartIntervals
                     interval={interval}

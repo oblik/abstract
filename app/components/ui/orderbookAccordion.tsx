@@ -271,12 +271,15 @@ const OrderbookAccordionContent = React.forwardRef<
       getOpenOrders();
     }, [selectedMarket]);
 
-    const  matchPriceAndQuantity = (data:any, targetPrice:number)=> {
+    const  matchPriceAndQuantity = (data:any, targetPrice:number, side: any)=> {
       let totalQty = 0;
     
       for (let [price, qty] of data) {
         let p = Number(price);
-        if (p <= targetPrice) {
+        if (side == "ask" && p <= targetPrice) {
+          totalQty += qty;
+        }
+        if (side == "bid" && p >= targetPrice) {
           totalQty += qty;
         }
       }
@@ -477,7 +480,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                       className="flex items-center h-[35px] w-full justify-between duration-300 ease-in-out bg-black text-white hover:bg-[#240000] z-20 relative cursor-pointer"
                                       onClick={() => setSelectedOrder({ 
                                         side: activeView, 
-                                        row:matchPriceAndQuantity(asks || [], Number(row[0])), 
+                                        row:matchPriceAndQuantity(asks || [], Number(row[0]), "ask"), 
                                         bidOrAsk: "ask", 
                                         ordCost: Number(
                                           getAccumalativeValueReverse(
@@ -570,7 +573,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                       className="flex items-center h-[35px] w-full justify-between bg-black text-white duration-300 ease-in-out hover:bg-[#001202] z-20 relative cursor-pointer"
                                       onClick={() => setSelectedOrder({ 
                                         side: activeView, 
-                                        row:matchPriceAndQuantity(bids || [], Number(row[0])), 
+                                        row:matchPriceAndQuantity(bids || [], Number(row[0]), "bid"), 
                                         bidOrAsk: "bid", 
                                         ordCost: Number(
                                           getAccumalativeValue(

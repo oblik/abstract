@@ -34,15 +34,21 @@ const CustomDateComponent: React.FC<CustomDateProps> = (props) => {
   }, [selectedDateTime]); // Only run once on component mount
 
   const filterPassedTime = (time) => {
-    const oneHourAhead = getOneHourAhead();
-    // Compare selected time with the one hour ahead time for the current day
-    return selectedDateTime && 
-           selectedDateTime.getDate() === new Date().getDate() && 
-           selectedDateTime.getMonth() === new Date().getMonth() && 
-           selectedDateTime.getFullYear() === new Date().getFullYear()
-      ? time.getTime() > oneHourAhead.getTime()
-      : true; // Allow any time for other days
-  };
+  const currentDate = new Date();
+  const selectedDate = selectedDateTime || currentDate;
+
+  // If the selected date is today, disable past times
+  if (
+    selectedDate.getDate() === currentDate.getDate() &&
+    selectedDate.getMonth() === currentDate.getMonth() &&
+    selectedDate.getFullYear() === currentDate.getFullYear()
+  ) {
+    return time.getTime() > currentDate.getTime();
+  }
+
+  // For future dates → allow all times
+  return true;
+};
 
   // state 
   const [date, setDate] = useState<Date | null>(minDateTime);
@@ -67,7 +73,7 @@ const CustomDateComponent: React.FC<CustomDateProps> = (props) => {
             />
           </div>
           <div className="flex justify-end mt-4">
-            <Button onClick={() => {setCustomDate(selectedDateTime), setShowCustomDialog(false)}}>Apply</Button>
+            <Button onClick={() => {setCustomDate(selectedDateTime), setShowCustomDialog(false)}} disabled = {selectedDateTime < new Date()}>Apply</Button>
           </div>
           <Dialog.Close asChild>
             <button className="modal_close_brn" aria-label="Close">

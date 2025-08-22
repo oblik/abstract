@@ -339,6 +339,7 @@ export default function EventPage({ categories }) {
                         eventId={events?._id}
                         eventSlug={events?.slug}
                         interval={interval}
+                        unit={events?.fcUnit || ""}
                       />
                     ) : (
                       <Chart

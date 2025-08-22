@@ -11,6 +11,7 @@ import { processSingleChartData, ChartDataPoint } from "@/utils/processChartData
 import { toTwoDecimal } from "@/utils/helpers";
 import ChartIntervals from "@/app/components/customComponents/ChartIntervals";
 import { getForecastHistory } from "@/services/market";
+import { isEmpty } from "@/lib/isEmpty";
 
 const getIntervalDate = (interval: string) => {
   const now = new Date();
@@ -56,7 +57,8 @@ interface MultiListenersChart2Props {
   market: MarketData[];
   eventSlug: string;
   customData?: ChartDataPoint[];
-  interval: string
+  interval: string;
+  unit?: string;
 }
 
 function calculateYAxisDomain(data: any[], assetKey: string = 'asset1'): [number, number] {
@@ -97,6 +99,15 @@ function calculateYAxisDomain(data: any[], assetKey: string = 'asset1'): [number
   return [roundedMin, roundedMax];
 }
 
+function numUnit(n: string) {
+  if (isEmpty(n) || !["k", "t", "m", "b"].includes(n)) return 1; 
+  if (n == "t") return 1e12;
+  if (n == "b") return 1e9;
+  if (n == "m") return 1e6;
+  if (n == "k") return 1e3;
+  return 1;
+}
+
 const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
   title,
   volume,
@@ -105,7 +116,8 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
   market,
   eventSlug,
   customData,
-  interval
+  interval,
+  unit,
 }) => {
   const [chartDataYes, setChartDataYes] = useState<ChartDataPoint[]>([]);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
@@ -118,11 +130,12 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
   const [hoveredChance, setHoveredChance] = useState<number | undefined>(undefined);
 
   // Create a custom tooltip component that can access the Chart component's state
-  const CustomTooltipWithState: React.FC<CustomTooltipProps & { isCustomData?: boolean }> = ({ 
+  const CustomTooltipWithState: React.FC<CustomTooltipProps & { isCustomData?: boolean, unit: string }> = ({ 
     active, 
     payload, 
     label, 
-    isCustomData = false
+    isCustomData = false,
+    unit = ""
   }) => {
     let formattedLabel = label;
     if (label && typeof label === 'number') {
@@ -144,7 +157,16 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
             (entry, index) =>
               entry.value !== null && (
                 <p key={index} style={{ color: entry.color }} className="text-sm">
-                  {entry.name} {isCustomData ? `${entry.value}M` : `${entry.value?.toFixed(1)}M`}
+                  {entry.name} 
+                  {" "}
+                  {entry.value !== undefined && entry.value !== null 
+                    ? (entry.value >= numUnit(unit ?? "") ? (entry.value / numUnit(unit ?? "")).toFixed(1) : entry.value.toFixed(1)) 
+                    : '0.0'
+                  }
+                  {entry.value !== undefined && entry.value !== null 
+                    ? (entry.value >= numUnit(unit ?? "") ? unit : "")
+                    : ""
+                  }
                 </p>
               )
           )}
@@ -285,20 +307,20 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
     );
   };
 
-  if (!chartData || chartData.length === 0) {
-    return (
-      <Card
-        className="w-[115vw] lg:w-[55vw] sm:w-[90vw] h-auto"
-        style={{ backgroundColor: "transparent", borderColor: "transparent" }}
-      >
-        <CardContent className="p-4">
-          <div className="text-center text-gray-500">
-            Loading chart data...
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  // if (!chartData || chartData.length === 0) {
+  //   return (
+  //     <Card
+  //       className="w-[115vw] lg:w-[55vw] sm:w-[90vw] h-auto"
+  //       style={{ backgroundColor: "transparent", borderColor: "transparent" }}
+  //     >
+  //       <CardContent className="p-4">
+  //         <div className="text-center text-gray-500">
+  //           Loading chart data...
+  //         </div>
+  //       </CardContent>
+  //     </Card>
+  //   );
+  // }
 
   return (
     <>
@@ -387,7 +409,14 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
               <div className="flex items-center justify-between mt-6 mb-6 w-full">
                 <div className="flex items-center">
                   <span className="text-3xl lg:text-4xl font-semibold" style={{ color: chanceColor }}>
-                    {displayChance !== undefined && displayChance !== null ? displayChance.toFixed(1) : '0.0'}M
+                    {displayChance !== undefined && displayChance !== null 
+                      ? (displayChance >= numUnit(unit ?? "") ? (displayChance / numUnit(unit ?? "")).toFixed(1) : displayChance.toFixed(1)) 
+                      : '0.0'
+                    }
+                    {displayChance !== undefined && displayChance !== null 
+                      ? (displayChance >= numUnit(unit ?? "") ? unit : "")
+                      : ""
+                    }
                   </span>
                   <span className="text-lg font-light ml-2" style={{ color: chanceColor }}>forecast</span>
                 </div>
@@ -454,8 +483,16 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                       }}
                     />
                     <YAxis
-                      domain={[0, 'dataMax']}                    
-                      tickFormatter={(tick) => customData ? `${tick}M` : `${tick}M`}
+                      domain={[0, 'dataMax']}
+                      tickFormatter={(tick) => {
+                        const f1 = tick !== undefined && tick !== null 
+                          ? (tick >= numUnit(unit ?? "") ? (tick / numUnit(unit ?? "")).toFixed(1) : tick) 
+                          : '0.0';
+                        const f2 = tick !== undefined && tick !== null 
+                          ? (tick >= numUnit(unit ?? "") ? unit : "")
+                          : "";
+                        return f1 + f2;
+                      }}
                       tickLine={false}
                       axisLine={false}
                       tickMargin={8}
@@ -463,7 +500,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                       width={40}
                     />
                     <Tooltip 
-                      content={<CustomTooltipWithState isCustomData={!!customData} />}
+                      content={<CustomTooltipWithState isCustomData={!!customData} unit={unit ?? ""} />}
                       allowEscapeViewBox={{ x: true, y: false }}
                       isAnimationActive={false}
                       shared={true}

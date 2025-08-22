@@ -68,7 +68,7 @@ const Notification = () => {
                             <h5 className="text-[16px] font-semibold text-gray-100">
                                 {item.type == "trade" && "Trade confirmed"}
                                 {item.type == "reply" && "Someone replied to your comment"}
-                                {item.type == "deposit" && "deposit confirmed"}
+                                {item.type == "deposit" && "Deposit confirmed"}
                                 {item.type == "withdraw" && "Withdraw approved"}
                             </h5>
                             <p className="text-sm text-gray-300">

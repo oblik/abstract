@@ -439,9 +439,9 @@ const Chart: React.FC<ChartProps> = ({
         };
         
         socket.on("chart-update", chartUpdate);
-        return () => {
-          socket.off("chart-update");
-        };
+        // return () => {
+        //   socket.off("chart-update");
+        // };
 
     }, [market, selectedYes]); // Remove interval from dependencies here too
 

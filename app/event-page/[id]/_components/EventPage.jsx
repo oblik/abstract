@@ -159,12 +159,23 @@ export default function EventPage({ categories }) {
       );
     };
 
+    const chartUpdate = (result) => {
+        // console.log("socket update odd ",result)
+        if(!result) return
+        const res = JSON.parse(result);
+        const marketId = res.m;
+        const price = res.pc.p;
+        setMarkets(prev => prev.map(market => market._id === marketId ? {...market, odd: price} : market)) 
+    };
+
     socket.on("orderbook", handleOrderbook);
     socket.on("recent-trade", handleRecentTrade);
+    socket.on("chart-update", chartUpdate);
 
     return () => {
       socket.off("orderbook");
       socket.off("recent-trade");
+      socket.off("chart-update");
     };
   }, [socketContext?.socket]);
 

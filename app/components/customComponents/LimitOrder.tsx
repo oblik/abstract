@@ -13,6 +13,7 @@ import { Switch } from "radix-ui";
 import CustomDateComponent from "./CustomDate";
 import { isEmpty } from "@/lib/isEmpty";
 import { firstLetterCase } from "@/lib/stringCase";
+import { Edit } from "lucide-react";
 
 interface LimitOrderProps {
   activeView: string;
@@ -206,6 +207,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
       toastAlert("success", "Order placed successfully!", "order-success");
       setFormValue({ ...formValue, price: "", amount: "" });
       setIsExpirationEnabled(false);
+      setCustomDate("");
     } else {
       toastAlert("error", message, "order-failed");
     }
@@ -388,9 +390,12 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
       )}
 
       {customDate && (
-        <div className="text-sm text-[#fff] mt-2">
-          {daysLeft !== null &&
-            `Expires in ${daysLeft} day${daysLeft === 1 ? "" : "s"}`}
+        <div className="flex justify-between items-center mt-2">
+          <div className="text-sm text-[#fff]">
+            {daysLeft !== null &&
+              `Expires in ${daysLeft} day${daysLeft === 1 ? "" : "s"}`}
+          </div>
+          <button onClick={()=>setShowCustomDialog(true)}><Edit size={16} /></button>
         </div>
       )}
 

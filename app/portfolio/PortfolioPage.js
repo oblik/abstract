@@ -303,6 +303,11 @@ export default function PortfolioPage({ categories }) {
       let respData = await getCoinList();
       if (respData.success) {
         setCoin(respData?.result);
+        setDepositData((prev) => ({
+          ...prev,
+          currency: respData?.result[0].symbol,
+          minDeposit: respData?.result[0].minDeposit,
+        }));
         const solCoin = respData.result.find((c) => c.symbol === "SOL");
         if (solCoin && solCoin.cnvPrice) {
           setTokenValue(solCoin.cnvPrice);
@@ -1513,7 +1518,7 @@ export default function PortfolioPage({ categories }) {
                     </span> Today
                   </span>
                 </div>
-                
+
                 <div className="justify-center items-center">
                   <ChartIntervals
                     interval={interval}

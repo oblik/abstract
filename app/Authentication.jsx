@@ -56,6 +56,15 @@ let initialValue = {
 };
 
 export default function Authentication() {
+  // Responsive style for auth buttons
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const style = document.createElement('style');
+      style.innerHTML = `@media (max-width: 640px) { .sono-auth-btn { font-size: 12px !important; padding: 0.25rem 0.75rem !important; height: 1.75rem !important; min-height: 1.75rem !important; border-radius: 0.375rem !important; } }`;
+      document.head.appendChild(style);
+      return () => { document.head.removeChild(style); };
+    }
+  }, []);
   const router = useRouter();
   const dispatch = useDispatch();
   const previousWalletRef = useRef(null);
@@ -448,7 +457,7 @@ console.log(data?.walletAddress,isConnected,"data");
         {!signedIn && (
           <>
             <Dialog.Trigger asChild>
-              <Button variant="outline" size="sm" onClick={() => {
+              <Button variant="outline" size="sm" className="sono-auth-btn" onClick={() => {
                 setOpen(true)
                 setUserData({ email: "" })
                 setExpireTime(0)
@@ -462,7 +471,7 @@ console.log(data?.walletAddress,isConnected,"data");
               <Button
                 variant="outline"
                 size="sm"
-                className="bg-[#eeeef0] text-[#131418]"
+                className="bg-[#eeeef0] text-[#131418] sono-auth-btn"
                 onClick={() => {
                   setOpen(true)
                   setUserData({ email: "" })
@@ -702,7 +711,7 @@ console.log(data?.walletAddress,isConnected,"data");
                 className="rounded p-2 hover:bg-[#333333] relative"
                 aria-label="Customise options"
               >
-                <BellIcon className="w-6 h-6 " />
+                <BellIcon className="sm:w-6 sm:h-6 w-5 h-5" />
                 {/* <span className="absolute top-[8px] right-[8px] w-2 h-2 bg-red-500 rounded-full block"></span> */}
               </button>
             </DropdownMenu.Trigger>
@@ -724,13 +733,6 @@ console.log(data?.walletAddress,isConnected,"data");
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
               <button className="profile_button" aria-label="Customise options">
-                {/* <img
-                  src={data?.profileImg ? data?.profileImg : "/images/default_user.png"}
-                  alt="Profile Icon"
-                  width={32}
-                  height={32}
-                  className="rounded-full"
-                /> */}
                 <Avatar className="w-6 h-6">
                     {data?.profileImg ? (
                     <AvatarImage

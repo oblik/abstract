@@ -165,16 +165,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
             (entry, index) =>
               entry.value !== null && (
                 <p key={index} style={{ color: entry.color }} className="text-sm">
-                  {entry.name} 
-                  {" "}
-                  {entry.value !== undefined && entry.value !== null 
-                    ? (entry.value >= numUnit(unit ?? "") ? (entry.value / numUnit(unit ?? "")).toFixed(1) : entry.value.toFixed(1)) 
-                    : '0.0'
-                  }
-                  {entry.value !== undefined && entry.value !== null 
-                    ? (entry.value >= numUnit(unit ?? "") ? unit : "")
-                    : ""
-                  }
+                  Forecast {isCustomData ? `${entry.value}` : `${entry.value?.toFixed(1)}`}
                 </p>
               )
           )}
@@ -262,7 +253,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
         ? chartData[chartData.length - 1]?.asset1
         : undefined;
 
-  const chanceColor = '#7DFDFE';
+  const chanceColor = '#ffffffff';
 
   const CustomDot = (props: any) => {
     const { cx, cy, payload, index } = props;
@@ -270,7 +261,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
     
     if (!isLastPoint) return null;
     
-    const dotColor = "#7DFDFE";
+    const dotColor = "#d0d0d0ff";
     
     return (
       <g>
@@ -350,61 +341,36 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
       },[series,eventSlug])
   return (
     <>
-      {/* Navigation bar restored to original position for mobile */}
-      <div className="block sm:hidden w-full z-20 sticky top-0 bg-black/90 border-b border-neutral-800 backdrop-blur-md">
-        <div className="flex items-center px-4 py-3">
-          <div
-            style={{
-              width: "40px",
-              height: "40px",
-              overflow: "hidden",
-              borderRadius: "10px",
-              flexShrink: 0,
-            }}
-          >
-            <Image
-              src="/images/logo_icon.png"
-              alt="Event"
-              width={40}
-              height={40}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
-          </div>
-          <div className="text-[18px] font-semibold pl-3 truncate">
-            {title || ""}
-          </div>
-        </div>
-      </div>
 
       <Card
         className="h-auto"
         style={{ backgroundColor: "transparent", borderColor: "transparent" }}
       >
         <div>
-          <CardHeader className="p-0">
-            <CardTitle style={{ lineHeight: "1.5" }}>
+          <CardHeader className="space-y-0 p-0">
+            <CardTitle style={{ lineHeight: "1.5" }} className="pt-3 sm:pb-1 pb-2 sm:pt-0">
               <div style={{ display: "flex", alignItems: "center" }}>
                 <div
                   style={{
-                    width: screenWidth < 640 ? "50px" : "75px",
-                    height: screenWidth < 640 ? "50px" : "75px",
-                    overflow: "hidden",
-                    borderRadius: "10px",
-                    flexShrink: 0,
+                   width: screenWidth < 640 ? "40px" : "65px",
+                   height: screenWidth < 640 ? "40px" : "65px",
+                   overflow: "hidden",
+                   borderRadius: "10px",
+                   flexShrink: 0,
                   }}
                 >
-                  <Image
-                    src={image}
-                    alt="Event"
-                    width={screenWidth < 640 ? 50 : 75}
-                    height={screenWidth < 640 ? 50 : 75}
-                    style={{ 
-                      width: "100%", 
-                      height: "100%", 
-                      objectFit: "cover",
-                      transition: "all 0.3s ease" 
-                    }}
-                  />
+              <img
+                 src={image}
+                 alt="Event"
+                 width={screenWidth < 640 ? 50 : 65}
+                 height={screenWidth < 640 ? 50 : 65}
+                 style={{ 
+                 width: "100%", 
+                 height: "100%", 
+                 objectFit: "cover",
+                 transition: "all 0.3s ease" 
+                 }}
+               />
                 </div>
                 <div
                   className="text-[19px] lg:text-[26px] sm:text-[20px]"
@@ -414,12 +380,12 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                 </div>
               </div>
             </CardTitle>
-            <CardDescription className="py-2 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-              <div className="flex pb-1 flex-wrap gap-3 items-center">
-                <p>Vol ${toTwoDecimal(volume)?.toLocaleString() || ""}</p>
+            <CardDescription className="py-0 pt-0 sm:pt-2 flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2">
+              <div className="flex flex-wrap gap-3 items-center">
+                <p className="text-[12px] sm:text-[14px]">Vol ${toTwoDecimal(volume)?.toLocaleString() || ""}</p>
                 {endDate && (
-                  <p className="flex items-center gap-1">
-                    <Clock size={14} />{" "}
+                  <p className="flex items-center gap-1 text-[12px] sm:text-[14px]">
+                   <Clock size={12} className="sm:w-[14px] sm:h-[14px] w-[12px] h-[12px]" />{" "}
                     {new Date(endDate)?.toLocaleString("en-US", {
                       day: "numeric",
                       month: "short",
@@ -490,19 +456,13 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
               </div>
             </CardDescription>
             {displayChance !== undefined && (
-              <div className="flex items-center justify-between mt-6 mb-6 w-full">
+              <div className="flex pt-2 sm:pt-3 pb-2 flex-wrap gap-3 items-center w-full">
                 <div className="flex items-center">
                   <span className="text-3xl lg:text-4xl font-semibold" style={{ color: chanceColor }}>
-                    {displayChance !== undefined && displayChance !== null 
-                      ? (displayChance >= numUnit(unit ?? "") ? (displayChance / numUnit(unit ?? "")).toFixed(1) : displayChance.toFixed(1)) 
-                      : '0.0'
-                    }
-                    {displayChance !== undefined && displayChance !== null 
-                      ? (displayChance >= numUnit(unit ?? "") ? unit : "")
-                      : ""
-                    }
+                    {displayChance !== undefined && displayChance !== null ? Number(displayChance).toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
                   </span>
                   <span className="text-lg font-light ml-2" style={{ color: chanceColor }}>forecast</span>
+
                 </div>
               </div>
             )}
@@ -514,7 +474,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                 </CardHeader>
               <CardContent className="p-0">
                 <ChartContainer
-                  className="h-[350px] p-0 pr-0 lg:h-[300px] sm:h-[250px] w-full"
+                  className="h-[300px] sm:h-[300px] lg:h-[300px] p-0 pr-0 w-full"
                   config={chartConfig}
                   onMouseLeave={() => {
                     setHoveredChance(undefined);
@@ -565,23 +525,18 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                           });
                         }
                       }}
+                      tick={{ fontSize: screenWidth < 640 ? 9 : 12, fill: '#bdbdbd' }}
+
                     />
                     <YAxis
-                      domain={[0, 'dataMax']}
-                      tickFormatter={(tick) => {
-                        const f1 = tick !== undefined && tick !== null 
-                          ? (tick >= numUnit(unit ?? "") ? (tick / numUnit(unit ?? "")).toFixed(1) : tick) 
-                          : '0.0';
-                        const f2 = tick !== undefined && tick !== null 
-                          ? (tick >= numUnit(unit ?? "") ? unit : "")
-                          : "";
-                        return f1 + f2;
-                      }}
+                      domain={[0, 'dataMax']}                    
+                      tickFormatter={(tick) => customData ? `${tick}` : `${tick}`}
                       tickLine={false}
                       axisLine={false}
                       tickMargin={8}
                       orientation="right"
                       width={40}
+                      tick={{ fontSize: screenWidth < 640 ? 9 : 12, fill: '#bdbdbd' }}
                     />
                     <Tooltip 
                       content={<CustomTooltipWithState isCustomData={!!customData} unit={unit ?? ""} />}
@@ -590,20 +545,14 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                       shared={true}
                       cursor={false}
                     />
-                    <Legend
-                      height={36}
-                      iconType="rect"
-                      wrapperStyle={{ top: "-30px", paddingBottom: 32 }}
-                      iconSize={8}
-                    />
+                    {/* Legend and forecast label removed */}
                     <Line
                       type="stepAfter"
                       dataKey="asset1"
-                      name={chartConfig.asset1.label}
-                      stroke="#7DFDFE"
+                      stroke="#ffffffff"
                       strokeWidth={1}
                       dot={<CustomDot />}
-                      activeDot={{ r: 4, fill: "#7DFDFE", stroke: "#fff", strokeWidth: 2 }}
+                      activeDot={{ r: 4, fill: "#d0d0d0ff", stroke: "#fff", strokeWidth: 2 }}
                       label={false}
                       connectNulls
                       isAnimationActive={false}

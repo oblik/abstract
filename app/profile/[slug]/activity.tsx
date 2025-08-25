@@ -78,7 +78,7 @@ const ActivityTable: React.FC<ActivityTableProps> = (props) => {
           {!loading && trades.length>0 && trades.map((trade, index) => (
             <Fragment key={index}>
               <tr>
-                <td colSpan={5} className='py-3 px-6'>
+                <td colSpan={5} className='sm:py-3 py-2 px-6'>
                   <div className="flex items-center gap-4">
                     <img
                       src={trade.marketId?.eventId?.image}
@@ -95,24 +95,24 @@ const ActivityTable: React.FC<ActivityTableProps> = (props) => {
                 </td>
               </tr>
             <tr  className="border-b border-[#333333]">
-              <td className="px-6 py-4">
+              <td className="px-6 sm:py-4 py-2">
                 <span className='font-bold'>Trade Completed</span>
                 <br />
                 <span className='text-xs'>{new Date(trade.time).toLocaleString()}</span>
               </td>
-              <td className="px-6 py-4">
+              <td className="px-6 sm:py-4 py-2">
                 {formatNumber(trade.price)}¢
               </td>
-              <td className="px-6 py-4">
+              <td className="px-6 sm:py-4 py-2">
                 {formatNumber(trade.quantity)}
               </td>
-              <td className="px-6 py-4">
+              <td className="px-6  sm:py-4 py-2">
                 ${formatNumber((trade.fee/100),5)}
               </td>
-              <td className={`px-6 py-4 ${trade.action === 'buy' ? 'text-green-500' : 'text-red-500'} capitalize`}>
+              <td className={`px-6 sm:py-4 sm:py-2 ${trade.action === 'buy' ? 'text-green-500' : 'text-red-500'} capitalize`}>
                 {trade.action}
               </td>
-              <td className={`px-6 py-4 ${trade.side === 'yes' ? 'text-green-500' : 'text-red-500'} capitalize`}>
+              <td className={`px-6 sm:py-4 sm:py-2 ${trade.side === 'yes' ? 'text-green-500' : 'text-red-500'} capitalize`}>
                 {trade.side == "yes" ? (trade?.marketId?.outcome?.[0]?.title || "yes") : (trade?.marketId?.outcome?.[1]?.title || "no") }
               </td>
             </tr>
@@ -121,7 +121,7 @@ const ActivityTable: React.FC<ActivityTableProps> = (props) => {
         </tbody>
       </table>
       {!loading && trades.length === 0 && (
-          <div  className="flex justify-center my-5 text-gray-500">
+          <div  className="flex justify-center text-[13px] my-5 text-gray-500">
               No Activity found
           </div>
       )}

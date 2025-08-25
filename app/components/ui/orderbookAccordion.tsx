@@ -8,8 +8,8 @@ import { FillBid } from "@/app/components/ui/fillBid";
 import { Badge } from "@/app/components/ui/badge";
 import {
   decimalToPercentage,
-  getAccumalativeValue,
-  getAccumalativeValueReverse,
+  getAccumulativeValue,
+  getAccumulativeValueReverse,
   toTwoDecimal,
 } from "@/utils/helpers";
 import { useContext, useEffect, useState } from "react";
@@ -78,18 +78,20 @@ const OrderbookAccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
 >(({ className, children, ...props }, ref) => {
+  // If the children is the string 'Orderbook', change it to 'Order Book'
+  const displayChildren = typeof children === 'string' && children.trim().toLowerCase() === 'orderbook' ? 'Order Book' : children;
   return (
-    <AccordionPrimitive.Header className="sm:text-[18px] text-[14px] flex items-center justify-between w-full">
+    <AccordionPrimitive.Header className="sm:text-[16px] text-[14px] flex items-center justify-between w-full">
       <AccordionPrimitive.Trigger
         ref={ref}
         className={cn(
-          "h-[68px] sm:h-[80px] sm:text-[18px] text-[14px] w-full pr-4 pl-4 sm:pr-3 sm:pl-4 flex flex-1 items-center justify-between sm:py-4 py-2 font-medium transition-all cursor-pointer",
+          "h-[56px] sm:h-[70px] sm:text-[16px] text-[14px] w-full pr-3 pl-3 sm:pr-3 sm:pl-4 flex flex-1 items-center justify-between sm:py-3 py-2 font-medium transition-all cursor-pointer",
           className
         )}
         {...props}
       >
-        <span className="text-[16px] sm:text-[18px] flex max-w-auto">
-          {children}
+        <span className="text-[14px] sm:text-[16px] flex max-w-auto">
+          {displayChildren}
         </span>
         <div className="flex-1" />
         <ChevronDown
@@ -412,25 +414,20 @@ const OrderbookAccordionContent = React.forwardRef<
             <TabsList className="flex justify-start w-1/4 min-w-[150px]">
               <TabsTrigger
                 value="Yes"
-                className="flex-1 px-2 py-2 transition-all duration-300 border-b-2 border-transparent"
+                className="flex-1 px-2 py-2 text-[12px] sm:text-base transition-all duration-300 border-b-2 border-transparent"
               >
                 Trade {capitalize(selectedMarket?.outcome?.[0]?.title || "Yes")}
               </TabsTrigger>
               <TabsTrigger
                 value="No"
-                className="flex-1 px-2 py-2 transition-all duration-300 border-b-2 border-transparent"
+                className="flex-1 px-2 py-2 text-[12px] sm:text-base transition-all duration-300 border-b-2 border-transparent"
               >
                 Trade {capitalize(selectedMarket?.outcome?.[1]?.title || "No")}
               </TabsTrigger>
               {
                 forecast && <TabsTrigger
                 value="Graph"
-                className={cn(
-                  "flex-1 p-2 transition-colors duration-300",
-                  forecastGraph
-                    ? "bg-transparent text-pink-500"
-                    : "bg-transparent text-white hover:bg-transparent"
-                )}
+                className="flex-1 px-2 py-2 text-[12px] sm:text-base transition-all duration-300 border-b-2 border-transparent data-[state=inactive]:border-b-2 data-[state=inactive]:border-transparent hover:border-transparent"
               >
                 Graph
               </TabsTrigger>
@@ -449,12 +446,12 @@ const OrderbookAccordionContent = React.forwardRef<
                   ) : (
                     <>
                       <div className="flex items-center h-[35px] w-full justify-between">
-                        <div className="w-[30%] p-3">
+                        <div className="text-[12px] sm:text-base w-[30%] p-3">
                           {activeView === "Yes" ? `Trade ${capitalize(selectedMarket?.outcome?.[0]?.title) || "Yes"}` : `Trade ${capitalize(selectedMarket?.outcome?.[1]?.title) || "No"}`}
                         </div>
-                        <div className="w-[20%] text-center">Price</div>
-                        <div className="w-[25%] text-center">Shares</div>
-                        <div className="w-[25%] text-center">Total</div>
+                        <div className="w-[20%] text-[12px] sm:text-base text-center">Price</div>
+                        <div className="w-[25%]  text-[12px] sm:text-base text-center">Shares</div>
+                        <div className="w-[25%]  text-[12px] sm:text-base text-center">Total</div>
                       </div>
                       <div className="w-full overflow-hidden h-[fit-content]">
                         <div
@@ -477,13 +474,13 @@ const OrderbookAccordionContent = React.forwardRef<
                                   return (
                                     <div
                                       key={index}
-                                      className="flex items-center h-[35px] w-full justify-between duration-300 ease-in-out bg-black text-white hover:bg-[#240000] z-20 relative cursor-pointer"
+                                      className="flex items-center text-[12px] sm:text-base h-[35px] w-full justify-between duration-300 ease-in-out bg-black text-white hover:bg-[#240000] z-20 relative cursor-pointer"
                                       onClick={() => setSelectedOrder({ 
                                         side: activeView, 
                                         row:matchPriceAndQuantity(asks || [], Number(row[0]), "ask"), 
                                         bidOrAsk: "ask", 
                                         ordCost: Number(
-                                          getAccumalativeValueReverse(
+                                          getAccumulativeValueReverse(
                                             asks || [],
                                             orderBookLength - (index + 1)
                                           ) / 100
@@ -493,7 +490,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                       <div className="w-[30%]">
                                         <FillAsk
                                           value={
-                                            (getAccumalativeValueReverse(
+                                            (getAccumulativeValueReverse(
                                               asks || [],
                                               orderBookLength - (index + 1)
                                             ) /
@@ -518,7 +515,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                       <div className="w-[25%] text-center">
                                         {"$" +
                                           Number(
-                                            getAccumalativeValueReverse(
+                                            getAccumulativeValueReverse(
                                               asks || [],
                                               orderBookLength - (index + 1)
                                             ) / 100
@@ -530,33 +527,33 @@ const OrderbookAccordionContent = React.forwardRef<
                               {/* Asks badge */}
                               {asks.length > 0 && (
                                 <div className="flex w-full">
-                                  <Badge className="w-[50px] text-xs text-white bg-[#ff0000] mb-1 absolute bottom-0 left-5 z-30">
+                                  <Badge className="w-[50px] text-xs text-white bg-[#ff0000] mb-1 absolute bottom-0 left-5 z-30 flex items-center justify-center px-3">
                                     Asks
                                   </Badge>
                                 </div>
                               )}{" "}
                             </div>
     
-                            {asks && bids && asks.length > 0 && bids.length > 0 && (
-                              <div className="flex items-center h-[35px] w-full p-3">
-                                <div className="w-[30%]">Last: 
-                                  {selectedMarket?.last ? (
-                                    activeView == "Yes" ? selectedMarket?.last || 0 : 100 - (selectedMarket?.last || 0)
-                                  ) : "--"}
-                                ¢</div>
-                                <div className="w-[20%] text-center">
-                                  Spread: {calcSpread(bids, asks)}
-                                </div>
-                                <div className="w-[25%]"></div>
-                                <div className="w-[25%]"></div>
+                            <div className="flex text-[12px] sm:text-base items-center h-[35px] w-full p-3">
+                              <div className="w-[30%]">Last: 
+                                {selectedMarket?.last ? (
+                                  activeView == "Yes" ? selectedMarket?.last || 0 : 100 - (selectedMarket?.last || 0)
+                                ) : "--"}
+                              ¢</div>
+                              <div className="text-[12px] sm:text-base w-[30%] text-center">
+                                {asks.length > 0 && bids.length > 0 ? (
+                                  <>Spread: {calcSpread(bids, asks)}</>
+                                ) : null}
                               </div>
-                            )}
+                              <div className="w-[25%]"></div>
+                              <div className="w-[25%]"></div>
+                            </div>
     
                             {/* Bids badge */}
                             <div className="relative w-full">
                               {bids.length > 0 && (
                                 <div className="flex w-full">
-                                  <Badge className="w-[50px] text-xs text-white bg-[#00c735] mt-1 mb-1 absolute top-0 left-5 z-30">
+                                  <Badge className="w-[50px] text-xs text-white bg-[#00c735] mt-1 mb-1 absolute top-0 left-5 z-30 flex items-center justify-center px-3">
                                     Bids
                                   </Badge>
                                 </div>
@@ -570,13 +567,13 @@ const OrderbookAccordionContent = React.forwardRef<
                                   return (
                                     <div
                                       key={index}
-                                      className="flex items-center h-[35px] w-full justify-between bg-black text-white duration-300 ease-in-out hover:bg-[#001202] z-20 relative cursor-pointer"
+                                      className="flex items-center text-[12px] sm:text-base h-[35px] w-full justify-between bg-black text-white duration-300 ease-in-out hover:bg-[#001202] z-20 relative cursor-pointer"
                                       onClick={() => setSelectedOrder({ 
                                         side: activeView, 
                                         row:matchPriceAndQuantity(bids || [], Number(row[0]), "bid"), 
                                         bidOrAsk: "bid", 
                                         ordCost: Number(
-                                          getAccumalativeValue(
+                                          getAccumulativeValue(
                                             asks || [],
                                             orderBookLength - (index + 1)
                                           ) / 100
@@ -586,7 +583,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                       <div className="w-[30%]">
                                         <FillBid
                                           value={
-                                            (getAccumalativeValue(
+                                            (getAccumulativeValue(
                                               bids || [],
                                               index
                                             ) /
@@ -611,7 +608,7 @@ const OrderbookAccordionContent = React.forwardRef<
                                       <div className="w-[25%] text-center">
                                         {"$" +
                                           Number(
-                                            getAccumalativeValue(
+                                            getAccumulativeValue(
                                               bids || [],
                                               index
                                             ) / 100
@@ -627,6 +624,7 @@ const OrderbookAccordionContent = React.forwardRef<
                       </div>
                     </>
                   )}
+                  
                 </div>
               ) :
               (

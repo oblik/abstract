@@ -1,0 +1,4 @@
+{
+    "files.participants.timeout": 600000,
+    "diffEditor.maxComputationTime": 0
+}

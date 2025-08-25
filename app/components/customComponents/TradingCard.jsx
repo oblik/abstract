@@ -122,14 +122,14 @@ export function TradingCard({
 
   return (
     <Card
-      className="w-[100%] trading_card border border-[#282828]"
+      className="w-[100%] trading_card border border-[#282828] min-h-[480px] pb-6 sm:min-h-[unset] sm:pb-0"
       style={{
         backgroundColor: "#000000",
         boxShadow: "0 2px 6px 0 rgba(220,220,255,0.13)",
       }}
     >
       <div className="w-[100%]">
-        <CardHeader className="p-5">
+        <CardHeader className="sm:p-5 sm:pb-3 pb-0 p-3">
           <CardTitle style={{ lineHeight: "1.5" }}>
             <div style={{ display: "flex", alignItems: "center" }}>
               <div
@@ -171,7 +171,7 @@ export function TradingCard({
           </CardDescription> */}
         </CardHeader>
 
-        <CardContent className="p-4 pt-0">
+        <CardContent className="sm:p-4 pt-0 sm:pt-0 p-3">
           <Tabs
             defaultValue="buy"
             className="w-full"
@@ -246,7 +246,7 @@ export function TradingCard({
               </h1>
             </TabsContent>
 
-            <div className="pt-1">
+            <div className="sm:pt-1 pt-0">
               <Options
                 defaultValue={activeView}
                 value={activeView}
@@ -255,7 +255,7 @@ export function TradingCard({
               >
                 <OptionsList className="grid w-full grid-cols-2 gap-2">
                   <OptionsTrigger
-                    className="rounded-md border-transparent hover:bg-[#0d1a26] hover:text-[#7dfdfe] data-[state=active]:bg-[#0d1a26] data-[state=active]:text-[#7dfdfe] data-[state=active]:border-[#0d1a26] relative group"
+                    className="rounded-md border-transparent hover:bg-[#0d1a26] hover:text-[#7dfdfe] data-[state=active]:bg-[#0d1a26] data-[state=active]:text-[#7dfdfe] data-[state=active]:border-[#0d1a26] relative group min-h-[36px] py-1 sm:min-h-[37px] sm:py-1"
                     value="Yes"
                   >
                     {firstLetterCase(market?.outcome?.[0]?.title) || "Yes"}{" "}
@@ -289,7 +289,7 @@ export function TradingCard({
                     </div>
                   </OptionsTrigger>
                   <OptionsTrigger
-                    className="rounded-md hover:bg-[#210d1a] hover:text-[#ec4899] data-[state=active]:bg-[#210d1a] data-[state=active]:text-[#ec4899] data-[state=active]:border-[#210d1a] relative group"
+                    className="rounded-md hover:bg-[#210d1a] hover:text-[#ec4899] data-[state=active]:bg-[#210d1a] data-[state=active]:text-[#ec4899] data-[state=active]:border-[#210d1a] relative group min-h-[37px] py-1 sm:min-h-[38px] sm:py-1"
                     value="No"
                   >
                     {firstLetterCase(market?.outcome?.[1]?.title) || "No"}{" "}
@@ -351,25 +351,20 @@ export function TradingCard({
                 </div>
 
                 {orderType === "market" && (
-                  <MarketOrder
-                    activeView={activeView}
-                    marketId={market?._id}
-                    buyorsell={tab}
-                    status={status}
-                    selectedOrder={selectedOrder}
-                    lastYesOrder={
-                      tab == "buy"
-                        ? buyYes?.length > 0 &&
-                          toFixedDown(100 - buyYes?.[0], 2)
-                        : sellYes?.length > 0 && toFixedDown(sellYes?.[0], 2)
-                    }
-                    lastNoOrder={
-                      tab == "buy"
-                        ? buyNo?.length > 0 && toFixedDown(100 - buyNo?.[0], 2)
-                        : sellNo?.length > 0 && toFixedDown(sellNo?.[0], 2)
-                    }
-                    outcomes={market?.outcome}
-                  />
+              <MarketOrder
+                activeView={activeView}
+                marketId={market?._id}
+                buyorsell={tab}
+                outcomes={market?.outcome}
+                orderBook={{
+                  bids: selectedOrderBookData?.bids?.[0] || [],
+                  asks: selectedOrderBookData?.asks?.[0] || [],
+                }}
+                status={status}
+                selectedOrder={selectedOrder}
+                takerFee={market?.takerFee}
+              />
+
                 )}
 
                 {orderType === "limit" && (

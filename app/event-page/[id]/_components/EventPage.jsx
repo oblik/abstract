@@ -656,7 +656,7 @@ export default function EventPage({ categories }) {
                             </p>
                           </div>
                         </div>
-                      )} */
+                      )}
                     </div>
 
                     {/* 评论区 Comment Section */}

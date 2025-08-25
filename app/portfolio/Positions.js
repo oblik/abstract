@@ -134,6 +134,7 @@ const Positions = (props) => {
                 filled: resData.filled,
                 quantity: resData.quantity,
                 last: resData.marketLast,
+                odd: resData.marketOdd
               },
             ],
           };
@@ -152,6 +153,7 @@ const Positions = (props) => {
               filled: resData.filled,
               quantity: resData.quantity,
               last: resData.marketLast,
+              odd: resData.marketOdd
             };
             const updatedEvent = {
               ...prev[eventIndex],
@@ -193,6 +195,7 @@ const Positions = (props) => {
               filled: resData.filled,
               price: resData.price,
               last: resData.marketLast,
+              odd: resData.marketOdd,
               side: resData.side,
             };
             const updatedEvent = {
@@ -218,11 +221,13 @@ const Positions = (props) => {
         }
       });
     };
-    socket.on("pos-update", handlePositions);
+    if (props.isPrivate){
+      socket.on("pos-update", handlePositions);
+    }
     return () => {
       socket.off("pos-update", handlePositions);
     };
-  }, [socketContext]);
+  }, [socketContext, props.isPrivate]);
 
   const marketPositionClaim = async (id) => {
     try {
@@ -280,7 +285,7 @@ const Positions = (props) => {
                         </div>
                         <div className="flex items-center gap-2">
                           {
-                            item?.positions.length == 1 && (
+                            props.isPrivate && item?.positions.length == 1 && (
                               <button
                                 className="text-gray-400 hover:text-white transition-colors duration-300"
                                 onClick={() =>
@@ -336,12 +341,12 @@ const Positions = (props) => {
                         )}
                       </td>
                       <td>
-                        {data.side == "no" ? 100 - data?.last : data?.last}¢
+                        {data.side == "no" ? 100 - data?.odd : data?.odd}¢
                         {/* <span className={(data.side == "no" ? (100 - data?.last) : data?.last) > data?.filled?.[0]?.price ? "text-green-500" : "text-red-500"}>({((((data.side == "no" ? (100 - data?.last) : data?.last) || data.filled?.[0]?.price) - data.filled?.[0]?.price) / data?.filled?.[0]?.price * 100).toFixed(2)}%)</span> */}
                       </td>
                       <td
                         className={`${
-                          (data.side == "no" ? 100 - data?.last : data?.last) >=
+                          (data.side == "no" ? 100 - data?.odd : data?.odd) >=
                           data?.filled?.[0]?.price
                             ? "text-green-500"
                             : "text-red-500"
@@ -349,7 +354,7 @@ const Positions = (props) => {
                       >
                         $
                         {toFixedDown(
-                          ((data.side == "no" ? 100 - data?.last : data?.last) *
+                          ((data.side == "no" ? 100 - data?.odd : data?.odd) *
                             data?.quantity) /
                             100,
                           2
@@ -357,8 +362,8 @@ const Positions = (props) => {
                         (
                         {toFixedDown(
                           (((data.side == "no"
-                            ? 100 - data?.last
-                            : data?.last) -
+                            ? 100 - data?.odd
+                            : data?.odd) -
                             data?.filled?.[0]?.price) /
                             data?.filled?.[0]?.price) *
                             100,
@@ -370,7 +375,7 @@ const Positions = (props) => {
 
                       <td>
                         <div className="flex justify-start items-center gap-2">
-                          {data.claim && (
+                          {props.isPrivate && data.claim && data.profit == true && (
                             <Button
                               size="sm"
                               className="bg-[#37ce37] text-[#fff] hover:text-[#000]"
@@ -380,7 +385,7 @@ const Positions = (props) => {
                             </Button>
                           )}
                           {
-                            item?.positions.length > 1 && (
+                            props.isPrivate && item?.positions.length > 1 && (
                               <button
                                 className="text-gray-400 hover:text-white transition-colors duration-300"
                                 onClick={() =>

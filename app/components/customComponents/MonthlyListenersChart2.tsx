@@ -10,7 +10,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/app
 import { processSingleChartData, ChartDataPoint } from "@/utils/processChartData";
 import { toTwoDecimal } from "@/utils/helpers";
 import ChartIntervals from "@/app/components/customComponents/ChartIntervals";
-import { getForecastHistory } from "@/services/market";
+import { getForecastHistory, getSeriesByEvent } from "@/services/market";
+import { isEmpty } from "@/lib/isEmpty";
+import { Popover } from "radix-ui";
+import { CountdownTimerIcon } from "@radix-ui/react-icons";
+import { momentFormat } from "@/app/helper/date";
+import { useRouter } from "next/navigation";
 
 const getIntervalDate = (interval: string) => {
   const now = new Date();
@@ -56,7 +61,9 @@ interface MultiListenersChart2Props {
   market: MarketData[];
   eventSlug: string;
   customData?: ChartDataPoint[];
-  interval: string
+  interval: string;
+  unit?: string;
+  series: any;
 }
 
 function calculateYAxisDomain(data: any[], assetKey: string = 'asset1'): [number, number] {
@@ -97,6 +104,15 @@ function calculateYAxisDomain(data: any[], assetKey: string = 'asset1'): [number
   return [roundedMin, roundedMax];
 }
 
+function numUnit(n: string) {
+  if (isEmpty(n) || !["k", "t", "m", "b"].includes(n)) return 1; 
+  if (n == "t") return 1e12;
+  if (n == "b") return 1e9;
+  if (n == "m") return 1e6;
+  if (n == "k") return 1e3;
+  return 1;
+}
+
 const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
   title,
   volume,
@@ -105,7 +121,9 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
   market,
   eventSlug,
   customData,
-  interval
+  interval,
+  unit,
+  series
 }) => {
   const [chartDataYes, setChartDataYes] = useState<ChartDataPoint[]>([]);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
@@ -116,13 +134,16 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
     },
   });
   const [hoveredChance, setHoveredChance] = useState<number | undefined>(undefined);
+  const [seriesData, setSeriesData] = useState<any>([])
+  const route = useRouter()
 
   // Create a custom tooltip component that can access the Chart component's state
-  const CustomTooltipWithState: React.FC<CustomTooltipProps & { isCustomData?: boolean }> = ({ 
+  const CustomTooltipWithState: React.FC<CustomTooltipProps & { isCustomData?: boolean, unit: string }> = ({ 
     active, 
     payload, 
     label, 
-    isCustomData = false
+    isCustomData = false,
+    unit = ""
   }) => {
     let formattedLabel = label;
     if (label && typeof label === 'number') {
@@ -285,21 +306,39 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
     );
   };
 
-  if (!chartData || chartData.length === 0) {
-    return (
-      <Card
-        className="w-[115vw] lg:w-[55vw] sm:w-[90vw] h-auto"
-        style={{ backgroundColor: "transparent", borderColor: "transparent" }}
-      >
-        <CardContent className="p-4">
-          <div className="text-center text-gray-500">
-            Loading chart data...
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  // if (!chartData || chartData.length === 0) {
+  //   return (
+  //     <Card
+  //       className="w-[115vw] lg:w-[55vw] sm:w-[90vw] h-auto"
+  //       style={{ backgroundColor: "transparent", borderColor: "transparent" }}
+  //     >
+  //       <CardContent className="p-4">
+  //         <div className="text-center text-gray-500">
+  //           Loading chart data...
+  //         </div>
+  //       </CardContent>
+  //     </Card>
+  //   );
+  // }
 
+  const getSeriesData = async(id:any)=>{
+          try{
+              let { success,result } = await getSeriesByEvent(id)
+              console.log("result",result)
+              if(success){
+                  setSeriesData(result)
+              }
+          }catch(err){
+              console.log('error',err)
+          }
+      }
+      useEffect(()=>{
+          if(series?.slug){
+              getSeriesData(series?.slug)
+          }else{
+              setSeriesData([])
+          }
+      },[series,eventSlug])
   return (
     <>
 
@@ -356,6 +395,64 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                     })}
                   </p>
                 )}
+              </div>
+              <div className="flex items-center gap-2 mt-2">
+                {seriesData?.length > 0 && (
+                    <Popover.Root>
+                        <Popover.Trigger asChild>
+                            <Button className="...">
+                                <CountdownTimerIcon />
+                            </Button>
+                        </Popover.Trigger>
+                        <Popover.Content className="history_card" sideOffset={5}>
+                            <ul className="history_card_list">
+                            {seriesData?.length > 0 && (
+                                seriesData
+                                    .filter((series) => series.status !== "active")
+                                    ?.sort((a: any, b: any) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())
+                                    ?.map((event) => (
+                                        <li key={event?.slug} 
+                                        onClick={()=>route.push(`/event-page/${event.slug}`)}
+                                        >
+                                            {/* <Link href={`/event-page/${event.slug}`}> */}
+                                                {momentFormat(event.endDate,"D MMM YYYY, h:mm A")}
+                                            {/* </Link> */}
+                                        </li>
+                                    ))
+                                )}
+                            </ul>
+                            <Popover.Arrow className="HoverCardArrow" />
+                        </Popover.Content>
+                    </Popover.Root>
+                )}
+                {seriesData?.length > 0 && (
+                    seriesData
+                        .filter((series) => series.status === "active")
+                        ?.sort((a: any, b: any) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime())
+                        ?.map((event) => (
+                        <div
+                            key={event.slug} 
+                            // href={`/event-page/${event.slug}`}
+                            onClick={()=>route.push(`/event-page/${event.slug}`)}
+                            className="w-[90px] rounded-full bg-transparent border border-[#262626] text-white hover:bg-[#262626] hover:text-white active:bg-[#262626] active:text-white text-center px-2 py-1 block text-sm"
+                        >
+                            {momentFormat(event?.endDate,"D MMM")}
+                        </div>
+                    ))
+                )}
+                {/* <Button
+                    // className="w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] active:bg-[#262626] active:text-[#fff]"
+                    className={`w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] ${activeDate === "Jun 18"
+                            ? "bg-[#fff] text-[#262626] border-[#262626]"
+                            : ""
+                        }`}
+                    onClick={() => setActiveDate("Jun 18")}
+                >
+                    Jun 18
+                </Button>
+                <Button className="w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] active:bg-[#262626] active:text-[#fff]">
+                    Jul 30
+                </Button> */}
               </div>
             </CardDescription>
             {displayChance !== undefined && (
@@ -442,7 +539,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                       tick={{ fontSize: screenWidth < 640 ? 9 : 12, fill: '#bdbdbd' }}
                     />
                     <Tooltip 
-                      content={<CustomTooltipWithState isCustomData={!!customData} />}
+                      content={<CustomTooltipWithState isCustomData={!!customData} unit={unit ?? ""} />}
                       allowEscapeViewBox={{ x: true, y: false }}
                       isAnimationActive={false}
                       shared={true}

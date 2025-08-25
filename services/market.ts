@@ -128,6 +128,19 @@ export const getComments = async (eventId: string) => {
   }
 };
 
+export const getCommentsPaginate = async (eventId: string, data: { page: number; limit: number }) => {
+  try {
+    let respData = await axios({
+      url: `${config.backendURL}/api/v1/user/comments/event/paginate/${eventId}`,
+      method: "get",
+      params: data
+    });
+    return handleResp(respData, "success");
+  } catch (error: any) {
+    return handleResp(error, "error");
+  }
+};
+
 export const postComment = async (data: any) => {
   try {
     let respData = await axios({

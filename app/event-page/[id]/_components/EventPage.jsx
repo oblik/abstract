@@ -1,7 +1,7 @@
 "use client";
 import "@/app/globals.css";
 import { useParams } from "next/navigation";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { CheckCircle, ClockIcon, Loader, XCircle } from "lucide-react";
 import Image from "next/image";
 import {
@@ -51,10 +51,12 @@ import Astroworld from "@/public/images/astroworld.png";
 import { NavigationBar } from "@/app/components/ui/navigation-menu";
 import HeaderFixed from "@/app/HeaderFixed";
 import { toFixedDown } from "@/lib/roundOf";
+import { capitalize } from "@/lib/stringCase";
 
 export default function EventPage({ categories }) {
   const param = useParams();
   const id = param.id;
+  const disContainer = document.getElementById("event-discription")
   const socketContext = useContext(SocketContext);
   const [events, setEvents] = useState([]);
   const [eventsLoading, setEventsLoading] = useState(true);
@@ -76,6 +78,8 @@ export default function EventPage({ categories }) {
   const [showFullText, setShowFullText] = useState(false);
   const [selectCategory, setSelectedCategory] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState({});
+  const [showMore, setShowMore] = useState(false);
+
 
   // Helper functions for price calculation (same as TradingCard)
   const descending = (a, b) => Number(b[0]) - Number(a[0]);
@@ -167,12 +171,23 @@ export default function EventPage({ categories }) {
       );
     };
 
+    const chartUpdate = (result) => {
+        // console.log("socket update odd ",result)
+        if(!result) return
+        const res = JSON.parse(result);
+        const marketId = res.m;
+        const price = res.pc.p;
+        setMarkets(prev => prev.map(market => market._id === marketId ? {...market, odd: price} : market)) 
+    };
+
     socket.on("orderbook", handleOrderbook);
     socket.on("recent-trade", handleRecentTrade);
+    socket.on("chart-update", chartUpdate);
 
     return () => {
       socket.off("orderbook");
       socket.off("recent-trade");
+      socket.off("chart-update");
     };
   }, [socketContext?.socket]);
 
@@ -227,6 +242,20 @@ export default function EventPage({ categories }) {
     }
   };
 
+  const checkOverflow =(container)=> {
+    if (container.scrollHeight > container.clientHeight) {
+      setShowMore(true);
+      setShowFullText(false);
+    } else {
+      setShowMore(false);
+      setShowFullText(true);
+    }
+  }
+
+  useEffect(() => {
+    if(!isEmpty(disContainer)) checkOverflow(disContainer);
+  },[disContainer])
+
   // Get Books Data
   useEffect(() => {
     if (markets.length > 0) {
@@ -260,6 +289,35 @@ export default function EventPage({ categories }) {
       console.error("Error fetching open orders:", error);
     }
   };
+
+  const getOutcomeTitle = (arr, id) => {
+    try {
+      const find = arr.find(item => item._id == id);
+      return find?.title ? capitalize(find?.title) : 'Yes';
+    } catch {
+      return '';
+    }
+  }
+
+  const isWinning = useCallback((events, market) => {
+    try {
+      if (isEmpty(events)) return false;
+      if (isEmpty(market)) return false;
+      
+      const outcomeType = events?.outcomeType;
+      if (outcomeType == 'single') {
+        if (events?.marketId.length == 1) {
+          return events?.marketId?.[0]?.outcome?.[0]._id == events?.outcomeId;
+        } else {
+          return events?.outcomeId == market?._id;
+        }
+      } else if (outcomeType == 'multi') {
+        return market?.outcome?.[0]._id == market?.outcomeId;
+      }
+    } catch {
+      return false;
+    }
+  }, [events]);
 
   return (
     <>
@@ -308,6 +366,8 @@ export default function EventPage({ categories }) {
                         eventId={events?._id}
                         eventSlug={events?.slug}
                         interval={interval}
+                        unit={events?.fcUnit || ""}
+                        series={events?.seriesId}
                       />
                     ) : (
                       <Chart
@@ -384,17 +444,13 @@ export default function EventPage({ categories }) {
                           <OrderbookAccordionItem value="orderbook">
                             <OrderbookAccordionTrigger>
                               Orderbook
-                              {/* <ClockIcon className="w-4 h-4" onClick={(e)=>{
-                                e.stopPropagation();
-                                handleOpenOrderDialog( markets[0]?._id)
-                              }}/> */}
+
                             </OrderbookAccordionTrigger>
                             <OrderbookAccordionContent
                               orderBook={
                                 books?.find(
                                   (book) =>
                                     book.marketId ==
-                                    // JSON?.parse(market?.clobTokenIds)[0]
                                     markets[0]?._id
                                 ) || {}
                               }
@@ -432,123 +488,123 @@ export default function EventPage({ categories }) {
 
                             {markets &&
                               markets?.length > 0 &&
-                              events?.status != "resolved" &&
                               markets
                                 // .filter((market) => market.status === "active")
-                                ?.map((market, index) => (
-                                  <AccordionItem
-                                    value={`market-${index + 1}`}
-                                    key={index}
-                                  >
-                                    <AccordionTrigger
-                                      marketId="market-1"
-                                      outcomePrice={market?.odd || 0}
-                                      volume={market?.volume || 0}
-                                      className="flex sm:text-[18px] text-[18px] items-center sm:gap-2 gap-0"
-                                      setSelectedOrderBookData={
-                                        setSelectedOrderBookData
-                                      }
-                                      orderBook={
-                                        books?.find(
-                                          (book) =>
-                                            book.marketId ==
-                                            // JSON?.parse(market?.clobTokenIds)[0]
-                                            market?._id
-                                        ) || {}
-                                      }
-                                      setSelectedIndex={setSelectedIndex}
-                                      index={index}
-                                      isMultiMarket={markets?.length > 1}
-                                      setIsDrawerOpen={setIsDrawerOpen}
-                                      setActiveView={setActiveView}
-                                    >
-                                      <div className="pr-6">
-                                        <img
-                                          src={events?.image}
-                                          alt="Market 1"
-                                          width={42}
-                                          height={42}
-                                          className="rounded-md object-cover"
-                                          style={{
-                                            width: "42px",
-                                            height: "42px",
-                                          }}
-                                        />
+                                ?.map((market, index) => {
+                                  if (market.status == "resolved") {
+                                    return (
+                                      <div key={index} className="flex justify-between items-center px-4 py-3 border-b border-[#2a2a2a] hover:bg-[#1d1d1d] cursor-pointer">
+                                        <div>
+                                          <h3 className="text-[15px] sm:text-[16px] font-bold text-white flex items-center gap-2">
+                                            {market.groupItemTitle}
+                                          </h3>
+                                          <p className="text-gray-400 text-sm">
+                                            ${Number(market.volume).toLocaleString()} Vol.
+                                          </p>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          <p
+                                            
+                                            className={`text-sm font-semibold ${
+                                              isWinning(events, market)
+                                                ? "text-green-500"
+                                                : "text-red-500"
+                                            }`}
+                                          >
+                                            {events?.outcomeType == "single" ? capitalize(events.outcome): getOutcomeTitle(market.outcome, market.outcomeId)}
+                                          </p>
+                                          {isWinning(events, market) ? (
+                                            <CheckCircle
+                                              className="w-5 h-5 text-green-500"
+                                              strokeWidth={2.5}
+                                            />
+                                            ) : (
+                                            <XCircle
+                                              className="w-5 h-5 text-red-500"
+                                              strokeWidth={2.5}
+                                            />
+                                            )
+                                          }
+                                        </div>
                                       </div>
-                                      <span className="pt-1">
-                                        {market.groupItemTitle}
-                                      </span>
-                                    </AccordionTrigger>
-                                    <OrderbookAccordionContent
-                                      orderBook={
-                                        books?.find(
-                                          (book) =>
-                                            book.marketId ==
-                                            // JSON?.parse(market?.clobTokenIds)[0]
-                                            market?._id
-                                        ) || {}
-                                      }
-                                      book={books}
-                                      activeView={activeView}
-                                      setActiveView={setActiveView}
-                                      setSelectedOrderBookData={
-                                        setSelectedOrderBookData
-                                      }
-                                      setSelectedIndex={setSelectedIndex}
-                                      index={index}
-                                      selectedMarket={market}
-                                      setSelectedOrder={setSelectedOrder}
-                                      // isResolved={events?.isResolved}
-                                      forecast={events?.forecast}
-                                      forecastGraph={forecastGraph}
-                                      setForecastGraph={setForecastGraph}
-                                    />
-                                  </AccordionItem>
-                                ))}
+                                    )
+                                  }
+
+                                  return (
+                                    <AccordionItem
+                                      value={`market-${index + 1}`}
+                                      key={index}
+                                    >
+                                      <AccordionTrigger
+                                        marketId="market-1"
+                                        outcomePrice={market?.odd || 0}
+                                        volume={market?.volume || 0}
+                                        className="flex sm:text-[18px] text-[18px] items-center sm:gap-2 gap-0"
+                                        setSelectedOrderBookData={
+                                          setSelectedOrderBookData
+                                        }
+                                        orderBook={
+                                          books?.find(
+                                            (book) =>
+                                              book.marketId ==
+                                              // JSON?.parse(market?.clobTokenIds)[0]
+                                              market?._id
+                                          ) || {}
+                                        }
+                                        setSelectedIndex={setSelectedIndex}
+                                        index={index}
+                                        isMultiMarket={markets?.length > 1}
+                                        setIsDrawerOpen={setIsDrawerOpen}
+                                        setActiveView={setActiveView}
+                                      >
+                                        <div className="pr-6">
+                                          <img
+                                            src={events?.image}
+                                            alt="Market 1"
+                                            width={42}
+                                            height={42}
+                                            className="rounded-md object-cover"
+                                            style={{
+                                              width: "42px",
+                                              height: "42px",
+                                            }}
+                                          />
+                                        </div>
+                                        <span className="pt-1">
+                                          {market.groupItemTitle}
+                                        </span>
+                                      </AccordionTrigger>
+                                      <OrderbookAccordionContent
+                                        orderBook={
+                                          books?.find(
+                                            (book) =>
+                                              book.marketId ==
+                                              // JSON?.parse(market?.clobTokenIds)[0]
+                                              market?._id
+                                          ) || {}
+                                        }
+                                        book={books}
+                                        activeView={activeView}
+                                        setActiveView={setActiveView}
+                                        setSelectedOrderBookData={
+                                          setSelectedOrderBookData
+                                        }
+                                        setSelectedIndex={setSelectedIndex}
+                                        index={index}
+                                        selectedMarket={market}
+                                        setSelectedOrder={setSelectedOrder}
+                                        // isResolved={events?.isResolved}
+                                        forecast={events?.forecast}
+                                        forecastGraph={forecastGraph}
+                                        setForecastGraph={setForecastGraph}
+                                      />
+                                    </AccordionItem>
+                                    )
+                                })}
                           </Accordion>
                         </>
                       )}
 
-                      {events?.status == "resolved" &&
-                        markets.length >= 2 &&
-                        markets.map((market, index) => (
-                          <div
-                            key={index}
-                            onClick={() => setSelectedIndex(index)}
-                            className="flex justify-between items-center px-4 py-3 border-b border-[#2a2a2a] hover:bg-[#1d1d1d] cursor-pointer"
-                          >
-                            <div>
-                              <h3 className="text-[15px] sm:text-[16px] font-bold text-white flex items-center gap-2">
-                                {market.groupItemTitle}
-                              </h3>
-                              <p className="text-gray-400 text-sm">
-                                ${Number(market.volume).toLocaleString()} Vol.
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <p
-                                className={`text-sm font-semibold ${
-                                  events.outcomeId === market._id
-                                    ? "text-green-500"
-                                    : "text-red-500"
-                                }`}
-                              >
-                                {events.outcomeId === market._id ? "Yes" : "No"}
-                              </p>
-                              {events.outcomeId === market._id ? (
-                                <CheckCircle
-                                  className="w-5 h-5 text-green-500"
-                                  strokeWidth={2.5}
-                                />
-                              ) : (
-                                <XCircle
-                                  className="w-5 h-5 text-red-500"
-                                  strokeWidth={2.5}
-                                />
-                              )}
-                            </div>
-                          </div>
-                        ))}
 
                       <h3 className="sm:text-[22px] text-[15px] font-bold sm:mt-6 sm:mb-2 sm:mr-4 mt-4 mb-1">
                         Rules
@@ -593,7 +649,6 @@ export default function EventPage({ categories }) {
 
                       {events?.status === "closed" && (
                         <div className="flex items-start gap-3 p-4 my-3 rounded-md border border-red-500 bg-[#2a1414] text-red-300">
-                          {/* <XCircle className="w-5 h-5 mt-0.5 text-red-400" /> */}
                           <div>
                             <p className=" font-semibold">Market Closed</p>
                             <p className="text-sm text-red-400">
@@ -602,7 +657,7 @@ export default function EventPage({ categories }) {
                             </p>
                           </div>
                         </div>
-                      )}
+                      )} */
                     </div>
 
                     {/* 评论区 Comment Section */}

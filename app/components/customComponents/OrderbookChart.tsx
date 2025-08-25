@@ -179,9 +179,9 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
       };
       
       socket.on("chart-update", chartUpdate);
-      return () => {
-        socket.off("chart-update", chartUpdate);
-      };
+      // return () => {
+      //   socket.off("chart-update", chartUpdate);
+      // };
   }, [market, selectedYes]); // Remove interval from dependencies like Chart.tsx
 
   useEffect(() => {

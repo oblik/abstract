@@ -46,7 +46,7 @@ interface ProfilePageProps {
 
 export default function ProfilePage(props: ProfilePageProps) {
   const router = useRouter();
-  
+
   const { signedIn } = useSelector((state: any) => state?.auth?.session);
   const user = useSelector((state: any) => state?.auth?.user);
   const { address } = useSelector((state: any) => state?.walletconnect?.walletconnect);
@@ -54,6 +54,7 @@ export default function ProfilePage(props: ProfilePageProps) {
 
   const [currentTab, setCurrentTab] = useState("positions");
   const [amountFilter, setAmountFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("All");
   const [activeTab, setActiveTab] = useState("activity");
   const [tradeOverview, setTradeOverview] = useState<any>(initialTradeOverview);
   const [tradeOverviewLoading, setTradeOverviewLoading] = useState(true);
@@ -212,15 +213,27 @@ export default function ProfilePage(props: ProfilePageProps) {
               <TabsTrigger className="sm:text-sm text-[13px]" value="positions">Positions</TabsTrigger>
               <TabsTrigger className="sm:text-sm text-[13px]" value="activity">Activity</TabsTrigger>
             </TabsList>
-            <select
-              value={amountFilter}
-              onChange={(e) => setAmountFilter(e.target.value)}
-              className="border border-gray-700 bg-black rounded p-1 text-sm"
-            >
-              <option>All</option>
-              <option>Above 1 USDC</option>
-              <option>Below 1 USDC</option>
-            </select>
+            {activeTab == "deposit" || activeTab == "withdraw" ?
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="border border-gray-700 bg-black rounded p-1 text-sm"
+              >
+                <option>All</option> 
+                <option value="requested">Requested</option>
+                <option value="completed">Completed</option>
+                <option value="rejected">Rejected</option>
+              </select> :
+              <select
+                value={amountFilter}
+                onChange={(e) => setAmountFilter(e.target.value)}
+                className="border border-gray-700 bg-black rounded p-1 text-sm"
+              >
+                <option>All</option>
+                <option>Above 1 USDC</option>
+                <option>Below 1 USDC</option>
+              </select>
+            }
           </div>
           <TabsContent value="positions">
             <Positions uniqueId={props.user?.uniqueId} isPrivate={isOwnProfile} />
@@ -261,13 +274,13 @@ export default function ProfilePage(props: ProfilePageProps) {
             }
             {
               isOwnProfile && activeTab == "deposit" &&
-              <DepositTable />
+              <DepositTable statusFilter = {statusFilter}/>
             }
             {
               isOwnProfile && activeTab == "withdraw" &&
-              <WithdrawTable />
+              <WithdrawTable statusFilter = {statusFilter}/>
             }
-        </TabsContent>
+          </TabsContent>
         </Tabs>
         <Footer />
         <HeaderFixed />

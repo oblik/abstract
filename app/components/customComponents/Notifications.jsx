@@ -66,10 +66,17 @@ const Notification = () => {
                         />
                         <div classname="pt-0">
                             <h5 className="text-[16px] font-semibold text-gray-100">
-                                {item.type == "trade" ? "Trade confirmed": "--"}
+                                {item.type == "trade" && "Trade confirmed"}
+                                {item.type == "reply" && "Someone replied to your comment"}
+                                {item.type == "deposit" && "Deposit confirmed"}
+                                {item.type == "withdraw" && "Withdraw approved"}
                             </h5>
                             <p className="text-sm text-gray-300">
-                                {item?.content?.marketTitle}
+                                {item.type == "trade" && (item?.content?.marketTitle)}
+                                {item.type == "reply" && (item?.content?.eventName ?? "--")}
+                                {item.type == "deposit" && (item?.content?.message ?? "--")}
+                                {item.type == "withdraw" && (item?.content?.message ?? "--")}
+
                             </p>
                             <p className="text-[12px] text-gray-400 mb-0">
                                 {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}

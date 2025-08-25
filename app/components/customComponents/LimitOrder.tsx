@@ -13,6 +13,7 @@ import { Switch } from "radix-ui";
 import CustomDateComponent from "./CustomDate";
 import { isEmpty } from "@/lib/isEmpty";
 import { firstLetterCase } from "@/lib/stringCase";
+import { Edit } from "lucide-react";
 
 interface LimitOrderProps {
   activeView: string;
@@ -65,6 +66,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
   const [showCustomDialog, setShowCustomDialog] = useState(false);
   const [isExpirationEnabled, setIsExpirationEnabled] = useState(false);
   const [customDate, setCustomDate] = useState<any>("");
+  const [orderBtn, setOrderBtn] = useState<boolean>(true);
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
   const [userPosition, setUserPosition] = useState<number>(0);
   const [expirationSeconds, setExpirationSeconds] = useState<number | null>(null);
@@ -157,6 +159,8 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
   };
 
   const handlePlaceOrder = async (action: any) => {
+    try{
+      setOrderBtn(false);
     let activeTab = activeView?.toLowerCase();
     if (!limitOrderValidation()) {
       return;
@@ -180,14 +184,19 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
     if (success) {
       toastAlert("success", "Order placed successfully!", "order-success");
       setFormValue({ ...formValue, price: "", amount: "" });
-      setOrderSuccess(true);
-      setTimeout(() => setOrderSuccess(false), 2000);
+      setIsExpirationEnabled(false);
+      setCustomDate("");
     } else {
       toastAlert("error", message, "order-failed");
       setOrderFailed(true);
       setTimeout(() => setOrderFailed(false), 2000);
     }
-  };
+  }catch (error) {
+      console.error("Error placing order:", error);
+  }finally {
+      setOrderBtn(true);
+    }
+  }
 
   const handlePercentageClick = (percentage: number) => {
     if (userPosition <= 0) {
@@ -324,13 +333,16 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
       )}
 
       {customDate && (
-        <div className="text-sm text-[#fff] mt-2">
-          {daysLeft !== null &&
-            `Expires in ${daysLeft} day${daysLeft === 1 ? "" : "s"}`}
+        <div className="flex justify-between items-center mt-2">
+          <div className="text-sm text-[#fff]">
+            {daysLeft !== null &&
+              `Expires in ${daysLeft} day${daysLeft === 1 ? "" : "s"}`}
+          </div>
+          <button onClick={()=>setShowCustomDialog(true)}><Edit size={16} /></button>
         </div>
       )}
 
-      {buyorsell == "buy" ? (
+      {buyorsell == "buy" && !isEmpty(price) && !isEmpty(amount) ? (
         <>
           <div className="pt-2 space-y-2 pb-2">
             <div className="flex justify-between text-sm pt-2">

@@ -10,8 +10,10 @@ export const userDeposit = async (data: any, dispatch: any) => {
         method: "post",
         data,
       });
-      const { wallet } = respData.data;
+      const { wallet,user } = respData.data;
+      console.log(user,wallet,"user");
       dispatch(setWallet(wallet));
+       dispatch(setUser(user));
       return handleResp(respData, "success");
     } catch (error: any) {
       return handleResp(error, "error");
@@ -53,6 +55,7 @@ export const withdrawRequest = async (data: any,dispatch: any) => {
       data,
     });
     const { wallet } = respData.data;
+    console.log(wallet,"walletwallet");
     dispatch(setWallet(wallet));
     return handleResp(respData, "success");
   } catch (error: any) {

@@ -66,6 +66,8 @@ import Withdraw from "./withdraw";
 import { getUserPnL } from "@/services/portfolio";
 import { NavigationBar } from "@/app/components/ui/navigation-menu";
 import { getCategories } from "@/services/market";
+import { trunc } from "@/lib/roundOf";
+
 import {
   Tooltip,
   TooltipTrigger,
@@ -113,6 +115,7 @@ export default function PortfolioPage({ categories }) {
   const [startDate, endDate] = dateRange;
   const [selectCategory, setSelectedCategory] = useState("all");
   const [navigationItems, setNavigationItems] = useState([]);
+  const [todayReal, setTodayReal] = useState(0);
 
   const PRIORITY_FEES = {
     low: 5000,
@@ -129,7 +132,7 @@ export default function PortfolioPage({ categories }) {
   });
   const [gasAmt, setGasAmt] = useState({ gasCost: 0, marketGasCost: 0 });
 
-  var { currency, amount, walletAddress, minDeposit } = depositData;
+  var { currency, amount, minDeposit } = depositData;
 
   useEffect(() => {
     getPnl();
@@ -141,6 +144,7 @@ export default function PortfolioPage({ categories }) {
       console.log("success,result", success, result);
       if (success) {
         setProfitAmount(result?.totalPnl / 100);
+        setTodayReal(result?.totalPnl / 100);
       }
     } catch (err) {
       console.log("error ", err);
@@ -260,6 +264,7 @@ export default function PortfolioPage({ categories }) {
         setOpen(false);
         getAddress();
         toastAlert("success", "Wallet Connected successfully!!", "wallet");
+        setCheck(true)
       } catch (err) {
         console.log(err, "errerr");
         if (err?.code === 4001) {
@@ -298,6 +303,15 @@ export default function PortfolioPage({ categories }) {
       let respData = await getCoinList();
       if (respData.success) {
         setCoin(respData?.result);
+        setDepositData((prev) => ({
+          ...prev,
+          currency: respData?.result[0].symbol,
+          minDeposit: respData?.result[0].minDeposit,
+        }));
+        const solCoin = respData.result.find((c) => c.symbol === "SOL");
+        if (solCoin && solCoin.cnvPrice) {
+          setTokenValue(solCoin.cnvPrice);
+        }
       }
     } catch (error) {
       console.error("Error getting coin list:", error);
@@ -327,14 +341,6 @@ export default function PortfolioPage({ categories }) {
     }
     const feeInUSD = feeInSol * tokenValue;
     setGasAmt({ gasCost: feeInSol, marketGasCost: feeInUSD });
-
-    const accountInfo = await connection.getAccountInfo(PYTH_PRICE_ACCOUNT);
-    if (!accountInfo) throw new Error("Pyth price account not found");
-
-    const priceData = parsePriceData(accountInfo.data);
-    console.log("📈 SOL/USD price:", priceData.price);
-
-    setTokenValue(priceData.price);
   };
 
   const getAddress = async (address) => {
@@ -408,6 +414,8 @@ export default function PortfolioPage({ categories }) {
           );
         } else if (depsoitAmt > depositBalance) {
           toastAlert("error", "Insufficient Balance", "deposit");
+        } else if (balance <= 0.001) {
+          toastAlert("error", "Your SOL balance is too low to pay the required transaction fee. Please add more SOL to proceed.", "wallet");
         } else if (depsoitAmt > 0) {
           setStep("3");
           getSolanaTxFee();
@@ -423,6 +431,16 @@ export default function PortfolioPage({ categories }) {
   const balanceChange = (value) => {
     if (currency == "USDC") {
       setDepositAmt(formatNumber(tokenbalance * (value / 100), 4));
+    } else if (currency == "SOL" && value == 100) {
+      setDepositAmt(
+        Math.max(
+          formatNumber(balance * (value / 100), 4) - 0.001,
+          0
+        )
+      );
+      if (balance <= 0.001) {
+        toastAlert("error", "Your SOL balance is too low to pay the required transaction fee. Please add more SOL to proceed.", "wallet");
+      }
     } else {
       setDepositAmt(formatNumber(balance * (value / 100), 4));
     }
@@ -596,8 +614,8 @@ export default function PortfolioPage({ categories }) {
         );
         // Loop through and compare
         for (let i = 0; i < preTokenBalances.length; i++) {
-          const pre = preTokenBalances[i];
-          const post = postTokenBalances[i];
+          const pre = preTokenBalances[0];
+          const post = postTokenBalances[0];
 
           if (!pre || !post) continue;
 
@@ -616,15 +634,16 @@ export default function PortfolioPage({ categories }) {
               Math.abs(change) / 10 ** pre.uiTokenAmount.decimals;
             depositdata = {
               hash: tx,
-              from: pre.owner,
+              from: provider.publicKey.toBase58(),
               to: config?.adminAdd.toString(),
               amount: tokenAmt,
               usdAmt: tokenAmt,
               symbol: "USDC",
             };
+            console.log(depositdata, "depositdata");
           }
         }
-
+        console.log(depositdata, "depositdata");
         var { message, status } = await userDeposit(depositdata, dispatch);
         if (status) {
           toastAlert("success", message, "deposit");
@@ -804,6 +823,7 @@ export default function PortfolioPage({ categories }) {
       getSolanaTxFee();
       setTxOpen(false);
       getCoinData();
+      setCheck(false)
       setloader(false);
     } else if (
       !isEmpty(data?.walletAddress) &&
@@ -816,10 +836,12 @@ export default function PortfolioPage({ categories }) {
         "wallet"
       );
     } else {
-      toastAlert("error", "Connect Your Wallet", "deposit");
+      setOpen(true)
+      // toastAlert("error", "Connect Your Wallet", "deposit");
     }
   };
-
+  const leftPNLPercent = trunc((walletData.pnl1D / (walletData?.balance + walletData?.position)) * 100, 2)
+  const todayRealPercent = trunc((todayReal / profitAmount) * 100, 2)
   return (
     <>
       <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
@@ -872,11 +894,11 @@ export default function PortfolioPage({ categories }) {
                       <span className="cursor-pointer">
                         {walletData?.balance
                           ? PnLFormatted(
-                              formatNumber(
-                                walletData?.balance - walletData?.locked,
-                                2
-                              )
+                            formatNumber(
+                              walletData?.balance - walletData?.locked,
+                              2
                             )
+                          )
                           : 0}
                       </span>
                     </TooltipTrigger>
@@ -897,16 +919,19 @@ export default function PortfolioPage({ categories }) {
                   <span className="sm:mt-2 mt-0 sm:text-3xl text-2xl font-semibold">
                     {walletData?.balance
                       ? // ? PnLFormatted(formatNumber(walletData?.balance - walletData?.locked, 2))
-                        PnLFormatted(
-                          formatNumber(
-                            walletData?.balance + walletData?.position,
-                            2
-                          )
+                      PnLFormatted(
+                        formatNumber(
+                          walletData?.balance + walletData?.position,
+                          2
                         )
+                      )
                       : 0}
                   </span>
-                  <span className="sm:text-sm text-[11px] text-gray-500 sm:mt-1 mt-0">
-                    <span className="text-green-500">$0.00 (0.00%)</span> Today
+                  <span className="text-sm text-gray-500 mt-1">
+                    <span className={walletData.pnl1D >= 0 ? "text-green-500" : "text-red-500"}>{walletData.pnl1D < 0 && "-"}${Math.abs(trunc(walletData.pnl1D, 2))}
+                      {" "}
+                      <span className={leftPNLPercent >= 0 ? "text-green-500" : "text-red-500"}>({trunc(leftPNLPercent, 2)}%)</span>
+                    </span> Today
                   </span>
                 </div>
               </div>
@@ -937,7 +962,7 @@ export default function PortfolioPage({ categories }) {
                         Deposit
                       </Button>
                     </Dialog.Trigger>
-                    {isConnected == true && txopen == false && (
+                    {isConnected == true && txopen == false && check == false && (
                       <Dialog.Portal>
                         <Dialog.Overlay className="DialogOverlay" />
                         <Dialog.Content className="DialogContent">
@@ -1014,11 +1039,10 @@ export default function PortfolioPage({ categories }) {
                                   return (
                                     <div key={i} className="wallet_coin_list">
                                       <div
-                                        className={`flex items-center justify-between my-3 border px-3 py-1 rounded cursor-pointer transition ${
-                                          isSelected
-                                            ? "border-[#4f99ff] bg-[#1a1a1a]"
-                                            : "border-[#3d3d3d] hover:bg-[#1e1e1e]"
-                                        }`}
+                                        className={`flex items-center justify-between my-3 border px-3 py-1 rounded cursor-pointer transition ${isSelected
+                                          ? "border-[#4f99ff] bg-[#1a1a1a]"
+                                          : "border-[#3d3d3d] hover:bg-[#1e1e1e]"
+                                          }`}
                                         onClick={() =>
                                           setDepositData((prev) => ({
                                             ...prev,
@@ -1278,9 +1302,9 @@ export default function PortfolioPage({ categories }) {
                                     {currency == "USDC"
                                       ? `${depsoitAmt} USDC`
                                       : `${formatNumber(
-                                          depsoitAmt * tokenValue,
-                                          4
-                                        )} USDC`}
+                                        depsoitAmt * tokenValue,
+                                        4
+                                      )} USDC`}
                                     {/* tokenAmt */}
                                   </span>
                                 </div>
@@ -1334,40 +1358,17 @@ export default function PortfolioPage({ categories }) {
                                         $ {""}
                                         {gasAmt?.marketGasCost
                                           ? formatNumber(
-                                              gasAmt?.marketGasCost,
-                                              6
-                                            )
+                                            gasAmt?.marketGasCost,
+                                            6
+                                          )
                                           : 0}{" "}
                                         {/* Gwei */}
                                       </span>
                                     </div>
-
-                                    {/* <div className="flex gap-2 items-center justify-between py-1 border-b border-[#302f2f]">
-                                      <span className="text-[13px] text-gray-400">
-                                        LP cost
-                                      </span>
-                                      <span className="text-[13px] text-gray-200">
-                                        $0.01
-                                      </span>
-                                    </div> */}
                                   </Accordion.Content>
                                 </Accordion.Item>
                               </Accordion.Root>
-                              {/* {showallowance ? (
-                                <Button
-                                  className="mt-4 w-full"
-                                  disabled={loader}
-                                  onClick={() => approve()}
-                                >
-                                  Approve{" "}
-                                  {loader && (
-                                    <i
-                                      className="fas fa-spinner fa-spin ml-2"
-                                      style={{ color: "black" }}
-                                    ></i>
-                                  )}
-                                </Button>
-                              ) : ( */}
+
                               <Button
                                 className="mt-4 w-full"
                                 disabled={loader}
@@ -1484,15 +1485,11 @@ export default function PortfolioPage({ categories }) {
                   >
                     {PnLFormatted(formatNumber(profitAmount, 2))}
                   </span>
-                  <span className="sm:text-sm text-[11px] text-gray-500 sm:mt-1 mt-0">
-                    <span
-                      className={`${
-                        profitAmount >= 0 ? "text-green-400" : "text-red-400"
-                      }`}
-                    >
-                      $0.00 (0.00%)
-                    </span>{" "}
-                    Today
+                    <span className="text-sm text-gray-500 mt-1">
+                    <span className={todayReal >= 0 ? "text-green-500" : "text-red-500"}>{todayReal < 0 && "-"}${Math.abs(trunc(todayReal, 2))}
+                      {" "}
+                      <span className={todayRealPercent >= 0 ? "text-green-500" : "text-red-500"}>({trunc(todayRealPercent, 2)}%)</span>
+                    </span> Today
                   </span>
                 </div>
                 <div className="justify-center items-center p-0 m-0 scale-90 sm:scale-100 origin-top-left sm:origin-center" style={{ minHeight: 0, minWidth: 0 }}>
@@ -1504,7 +1501,7 @@ export default function PortfolioPage({ categories }) {
                 </div>
               </div>
             </div>
-          </div>
+             </div>
 
           {/* 3. Tab 与筛选区 */}
           {/* 3. Tab and filter area */}

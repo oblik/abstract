@@ -280,7 +280,6 @@ export default function Authentication() {
       setError(errMsg);
       if (isEmpty(errMsg)) {
         let { success, message, errors } = await register(userData);
-        console.log(errors, "errorserrors");
         if (success) {
           toastAlert("success", message, "login");
           setVerifyStatus(true);
@@ -384,6 +383,7 @@ export default function Authentication() {
   async function logout() {
     disconnectWallet();
     document.cookie = "user-token" + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    localStorage.removeItem("eventData");
     dispatch(reset());
     dispatch(signOut());
     toastAlert("success", "Logged out successfully", "logout");
@@ -395,6 +395,7 @@ export default function Authentication() {
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
+      if(signedIn){
         const res = await window.solana.connect({ onlyIfTrusted: true });
         const newPublicKey = res?.publicKey?.toString()?.toLowerCase();
         const savedAddress = data?.walletAddress?.toLowerCase();
@@ -429,6 +430,7 @@ export default function Authentication() {
         }
   
         previousWalletRef.current = newPublicKey;
+      }
       } catch (err) {
         // console.warn("Phantom not connected yet");
       }
@@ -436,7 +438,7 @@ export default function Authentication() {
   
     return () => clearInterval(interval);
   }, [data?.walletAddress, isConnected]);
-
+console.log(data?.walletAddress,isConnected,"data");
   return (
     <>
       {/* {signedIn && (

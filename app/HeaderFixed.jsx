@@ -23,7 +23,6 @@ import {
   DrawerHeader,
 } from "@/app/components/ui/drawer";
 
-
 export default function HeaderFixed() {
   const router = useRouter();
   const [activeMenu, setActiveMenu] = useState("home");

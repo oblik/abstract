@@ -8,6 +8,7 @@ const dataSlice = createSlice({
 		inOrder: 0,
 		locked: 0,
 		position: 0,
+		pnl1D: 0,
 	},
 	reducers: {
 		setWallet: (_, action) => ({
@@ -15,6 +16,7 @@ const dataSlice = createSlice({
 			inOrder: action.payload.inOrder ?? 0,
 			locked: action.payload.locked ?? 0,
 			position: action.payload.position ?? 0,
+			pnl1D: action.payload.pnl1D ?? 0,
 		  }),
 		  
 	},

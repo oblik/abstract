@@ -14,7 +14,7 @@ import { Trash2, Reply } from "lucide-react";
 import CommentForm from "./CommentForm";
 import { CommentProps, PostCommentRequestData } from "@/types/comments";
 import CommentList from "./CommentList";
-import { getComments, postComment } from "@/services/market";
+import { getComments, getCommentsPaginate, postComment } from "@/services/market";
 import { toastAlert } from "@/lib/toast";
 import { useSelector, useDispatch } from "react-redux";
 import { SocketContext } from "@/config/socketConnectivity";
@@ -25,6 +25,7 @@ import { addUserName } from "@/services/user";
 import Link from "next/link";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { longNumbersNoDecimals } from "@/lib/roundOf";
 
 const avatarColors = [
   "bg-blue-500",
@@ -99,12 +100,12 @@ export function Comment({
       <div className="flex-shrink-0">
         <Link href={`/profile/@${comment?.userId?.uniqueId}`}>
           <Avatar>
-            {comment?.userId?.profileImg ? (
+            {/* {comment?.userId?.profileImg ? ( */}
               <AvatarImage
                 src={comment?.userId?.profileImg}
                 alt={comment?.userId?.userName}
               />
-            ) : (
+            {/* ) : ( */}
               <AvatarFallback
                 className={getColorFromUsername(comment?.userId?.userName)}
               >
@@ -112,7 +113,7 @@ export function Comment({
                   ? comment?.userId?.userName.charAt(0).toUpperCase()
                   : "unknown".charAt(0).toUpperCase()}
               </AvatarFallback>
-            )}
+            {/* )} */}
           </Avatar>
         </Link>
       </div>
@@ -125,40 +126,62 @@ export function Comment({
               {comment?.userId?.userName || "Unknown user"}
             </Link>
           </span>
-
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild>
+          {
+            comment.positions && comment.positions.length == 1 ? (
               <button
                 className="flex items-center gap-1 px-1 py-0 text-[12px] font-normal rounded"
                 aria-label="Customise options"
-                style={{ background: "#152632", color: "#7DFDFE" }}
+                style={{ 
+                  background: comment.positions?.[0].side == "yes" ? "#152632": "#210d1a", 
+                  color: comment.positions?.[0].side == "yes" ? "#7DFDFE": "#ec4899" 
+                }}
               >
-                <span>125 | More than 10 Million</span>
-                <ChevronDownIcon className="w-4 h-4" />
+                <span>{longNumbersNoDecimals(comment.positions?.[0].quantity)} | {comment.positions?.[0].label}</span>
               </button>
-            </DropdownMenu.Trigger>
-
-            <DropdownMenu.Portal>
-              <DropdownMenu.Content
-                className="comment-dropdown-content"
-                sideOffset={5}
-              >
-                <DropdownMenu.Item className="px-2 py-0.5 cursor-pointer hover:bg-[#100f0f] text-[12px] font-normal flex gap-2 items-center justify-between">
-                  <span style={{ background: "#152632", color: "#7DFDFE" }} >15.9K</span>                  
-                  <span>More than 10 Million</span>
-                </DropdownMenu.Item>
-                <DropdownMenu.Item className="px-2 py-0.5 cursor-pointer hover:bg-[#100f0f] text-[12px] font-normal flex gap-2 items-center justify-between">
-                  <span style={{ background: "#152632", color: "#7DFDFE" }} >10.2K</span>                  
-                  <span>More than 8 Million</span>
-                </DropdownMenu.Item>
-                <DropdownMenu.Item className="px-2 py-0.5 cursor-pointer hover:bg-[#100f0f] text-[12px] font-normal flex gap-2 items-center justify-between">
-                  <span style={{ background: "#210d1a", color: "#ec4899" }} >2.2K</span>                  
-                  <span>More than 8 Million</span>
-                </DropdownMenu.Item>
-              </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-          </DropdownMenu.Root>
-          <span className="text-[12px] text-gray-400">{timeAgo}</span>
+              ) 
+              : comment.positions.length > 1 ? (
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger asChild>
+                    <button
+                      className="flex items-center gap-1 px-2 py-0.5 text-[12px] font-normal rounded"
+                      aria-label="Customise options"
+                      style={{ 
+                        background: comment.positions?.[0].side == "yes" ? "#152632": "#210d1a", 
+                        color: comment.positions?.[0].side == "yes" ? "#7DFDFE": "#ec4899" 
+                      }}
+                    >
+                      <span>{longNumbersNoDecimals(comment.positions?.[0].quantity)} | {comment.positions?.[0].label}</span>
+                      <ChevronDownIcon className="w-4 h-4" />
+                    </button>
+                  </DropdownMenu.Trigger>
+      
+                  <DropdownMenu.Portal>
+                    <DropdownMenu.Content
+                      className="comment-dropdown-content"
+                      sideOffset={5}
+                    >
+                      {
+                        comment.positions?.map((item, index) => (
+                          <DropdownMenu.Item key={index} className="px-2 py-0.5 cursor-pointer hover:bg-[#100f0f] text-[12px] font-normal flex gap-2 items-center justify-between">
+                            <span 
+                              style={{ 
+                                background: item.side == "yes" ? "#152632": "#210d1a", 
+                                color: item.side == "yes" ? "#7DFDFE": "#ec4899" 
+                              }}
+                            >
+                              {longNumbersNoDecimals(item.quantity)}
+                            </span>                  
+                            <span>{item.label}</span>
+                          </DropdownMenu.Item>
+                        ))
+                      }
+                    </DropdownMenu.Content>
+                  </DropdownMenu.Portal>
+                </DropdownMenu.Root>
+              ) 
+              : null
+          }
+          <span className="text-xs text-gray-400">{timeAgo}</span>
         </div>
 
         {/* Comment content */}
@@ -231,21 +254,25 @@ export function ReplyForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // if (!account || !reply.trim()) {
-    //   return;
-    // }
+    const parentComment: any = comments?.find((c: any) => c?._id === parentId);
+    const parentUsername = parentComment?.userId?.userName;
+
+    let contentToSubmit = reply.trim();
+    if (parentUsername && contentToSubmit.startsWith(`@${parentUsername}`)) {
+      contentToSubmit = contentToSubmit.substring(`@${parentUsername} `.length).trim();
+    }
 
     try {
       setIsSubmitting(true);
       const reqData = {
         userId: user._id,
         eventId: eventId,
-        content: reply,
+        content: contentToSubmit,
         parentId: parentId,
       };
-      const { success, comment } = await postComment(reqData);
+      const { success, message } = await postComment(reqData);
       if (!success) {
-        toastAlert("error", "Failed to post comment. Please try again later.");
+        toastAlert("error",message || "Failed to post comment. Please try again later.");
         return;
       }
       // toastAlert("success", "Comment posted successfully!");
@@ -319,14 +346,6 @@ export function ReplyForm({
   useEffect(() => {
     // Find the parent comment to get the username
     const parentComment: any = comments?.find((c: any) => c?._id === parentId);
-    console.log(
-      parentComment,
-      "parentComment",
-      parentId,
-      "parentId",
-      comments,
-      "comments"
-    );
     if (parentComment?.userId?.userName) {
       setReply(`@${parentComment?.userId?.userName} `);
     }
@@ -382,75 +401,103 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ eventId }: CommentSectionProps) {
-  const { address } = useSelector(
-    (state: any) => state?.walletconnect?.walletconnect
-  );
-  const [account, setaccount] = useState(address);
-  const [comments, setComments] = useState<CommentProps["comment"][]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [replyingTo, setReplyingTo] = useState<string | null>(null);
-
   const socketContext = useContext(SocketContext);
 
-  React.useEffect(() => {
-    const fetchComments = async () => {
-      try {
+  const limit = 10;
+  const { address } = useSelector((state: any) => state?.walletconnect?.walletconnect);
+  const [account, setaccount] = useState(address);
+  const [comments, setComments] = useState<CommentProps["comment"][]>([]); // This will now hold all loaded comments
+  const [isLoading, setIsLoading] = useState(false); // For the initial big load
+  const [isFetching, setIsFetching] = useState(false); // For subsequent "load more" requests
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [total, setTotal] = useState(0);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  
+  const fetchComments = async (pageToFetch = 1, isInitialLoad = false) => {
+    try {
+      if (isInitialLoad) {
         setIsLoading(true);
-        const response = await getComments(eventId);
-        if (!response.success) {
-          return;
-        }
-        setComments(response.comments || []);
-      } catch (error) {
-        console.error("Error loading comments:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (eventId) {
-      fetchComments();
-    }
-  }, [eventId]);
-
-  const handleCommentAdded = (newComment: CommentProps["comment"]) => {
-    if (newComment) {
-      // If it's a reply, we need to update the parent's reply count
-      if (!newComment.parentId) {
-        // It's a top-level comment
-        setComments((prev) => [newComment, ...prev]);
       } else {
-        // It's a reply, add to the list and update parent
-        setComments((prev) => {
-          const updated = [...prev];
-          const parentIndex = updated.findIndex(
-            (c) => c?._id === newComment.parentId
-          );
-
-          if (parentIndex !== -1 && updated[parentIndex]) {
-            // Update parent's reply count
-            updated[parentIndex] = {
-              ...updated[parentIndex]!,
-              reply_count: (updated[parentIndex]!.reply_count || 0) + 1,
-            };
-          }
-
-          // Add the reply to the list
-          return [newComment, ...updated];
-        });
+        setIsFetching(true);
       }
+  
+      const response = await getCommentsPaginate(eventId, { page: pageToFetch, limit });
+  
+      if (!response.success) {
+        setHasMore(false);
+        return;
+      }
+  
+      const { comments, positions, count } = response;
+      setTotal(count);
+
+      const positionsMap = new Map();
+        positions.forEach(item => {
+          const userId = item.userId.toString();
+          if (!positionsMap.has(userId)) {
+            positionsMap.set(userId, []);
+          }
+          
+          positionsMap.get(userId).push({
+            quantity: item.quantity,
+            side: item.side,
+            label: !isEmpty(item?.marketId?.groupItemTitle) 
+              ? item?.marketId?.groupItemTitle 
+              : (item.side === "yes" ? item.marketId.outcome[0].title : item.marketId.outcome[1].title)
+          });
+        });
+
+        const addPositionsToComment = (comment) => {
+          const userId = comment.userId._id?.toString() || comment.userId.toString();
+          return {
+            ...comment,
+            positions: positionsMap.get(userId) || []
+          };
+        };
+
+        const flatComments = comments.reduce((acc, comment) => {
+          const { replies, ...parentComment } = comment;
+          acc.push(addPositionsToComment(parentComment));
+          
+          if (replies?.length > 0) {
+            replies.forEach(reply => {
+              acc.push(addPositionsToComment(reply));
+            });
+          }
+          
+          return acc;
+        }, []);
+  
+      setComments(prevComments => {
+        if (isInitialLoad) {
+          return flatComments;
+        }
+        return [...prevComments, ...flatComments]; // Append new comments
+      });
+  
+      setPage(pageToFetch);
+      setHasMore(comments.length === limit);
+  
+    } catch (error) {
+      console.error("Error loading comments:", error);
+    } finally {
+      setIsLoading(false);
+      setIsFetching(false);
     }
   };
+  
+  useEffect(() => {
+    if (eventId) {
+      fetchComments(1, true);
+    }
+  }, [eventId]);
 
   const handleReply = (commentId: string) => {
     setReplyingTo((prevState) => (prevState === commentId ? null : commentId));
   };
 
   const handleDelete = async (commentId: string) => {
-    // if (!confirm("Are you sure you want to delete this comment?")) {
-    //   return;
-    // }
-
     try {
       const { success, message } = await deleteComment({ id: commentId });
       if (!success) {
@@ -460,13 +507,10 @@ export function CommentSection({ eventId }: CommentSectionProps) {
         );
         return;
       }
-      // toastAlert("success", "Comment deleted successfully!");
 
       setComments((prev) => {
         const deletedComment = prev.find((c) => c?._id === commentId);
         const newComments = prev.filter((c) => c?._id !== commentId);
-
-        // // If it's a reply, update the reply count of the parent comment
         if (deletedComment?.parentId) {
           const parentIndex = newComments.findIndex(
             (c) => c?._id === deletedComment.parentId
@@ -481,18 +525,22 @@ export function CommentSection({ eventId }: CommentSectionProps) {
             };
           }
         }
-
-        // If it's a main comment, also delete all its replies
         return newComments.filter((c) => c?.parentId !== commentId);
       });
     } catch (error) {
       console.error("Error deleting comment:", error);
-      // alert("Failed to delete comment. Please try again later.");
     }
   };
 
-  // Calculate total comments count (main comments + replies)
-  const totalCommentsCount = comments.length;
+  const loadMoreComments = () => {
+    if (!isFetching && hasMore) {
+      fetchComments(page + 1);
+    }
+  };
+    
+  const handleCommentAdded = () => {
+    fetchComments(1, true);
+  };
 
   useEffect(() => {
     const socket = socketContext?.socket;
@@ -500,30 +548,16 @@ export function CommentSection({ eventId }: CommentSectionProps) {
       return;
     }
 
-    const handleCommentAdded = (result: any) => {
-      const parsedData = JSON.parse(result);
-      // console.log('cmt socket Data: ', parsedData);
-      const { type, data } = parsedData;
-      if (type === "add" && data?.eventId === eventId) {
-        setComments((prev) => [data, ...prev]);
-      } else if (type === "delete" && data?.eventId === eventId) {
-        setComments((prev) =>
-          prev.filter((comment) => comment?._id !== data.id)
-        );
-      }
-    };
-
     socket.on("comment", handleCommentAdded);
-
     return () => {
       socket.off("comment", handleCommentAdded);
     };
   }, [socketContext?.socket]);
 
   return (
-    <div className="mt-4">
-      <h2 className="text-[15px] sm:text-xl font-bold mb-4">
-        Comments ({totalCommentsCount})
+    <div className="mt-6">
+      <h2 className="text-xl font-bold mb-4">
+        Comments ({total})
       </h2>
       <CommentForm eventId={eventId} onCommentAdded={handleCommentAdded} />
       <CommentList
@@ -535,6 +569,9 @@ export function CommentSection({ eventId }: CommentSectionProps) {
         eventId={eventId}
         onReplyAdded={handleCommentAdded}
         currentUserWallet={account ? account : ""}
+        hasMore={hasMore}
+        onLoadMore={loadMoreComments}
+        isFetching={isFetching}
       />
     </div>
   );

@@ -18,6 +18,7 @@ export default function ClientLayoutEffect() {
           inOrder: result.inOrder,
           locked: result.locked,
           position: result.position/100,
+          pnl1D: result.pnl1D
         }));
       }
     } catch (error) {

@@ -79,7 +79,7 @@ export const OpenOrderDialog = ({
                         {" "}
                         {item.timeInForce == "GTC"
                           ? "Good 'til canceled"
-                          : "Good 'til Date"}
+                          : `Good 'til ${momentFormat(item.expiration,"MMM D, YYYY · hh:mm A")}`}
                       </td>
                       <td>
                         {momentFormat(item.createdAt, "DD/MM/YYYY HH:mm")}

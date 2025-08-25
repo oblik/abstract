@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/app/components/ui/select";
+import { firstLetterCase } from "@/lib/stringCase";
 
 interface Market {
   id: string;
@@ -133,10 +134,10 @@ export default function EventLinting({
                           : "0.00"
                       }`}
                       yesButtonLabel={`Buy ${
-                        event.marketId[0]?.outcome?.[0]?.title || "Yes"
+                        firstLetterCase(event.marketId[0]?.outcome?.[0]?.title) || "Yes"
                       }`}
                       noButtonLabel={`Buy ${
-                        event.marketId[0]?.outcome?.[1]?.title || "No"
+                        firstLetterCase(event.marketId[0]?.outcome?.[1]?.title) || "No"
                       }`}
                       yesPotential={
                         (event.marketId[0]?.outcomePrices &&

@@ -51,7 +51,6 @@ import Astroworld from "@/public/images/astroworld.png";
 import { NavigationBar } from "@/app/components/ui/navigation-menu";
 import HeaderFixed from "@/app/HeaderFixed";
 import { toFixedDown } from "@/lib/roundOf";
-import { capitalize } from "@/lib/stringCase";
 
 export default function EventPage({ categories }) {
   const param = useParams();

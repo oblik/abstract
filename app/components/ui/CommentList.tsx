@@ -2,6 +2,7 @@ import React, { memo, useRef, useState, useCallback } from "react";
 import { CommentListProps } from "@/types/comments";
 import { Loader } from "lucide-react";
 import { Comment, ReplyForm } from "./comment";
+import { Reply } from "lucide-react";
 import { useSelector } from "@/store";
 
 
@@ -66,7 +67,7 @@ const CommentList: React.FC<CommentListProps> = (props) => {
                                 <>
                                     <button
                                         onClick={() => toggleReplies(comment._id)}
-                                        className="text-xs text-gray-400 hover:text-white ml-10 mt-1 flex items-center"
+                                        className="text-xs text-gray-400 hover:text-white ml-10 mt-0 sm:mt-1 flex items-center"
                                     >
                                         {expandedComments[comment._id] ? 'Hide' : 'Show'} {repliesForComment.length} {repliesForComment.length === 1 ? 'reply' : 'replies'}
                                     </button>

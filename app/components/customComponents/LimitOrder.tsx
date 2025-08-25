@@ -69,9 +69,9 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
   const [orderBtn, setOrderBtn] = useState<boolean>(true);
   const [daysLeft, setDaysLeft] = useState<number | null>(null);
   const [userPosition, setUserPosition] = useState<number>(0);
-  const [expirationSeconds, setExpirationSeconds] = useState<number | null>(
-    null
-  );
+  const [expirationSeconds, setExpirationSeconds] = useState<number | null>(null);
+  const [orderSuccess, setOrderSuccess] = useState(false);
+  const [orderFailed, setOrderFailed] = useState(false);
 
   const { price, amount } = formValue;
 
@@ -117,26 +117,6 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
           return prev;
         }
       } else if (name === "amount") {
-        // const numericValue = value.replace(/[^0-9.]/g, '');
-
-        // const parts = numericValue.split('.');
-        // if (parts.length > 2) {
-        //   return prev;
-        // }
-
-        // if (parts[1] && parts[1].length > 2) {
-        //   return prev;
-        // }
-
-        // const amountNum = parseInt(numericValue);
-
-        // if (numericValue === '' || numericValue === '.') {
-        //   return { ...prev, [name]: numericValue };
-        // } else if (amountNum >= 0 && amountNum <= 100000) {
-        //   return { ...prev, [name]: numericValue };
-        // } else {
-        //   return prev;
-        // }
 
         const numericValue = value.replace(/[^0-9]/g, ""); // Only digits, no decimal point
 
@@ -173,9 +153,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
     if (Number(amount) <= 0) {
       errors.amount = "Contracts must be greater than 0";
     }
-    // if (customDate && customDate <= new Date()) {
-    //   errors.customDate = "Custom date must be in the future";
-    // }
+
     setErrors(errors);
     return Object.keys(errors).length > 0 ? false : true;
   };
@@ -210,6 +188,8 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
       setCustomDate("");
     } else {
       toastAlert("error", message, "order-failed");
+      setOrderFailed(true);
+      setTimeout(() => setOrderFailed(false), 2000);
     }
   }catch (error) {
       console.error("Error placing order:", error);
@@ -285,72 +265,35 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
   return (
     <>
       <div className="flex justify-between mt-3">
-        <div className="w-full flex items-center border border-input rounded-md bg-background px-0 py-0 h-12 overflow-hidden">
+        <div className="w-full flex items-center border border-input rounded-md bg-background px-0 py-0 sm:h-12 h-11 overflow-hidden">
           <Input
             type="text"
             name="amount"
             placeholder="Amount"
             value={amount}
             onChange={handleChange}
-            className="border-0 text-left bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+            className="border-0 text-left bg-transparent text-[14px] sm:text-[16px] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
           />
-          <span className="cursor-default text-[16px] p-3">Contracts</span>
+          <span className="cursor-default text-[14px] sm:text-[16px] p-3">Contracts</span>
         </div>
       </div>
       <span className="text-red-500 text-sm">{errors?.amount}</span>
 
       <div className="flex justify-between mt-3">
-        <div className="w-full flex items-center border border-input rounded-md bg-background px-0 py-0 h-12 overflow-hidden">
+        <div className="w-full flex items-center border border-input rounded-md bg-background px-0 py-0 sm:h-12 h-11 overflow-hidden">
           <Input
             type="text"
             value={price}
             name="price"
             placeholder="Limit Price"
             onChange={handleChange}
-            className="border-0 text-left bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+            className="border-0 text-left text-[14px] sm:text-[16px] bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
           />
-          <span className="cursor-default text-[16px] p-3">¢</span>
+          <span className="cursor-default text-[14px] sm:text-[16px] p-3">¢</span>
         </div>
       </div>
       <span className="text-red-500 text-sm">{errors?.price}</span>
 
-      {/* {buyorsell == "sell" ? (
-        <div className="flex gap-2 pt-2 justify-end">
-          <Button
-            className="text-[13px] h-8 rounded bg-[trasparent] border border-[#262626] text-[#fff] hover:bg-[#262626]"
-            onClick={() => handlePercentageClick(25)}
-          >
-            25%
-          </Button>
-          <Button
-            className="text-[13px] h-8 rounded bg-[trasparent] border border-[#262626] text-[#fff] hover:bg-[#262626]"
-            onClick={() => handlePercentageClick(50)}
-          >
-            50%
-          </Button>
-          <Button
-            className="text-[13px] h-8 rounded bg-[trasparent] border border-[#262626] text-[#fff] hover:bg-[#262626]"
-            onClick={() => handlePercentageClick(100)}
-          >
-            Max
-          </Button>
-        </div>
-      ) : (
-        <div className="flex gap-2 pt-2 justify-end">
-          <Button
-            className="text-[13px] h-8 rounded bg-[trasparent] border border-[#262626] text-[#fff] hover:bg-[#262626]"
-            onClick={() => handleChangeBtn("-", "amount", 10)}
-          >
-            -10
-          </Button>
-          <Button
-            className="text-[13px] h-8 rounded bg-[trasparent] border border-[#262626] text-[#fff] hover:bg-[#262626]"
-            onClick={() => handleChangeBtn("+", "amount", 10)}
-          >
-            +10
-          </Button>
-        </div>
-      )} */}
 
       <div className="flex items-center justify-between mt-3">
         <label className="Label" htmlFor="expiry" style={{ paddingRight: 15 }}>
@@ -405,7 +348,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
             <div className="flex justify-between text-sm pt-2">
               <span className="text-muted-foreground">Contracts</span>
               <span className="text-foreground">
-                {Number(amount || 0)}
+                {Number(amount || 0).toLocaleString()}
               </span>{" "}
             </div>
 
@@ -414,64 +357,96 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
                 Average price per contract
               </span>
               <span className="text-foreground">
-                {Number(amount || 0).toFixed(1)}¢
+                {Number(price || 0).toLocaleString()}¢
               </span>{" "}
               {/* Replace with actual number */}
             </div>
 
-            {/* <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Total</span>
-              <span className="text-foreground">
-                ${" "}
-                {(Number(price) * Number(amount)) / 100}
+            <div className="flex justify-between text-sm">
+  <div>
+    <span className="text-white">
+      Total paid
+    </span>
+    <span className="text-muted-foreground"> (incl. fee)</span>
+  </div>
+  <span className="text-green-500">
+    {(() => {
+      const amt = Number(amount || 0);
+      const prc = Number(price || 0);
+      const fee = Number(makerFee || 0);
+      const base = (amt * prc) / 100;
+      const feePaid = (fee / 100) * base;
+      const total = base + feePaid;
+      return `$ ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    })()}
+  </span>
+</div>
+
+<div className="flex justify-between text-sm">
+  <div>
+    <span className="text-muted-foreground">Total return if</span>
+    <span className="text-white">
+      {` ${
+        activeView == "Yes"
+          ? firstLetterCase(outcomes?.[0]?.title || "yes")
+          : firstLetterCase(outcomes?.[1]?.title || "no")
+      }`}
+    </span>
+    <span className="text-muted-foreground"> wins</span>
+  </div>
+  <span className="text-green-500">
+    {(() => {
+      const amt = Number(amount || 0);
+      const totalReturn = amt * 1; // $1 per contract
+      return `$ ${totalReturn.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    })()}
+  </span>
+</div>
+
+
+   
+          </div>
+        </>
+      ) : (
+          <div className="pt-1 pb-1 mt-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">
+                Estimated amount to receive
+              </span>
+              <span className="text-foreground text-green-500">
+                {(() => {
+                  const amt = Number(amount || 0);
+                  const prc = Number(price || 0);
+                  const base = (amt * prc) / 100;
+                  const fee = Number(makerFee || 0);
+                  const feeDeducted = base - (fee / 100) * base;
+                  return `$ ${feeDeducted.toFixed(2)}`;
+                })()}
               </span>
             </div>
-            */}
+          </div>
+      )}
 
-            <div className="flex justify-between text-sm">
-              <div>
-                <span className="text-muted-foreground">Total return if</span>
-                <span className="text-white">
-                  {" "}
-                  {` ${
+      <div className="sm:pt-4 pt-3">
+        {signedIn ? (
+          <Button
+            className={`w-full border transition-colors duration-300 
+              ${orderSuccess ? 'bg-green-600 text-white hover:text-white border-green-600 cursor-default' : ''}
+              ${orderFailed ? 'bg-red-600 text-white hover:text-white border-red-600 cursor-default' : ''}
+              ${!orderSuccess && !orderFailed ? 'border-white bg-transparent text-white hover:bg-white hover:text-black' : ''}
+            `}
+            onClick={() => !orderSuccess && !orderFailed && handlePlaceOrder(buyorsell)}
+            disabled={orderSuccess || orderFailed}
+          >
+            {orderSuccess
+              ? 'Order placed'
+              : orderFailed
+                ? 'Insufficient balance'
+                : `${buyorsell === "buy" ? "Buy" : "Sell"} ${
                     activeView == "Yes"
                       ? firstLetterCase(outcomes?.[0]?.title || "yes")
                       : firstLetterCase(outcomes?.[1]?.title || "no")
-                  }`}{" "}
-                </span>
-                <span className="text-muted-foreground"> wins</span>
-              </div>
-              <span className="text-green-500">
-                $ {Number(amount || 0).toFixed(2)}
-              </span>
-            </div>
-          </div>
-        </>
-      ) : !isEmpty(price) && !isEmpty(amount) && (
-        <div className="pt-1 pb-1 mt-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">
-              Estimated amount to receive
-            </span>
-            <span className="text-foreground text-green-500">
-              $ {Number(amount)}
-            </span>
-          </div>
-        </div>
-      )}
-
-      <div className="pt-4">
-        {signedIn ? (
-          <Button
-            className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300"
-            onClick={() => handlePlaceOrder(buyorsell)}
-            disabled={orderBtn ? false : true}
-          >
-            {`${buyorsell === "buy" ? "Buy" : "Sell"} ${
-              activeView == "Yes"
-                ? firstLetterCase(outcomes?.[0]?.title || "yes")
-                : firstLetterCase(outcomes?.[1]?.title || "no")
-            }`}
+                  }`}
           </Button>
         ) : (
           <Button className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300">

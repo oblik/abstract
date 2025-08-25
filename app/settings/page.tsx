@@ -102,7 +102,7 @@ export default function ProfilePage() {
         <Header />
       </div>
 
-      <div className="container mx-auto py-10 px-4 container-sm">
+      <div className="container mx-auto sm:py-10 py-4 px-4 container-sm">
         <Tabs.Root defaultValue="tab1" orientation="vertical">
           <div className="flex justify-center mb-0 w-full lg:flex-row flex-col">
             <div className="w-full pl-0 pr-0 lg:w-[20%] relative">

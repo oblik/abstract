@@ -46,8 +46,8 @@ const InfoCards = ({ infoCardCms }) => {
   };
 
   return (
-    <div className="-mt-4 lg:block hidden">
-      <div className="justify-center mb-4 mt-2 pt-0 w-full flex">
+    <div className="mt-0 lg:block hidden">
+      <div className="justify-center mb-6 mt-5 pt-0 w-full flex">
         <div className="w-full flex flex-col items-center justify-center">
           {/* Desktop view */}
           <div className="hidden md:grid md:grid-cols-4 gap-4 justify-items-center items-center">
@@ -89,7 +89,7 @@ const SubcategoryBar = ({
 }) => (
   <div className="justify-center items-center py-1 lg:flex hidden">
     <div className="w-full max-w-7xl relative">
-      <div className="flex justify-start gap-2 sm:gap-3 overflow-x-auto hide-scrollbar flex-nowrap pb-5">
+      <div className="flex justify-start gap-2 sm:gap-3 overflow-x-auto flex-nowrap pb-5">
         <Button
           className={cn(
             "px-3 py-1 h-[30px] rounded-md transition-colors text-sm font-medium whitespace-nowrap border-[1px] hover:bg-transparent",
@@ -150,17 +150,27 @@ export default function Home({ infoCardCms, categories, tags }) {
   return (
     <>
       <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
-        <div className="sticky top-0 z-50 w-[100%] backdrop-blur-md bg-black/90 border-b border-[#222] lg:mb-4 mb-0" style={{ borderBottomWidth: '1px' }}>
-          <Header />
-          <NavigationBar
-            menuItems={categories}
-            showLiveTag={true}
-            setSelectedCategory={setSelectedCategory}
-            selectedCategory={selectCategory}
-          />
-        </div>
+      {/* Fixed header/navbar */}
+      <div className="fixed top-0 left-0 z-50 w-full backdrop-blur-md bg-black/80 border-b border-[#222]" style={{ borderBottomWidth: '1px' }}>
+        <Header />
+        <NavigationBar
+          menuItems={categories}
+          showLiveTag={true}
+          setSelectedCategory={setSelectedCategory}
+          selectedCategory={selectCategory}
+        />
+      </div>
+      {/* Spacer to prevent content from being hidden behind the fixed header/navbar */}
+      <div
+        className="lg:mb-4 mb-0"
+        style={{
+          height: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
+          minHeight: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
+          width: '100%'
+        }}
+      />
 
-        <div className="container mx-auto px-0 sm:px-4 max-w-full overflow-hidden">
+        <div className="container mx-auto pt-0 px-0 sm:px-2 max-w-full overflow-hidden">
           <div className="px-1 sm:px-0">
             <SubcategoryBar
               subcategories={subcategoryList}
@@ -190,11 +200,19 @@ export default function Home({ infoCardCms, categories, tags }) {
 
             {/* Discord Community Section */}
             <div className="w-full max-w-7xl mx-auto mt-5 mb-5 flex justify-center">
-              <div className="bg-black rounded-md px-6 py-8 flex flex-col items-center w-full max-w-xl border border-[#222] shadow-sm gap-2" style={{ boxShadow: '0 2px 6px 0 rgba(220,220,255,0.13)' }}>
-                <h3 className="text-xl font-bold mb-1 text-white">Join our Discord community</h3>
-                <p className="text-gray-300 mb-2 text-center text-sm">Connect with other traders, get support, and stay up to date with the latest news and features.</p>
-                <a href="https://discord.com/invite/sonotrade" target="_blank" rel="noopener noreferrer" className="bg-[#5865F2] hover:bg-[#4752c4] text-white font-semibold px-2 py-2 rounded-md transition-colors duration-200 text-sm flex items-center gap-1">
-                  <Image src={DiscordLogo} alt="Discord" width={20} height={20} className="mr-1" />
+              <div
+                className="bg-black rounded-md px-4 py-5 sm:px-6 sm:py-8 flex flex-col items-center w-full max-w-xs sm:max-w-xl border border-[#222] shadow-sm gap-2"
+                style={{ boxShadow: '0 2px 6px 0 rgba(220,220,255,0.13)' }}
+              >
+                <h3 className="text-base sm:text-xl font-bold mb-1 text-white">Join our Discord community</h3>
+                <p className="text-xs sm:text-sm text-gray-300 mb-2 text-center">Connect with other traders, get support, and stay up to date with the latest news and features.</p>
+                <a
+                  href="https://discord.com/invite/sonotrade"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#5865F2] hover:bg-[#4752c4] text-white font-semibold px-2 py-2 rounded-md transition-colors duration-200 text-xs sm:text-sm flex items-center gap-1"
+                >
+                  <Image src={DiscordLogo} alt="Discord" width={16} height={16} className="mr-1" />
                   Join Discord
                 </a>
               </div>
@@ -202,7 +220,11 @@ export default function Home({ infoCardCms, categories, tags }) {
           </div>
         </div>
       </div>
-      <Footer />
+      <div className="hidden sm:block">
+        <Footer />
+      </div>
+      {/* Add extra bottom space for mobile so HeaderFixed does not overlay content */}
+      <div className="block sm:hidden" style={{ height: '75px' }} />
       <HeaderFixed />
     </>
   );

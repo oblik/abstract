@@ -249,7 +249,7 @@ const Chart: React.FC<ChartProps> = ({
                     return {
                         label: item.groupItemTitle,
                         color: ChartColors[index],
-                        asset: `asset${index + 1}`,
+                        asset: `${index + 1}`,
                     };
                 });
                 if (market.length > 1) {
@@ -513,6 +513,7 @@ const Chart: React.FC<ChartProps> = ({
         }
     }, [market, multiHoveredChance, selectedYes]);
 
+
     const CustomDot = (props: any) => {
         const { cx, cy, payload, index, stroke } = props;
         const isLastPoint = index === chartData.length - 1;
@@ -571,34 +572,34 @@ const Chart: React.FC<ChartProps> = ({
             style={{ backgroundColor: "transparent", borderColor: "transparent" }}
         >
             <div>
-                <CardHeader className="p-0">
+                <CardHeader className="space-y-0 p-0">
                     {/* 先显示标题 */}
-                    <CardTitle style={{ lineHeight: "1.5" }}>
+                    <CardTitle style={{ lineHeight: "1.5" }} className="pt-3 sm:pb-1 pb-2 sm:pt-0">
                         <div style={{ display: "flex", alignItems: "center" }}>
                             <div
                                 style={{
-                                    width: screenWidth < 640 ? "40px" : "40px",
-                                    height: screenWidth < 640 ? "40px" : "40px",
+                                    width: screenWidth < 640 ? "40px" : "65px",
+                                    height: screenWidth < 640 ? "40px" : "65px",
                                     overflow: "hidden",
-                                    borderRadius: "4px",
+                                    borderRadius: "10px",
                                     flexShrink: 0,
                                 }}
                             >
                                 <img
                                     src={image}
                                     alt="Event"
-                                    width={screenWidth < 640 ? 40 : 40}
-                                    height={screenWidth < 640 ? 40 : 40}
-                                    style={{
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "cover",
-                                        transition: "all 0.3s ease",
+                                    width={screenWidth < 640 ? 50 : 65}
+                                    height={screenWidth < 640 ? 50 : 65}
+                                    style={{ 
+                                    width: "100%", 
+                                    height: "100%", 
+                                    objectFit: "cover",
+                                    transition: "all 0.3s ease" 
                                     }}
                                 />
                             </div>
                             <div
-                                className="text-[18px] lg:text-[24px] sm:text-[16px]"
+                                className="text-[19px] lg:text-[26px] sm:text-[20px]"
                                 style={{ paddingLeft: "15px" }}
                             >
                                 {title || ""}
@@ -607,13 +608,13 @@ const Chart: React.FC<ChartProps> = ({
                     </CardTitle>
 
                     {/* 显示 Vol 和时间等信息 */}
-                    <CardDescription className="py-1 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                    <CardDescription className="py-0 flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2">
                         {/* First line - Volume, Date, and Toggle */}
                         <div className="flex flex-wrap gap-3 items-center">
-                            <p>Vol ${(volume && toTwoDecimal(volume/100)?.toLocaleString()) || "0.00"}</p>
+                            <p className="text-[12px] sm:text-[14px]">Vol ${(volume && toTwoDecimal(volume/100)?.toLocaleString()) || "0.00"}</p>
                             {endDate && (
-                                <p className="flex items-center gap-1">
-                                    <Clock size={14} />{" "}
+                                <p className="flex items-center gap-1 text-[12px] sm:text-[14px]">
+                                    <Clock size={12} className="sm:w-[14px] sm:h-[14px] w-[12px] h-[12px]" />{" "}
                                     {new Date(endDate)?.toLocaleString("en-US", {
                                         day: "numeric",
                                         month: "short",
@@ -629,6 +630,7 @@ const Chart: React.FC<ChartProps> = ({
                                     variant="ghost"
                                     onClick={() => setSelectedYes(!selectedYes)}
                                     size="sm"
+                                    className="h-1 px-0 sm:h-9 sm:px-3"
                                 >
                                     <ArrowRightLeft />
                                 </Button>
@@ -639,8 +641,8 @@ const Chart: React.FC<ChartProps> = ({
                                     variant="ghost"
                                     onClick={() => setSelectedYes(!selectedYes)}
                                     size="sm"
-                                    className="hidden sm:block"
-                                >
+                                    className="h-1 px-0 sm:h-9 sm:px-3"                               
+                                    >
                                     <ArrowRightLeft />
                                 </Button>
                             )}
@@ -703,7 +705,7 @@ const Chart: React.FC<ChartProps> = ({
                     </CardDescription>
                     {/* Single market chance display - inside CardHeader like MonthlyListenersChart2 */}
                     {market?.length <= 1 && displayChance !== undefined && (
-                        <div className="flex items-center justify-between mt-3 mb-3 w-full">
+                        <div className="flex flex-wrap gap-3 items-center w-full">
                             <div className="flex items-center">
                                 <span className="text-3xl lg:text-4xl font-semibold" style={{ color: chanceColor }}>
                                     {typeof displayChance === 'number' ? displayChance.toFixed(1) : '0.0'}%
@@ -752,7 +754,7 @@ const Chart: React.FC<ChartProps> = ({
                         </CardHeader>
                         <CardContent className="p-0">
                             <ChartContainer
-                                className="h-[350px] p-0 pr-0 lg:h-[300px] sm:h-[250px] w-full"
+                                className="h-[300px] sm:h-[300px] lg:h-[300px] p-0 pr-0 w-full"
                                 config={chartConfig}
                                 onMouseLeave={() => {
                                     setHoveredChance(undefined);
@@ -784,7 +786,7 @@ const Chart: React.FC<ChartProps> = ({
                                         domain={['dataMin', 'dataMax']}
                                         tickLine={false}
                                         axisLine={false}
-                                        tickMargin={8}
+                                        tickMargin={4}
                                         width={100}
                                         ticks={chartData.length > 0 ? (() => {
                                           const minTime = Math.min(...chartData.map(d => d.rawTimestamp || 0));
@@ -809,15 +811,17 @@ const Chart: React.FC<ChartProps> = ({
                                             });
                                           }
                                         }}
+                                        tick={{ fontSize: screenWidth < 640 ? 9 : 12, fill: '#bdbdbd' }}
                                     />
                                     <YAxis
                                         domain={[0, 100]}
                                         tickFormatter={(tick) => `${tick}%`}
                                         tickLine={false}
                                         axisLine={false}
-                                        tickMargin={8}
+                                        tickMargin={4}
                                         orientation="right"
-                                        width={40}
+                                        width={32}
+                                        tick={{ fontSize: screenWidth < 640 ? 9 : 12, fill: '#bdbdbd' }}
                                     />
                                     <Tooltip 
                                         content={<CustomTooltipWithState />}
@@ -826,24 +830,21 @@ const Chart: React.FC<ChartProps> = ({
                                         shared={true}
                                         cursor={false}
                                     />
-                                    <Legend
-                                        height={36}
-                                        iconType="circle"
-                                        wrapperStyle={{ top: "-10px" }}
-                                    />
+                                    {/* Legend removed to hide Yes/No labels */}
                                     {chartConfig.map((asset: any, idx: any) => (
                                         <Line
                                             key={asset.asset}
-                                            type="stepAfter" // stepAfter for proper odds representation
+                                            type="stepAfter"
                                             dataKey={asset.asset}
-                                            name={asset.fullLabel || asset.label}
                                             stroke={asset.color}
                                             strokeWidth={2}
-                                            dot={<CustomDot color={asset.color}/>}
-                                            activeDot={{ 
-                                                r: 6, 
-                                                fill: asset.color, 
-                                                stroke: "#fff", 
+                                            name={asset.fullLabel || asset.label}
+
+                                            dot={<CustomDot color={asset.color}/>} 
+                                            activeDot={{
+                                                r: 3,
+                                                fill: asset.color,
+                                                stroke: "#fff",
                                                 strokeWidth: 2,
                                                 style: { filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.3))' }
                                             }}

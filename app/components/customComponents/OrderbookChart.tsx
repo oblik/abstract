@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Button } from "@/app/components/ui/button";
 import { Legend, Line, LineChart, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 import { ArrowRightLeft } from "lucide-react";
@@ -89,6 +89,7 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
   const [hoveredChance, setHoveredChance] = useState<number | undefined>(
           undefined
       );
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // State to track screen width
   const [screenWidth, setScreenWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1024);
@@ -246,14 +247,20 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
   return (
     <Card className="h-auto" style={{ backgroundColor: "transparent", borderColor: "transparent" }}>
       <div className="relative">
-        {/* Volume and Date info (should be above chance/logo row) */}
-        {/* (Volume removed as requested) */}
-        {/* Chance Row: Chance value left, logo right */}
+
         <div className="flex items-center justify-between mb-3 pb-2 mt-4 w-full relative">
           <div className="flex items-center">
             <CardTitle className="text-4xl text-left ml-0" style={{ color: chanceColor }}>
-              <span>{toFixedDown(displayChance,1)}%</span>
-              <span className="text-2xl font-light">chance</span>
+                        <div className="flex flex-wrap gap-3 items-center w-full">
+                            <div className="flex items-center">
+                                <span className="text-3xl lg:text-4xl font-semibold" style={{ color: chanceColor }}>
+                                    {typeof displayChance === 'number' ? displayChance.toFixed(1) : '0.0'}%
+                                </span>
+                                <span className="text-lg font-light ml-2" style={{ color: chanceColor }}>
+                                    chance
+                                </span>
+                            </div>
+                        </div>
             </CardTitle>
           </div>
           <Button variant="ghost" size="icon" className="h-6 w-6 p-0 mr-0" onClick={() => setSelectedYes(!selectedYes)}>
@@ -262,20 +269,23 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
         </div>
           <CardContent className="pt-0 pb-0 pl-0 pr-0">
             <div className="w-full p-0 m-0 pb-0" style={{ width: '100%', paddingBottom: 0 }}>
-              <ChartContainer className="h-[300px] w-full p-0 m-0 flex justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none pb-0 mb-0" style={{ marginBottom: 0, paddingBottom: 0, overflow: 'visible' }} config={chartConfig}>
+              <ChartContainer ref={containerRef} className="h-[300px] w-full p-0 m-0 flex justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none pb-0 mb-0" style={{ marginBottom: 0, paddingBottom: 0, overflow: 'visible' }} config={chartConfig}>
                 <LineChart 
                   data={chartData} 
-                  className="pl-0" 
+                  className="pl-0 w-full"
                   margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+                  width={undefined}
                   syncId="chart"
                   syncMethod="value"
                   onMouseMove={(e) => {
                     if (e.activePayload && e.activePayload.length > 0) {
                       setHoveredChance(e.activePayload[0].value);
                     }
+                    // no dynamic radius
                   }}
                   onMouseLeave={() => {
                     setHoveredChance(undefined);
+                    // no dynamic radius
                   }}
                 >
                   <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#1a1a1a" />
@@ -319,6 +329,8 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
                     axisLine={false}
                     tickMargin={8}
                     orientation="right"
+                    width={46}
+                    tick={{ fill: '#fff', fontSize: 12 }}
                   />
                   <Tooltip 
                     content={<CustomTooltip />}
@@ -335,7 +347,7 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
                     stroke={selectedYes ? "#7DFDFE" : "#EC4899"}
                     strokeWidth={1}
                     dot={<CustomDot />}
-                    activeDot={{ r: 4, fill: selectedYes ? "#7DFDFE" : "#EC4899", stroke: "#fff", strokeWidth: 2 }}
+                    activeDot={{ r: 3, fill: selectedYes ? "#7DFDFE" : "#EC4899", stroke: "#fff", strokeWidth: 2 }}
                     label={false}
                     connectNulls={false}
                     isAnimationActive={false}
@@ -344,7 +356,7 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
                   />
                 </LineChart>
               </ChartContainer>
-              <div className="flex justify-center items-center mt-4 mb-2" style={{ position: 'relative', zIndex: 20, pointerEvents: 'auto' }}>
+              <div className="flex justify-center items-center mt-2 sm:mt-0 mb-4 sm:mb-8 md:mb-8 text-xs sm:text-base" style={{ marginTop: '0.5rem', marginBottom: '1rem', transform: 'scale(0.85)', transformOrigin: 'center', maxWidth: '90vw' }}>
                 <ChartIntervals interval={interval} setInterval={setInterval} />
               </div>
             </div>

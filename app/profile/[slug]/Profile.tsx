@@ -108,11 +108,11 @@ export default function ProfilePage(props: ProfilePageProps) {
           selectedCategory={selectCategory}
         />
       </div>
-      <div className="container mx-auto py-10 px-4 container-sm">
+      <div className="container mx-auto py-5 px-4 container-sm">
         {/* 1. User information area */}
         <div className="flex items-center justify-between space-x-4 mb-6 profile_top">
           <div className="flex items-center space-x-4">
-            <Avatar className="w-16 h-16">
+            <Avatar className="sm:w-16 sm:h-16 w-14 h-14">
               {props?.user?.profileImg ? (
                 <AvatarImage
                   src={props?.user?.profileImg}
@@ -129,7 +129,7 @@ export default function ProfilePage(props: ProfilePageProps) {
               )}
             </Avatar>
             <div>
-              <h2 className="text-xl font-bold">
+              <h2 className="sm:text-xl text-lgfont-bold">
                 {props?.user?.userName ||
                   (wallet ? `${wallet?.slice(0, 6)}...${wallet?.slice(-4)}` : "")}
               </h2>
@@ -139,7 +139,7 @@ export default function ProfilePage(props: ProfilePageProps) {
           {
             isOwnProfile && (
               <Button
-                className="ml-auto"
+                className="ml-auto min-w-[95px] text-[12px] sm:text-sm max-h-8 sm:max-h-12 px-4"
                 variant="outline"
                 onClick={NavigateSettings}
               >
@@ -150,8 +150,8 @@ export default function ProfilePage(props: ProfilePageProps) {
         </div>
 
         {/* 2. Key metrics card area */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
-          <div className="bg-[#131212] p-4 rounded-lg flex flex-col items-center">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
+          <div className="bg-[#131212] sm:p-4 p-2 rounded-lg flex flex-col items-center">
             <span className="text-2xl">
               <Image
                 src="/images/icon_01.png"
@@ -161,9 +161,9 @@ export default function ProfilePage(props: ProfilePageProps) {
               />
             </span>
             {tradeOverviewLoading ? <span className="mt-2 text-sm text-gray-500">Loading...</span> : <span className="mt-2 text-lg font-semibold">${tradeOverview?.total_value}</span>}
-            <span className="text-sm text-gray-500 mt-1">Positions value</span>
+            <span className="sm:text-sm text-xs text-gray-500 mt-1">Positions value</span>
           </div>
-          <div className="bg-[#131212] p-4 rounded-lg flex flex-col items-center">
+          <div className="bg-[#131212] sm:p-4 p-2 rounded-lg flex flex-col items-center">
             <span className="text-2xl">
               <Image
                 src="/images/icon_02.png"
@@ -173,9 +173,9 @@ export default function ProfilePage(props: ProfilePageProps) {
               />
             </span>
             {tradeOverviewLoading ? <span className="mt-2 text-sm text-gray-500">Loading...</span> : <span className="mt-2 text-lg font-semibold">${tradeOverview?.total_profit_loss}</span>}
-            <span className="text-sm text-gray-500 mt-1">Profit / loss</span>
+            <span className="sm:text-sm text-xs text-gray-500 mt-1">Profit / loss</span>
           </div>
-          <div className="bg-[#131212] p-4 rounded-lg flex flex-col items-center">
+          <div className="bg-[#131212] sm:p-4 p-2 rounded-lg flex flex-col items-center">
             <span className="text-2xl">
               <Image
                 src="/images/icon_03.png"
@@ -185,9 +185,9 @@ export default function ProfilePage(props: ProfilePageProps) {
               />
             </span>
             {tradeOverviewLoading ? <span className="mt-2 text-sm text-gray-500">Loading...</span> : <span className="mt-2 text-lg font-semibold">${tradeOverview?.total_volume_traded}</span>}
-            <span className="text-sm text-gray-500 mt-1">Volume traded</span>
+            <span className="sm:text-sm text-xs text-gray-500 mt-1">Volume traded</span>
           </div>
-          <div className="bg-[#131212] p-4 rounded-lg flex flex-col items-center">
+          <div className="bg-[#131212] sm:p-4 p-2 rounded-lg flex flex-col items-center">
             <span className="text-2xl">
               <Image
                 src="/images/icon_04.png"
@@ -197,7 +197,7 @@ export default function ProfilePage(props: ProfilePageProps) {
               />
             </span>
             {tradeOverviewLoading ? <span className="mt-2 text-sm text-gray-500">Loading...</span> : <span className="mt-2 text-lg font-semibold">{tradeOverview?.total_events_traded}</span>}
-            <span className="text-sm text-gray-500 mt-1">Event traded</span>
+            <span className="sm:text-sm text-xs text-gray-500 mt-1">Event traded</span>
           </div>
         </div>
 
@@ -209,9 +209,9 @@ export default function ProfilePage(props: ProfilePageProps) {
           className="mb-4"
         >
           <div className="flex justify-between items-center mb-4">
-            <TabsList className="flex space-x-4">
-              <TabsTrigger value="positions">Positions</TabsTrigger>
-              <TabsTrigger value="activity">Activity</TabsTrigger>
+            <TabsList className="flex w-full justify-start sm:space-x-2 space-x-0">
+              <TabsTrigger className="sm:text-sm text-[13px]" value="positions">Positions</TabsTrigger>
+              <TabsTrigger className="sm:text-sm text-[13px]" value="activity">Activity</TabsTrigger>
             </TabsList>
             {activeTab == "deposit" || activeTab == "withdraw" ?
               <select
@@ -241,21 +241,24 @@ export default function ProfilePage(props: ProfilePageProps) {
           <TabsContent value="activity">
             {
               isOwnProfile && (
-                <div className="p-4">
+                <div className="sm:p-4 p-1">
                   <div className="flex gap-2 mb-4">
                     <Button
+                      className="h-7 sm:h-9 text-xs sm:text-sm px-3 sm:px-4"
                       variant={activeTab === "activity" ? "default" : "outline"}
                       onClick={() => setActiveTab("activity")}
                     >
                       Trade
                     </Button>
                     <Button
+                      className="h-7 sm:h-9 text-xs sm:text-sm px-3 sm:px-4"
                       variant={activeTab === "deposit" ? "default" : "outline"}
                       onClick={() => setActiveTab("deposit")}
                     >
                       Deposit
                     </Button>
                     <Button
+                      className="h-7 sm:h-9 text-xs sm:text-sm px-3 sm:px-4"
                       variant={activeTab === "withdraw" ? "default" : "outline"}
                       onClick={() => setActiveTab("withdraw")}
                     >

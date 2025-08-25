@@ -95,21 +95,6 @@ export default function EventLinting({
 
   return (
     <>
-      {/* <div className="flex justify-end mb-9 w-full text-end">
-        <Select value={selectedMarket} onValueChange={setSelectedMarket}>
-          <SelectTrigger className="focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none w-64 h-12 border-[#464646]">
-            <SelectValue placeholder="All Markets" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="all">All Markets</SelectItem>
-              <SelectItem value="open">Open Markets</SelectItem>
-              <SelectItem value="closed">Closed Markets</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div> */}
-      <div className="flex flex-col items-center justify-center gap-9 w-full mt-3">
         {loading && (
           <Loader className="w-26 h-26 animate-spin" />
         )}
@@ -204,7 +189,6 @@ export default function EventLinting({
             hasMore={hasMore}
           />
         )}
-      </div>
     </>
   );
 }

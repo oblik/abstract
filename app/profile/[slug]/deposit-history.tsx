@@ -165,7 +165,7 @@ const DepositTable = ({statusFilter}) => {
         </tbody>
       </table>
       {!loading && Deposit?.length === 0 && (
-        <div className="flex justify-center my-5 text-gray-500">
+        <div className="flex text-[13px] justify-center my-5 text-gray-500">
           No Activity found
         </div>
       )}

@@ -164,7 +164,8 @@ export function processMultiChartData(
   let currentIdx1 = idx1, currentIdx2 = idx2, currentIdx3 = idx3, currentIdx4 = idx4;
   let currentVal1 = last1, currentVal2 = last2, currentVal3 = last3, currentVal4 = last4;
 
-  for (const timestamp of sortedTimestamps) {
+  for (let i = 0; i < sortedTimestamps.length; i++) {
+    const timestamp = sortedTimestamps[i];
     // Update values based on any new data points up to this timestamp
     while (currentIdx1 < sorted1.length && sorted1[currentIdx1].t <= timestamp) {
       currentVal1 = sorted1[currentIdx1].p * 100;
@@ -183,30 +184,49 @@ export function processMultiChartData(
       currentIdx4++;
     }
 
-    const date = new Date(timestamp * 1000);
-    let timestampString = "";
-    if (formattingInterval === "all" || formattingInterval === "1m" || formattingInterval === "1w") {
-      timestampString = date.toLocaleString("en-US", {
-        day: "numeric",
-        month: "short",
+    const pushPoint = (ts: number) => {
+      const date = new Date(ts * 1000);
+      let timestampString = "";
+      if (formattingInterval === "all" || formattingInterval === "1m" || formattingInterval === "1w") {
+        timestampString = date.toLocaleString("en-US", {
+          day: "numeric",
+          month: "short",
+        });
+      } else {
+        timestampString = date.toLocaleString("en-US", {
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true
+        });
+      }
+      result.push({
+        rawTimestamp: ts,
+        timestamp: timestampString,
+        asset1: currentVal1,
+        asset2: currentVal2,
+        asset3: currentVal3,
+        asset4: currentVal4,
+        formattingInterval,
       });
-    } else {
-      timestampString = date.toLocaleString("en-US", {
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true
-      });
-    }
+    };
 
-    result.push({
-      rawTimestamp: timestamp,
-      timestamp: timestampString,
-      asset1: currentVal1,
-      asset2: currentVal2,
-      asset3: currentVal3,
-      asset4: currentVal4,
-      formattingInterval,
-    });
+    // Push the real data timestamp
+    pushPoint(timestamp);
+
+    // If there's a large gap to the next real timestamp, insert forward-filled points
+    const nextReal = sortedTimestamps[i + 1];
+    if (nextReal) {
+      const gap = nextReal - timestamp;
+      if (gap > step * 1.5) { // only fill if gap clearly larger than step
+        // Limit number of inserted points to avoid huge arrays (safety cap ~1500 extra)
+        let inserted = 0;
+        for (let filler = timestamp + step; filler < nextReal; filler += step) {
+          pushPoint(filler);
+          inserted++;
+          if (inserted > 1500) break; // safety cap
+        }
+      }
+    }
   }
 
   // Remove duplicates and sort
@@ -291,6 +311,7 @@ export function processSingleChartData(
 
   const rangeSec = now - startTime;
   const formattingInterval = getFormattingInterval(rangeSec);
+  const step = getFixedStep(adjustedInterval, rangeSec); // reuse same step logic as multi-chart
 
   const sorted = [...data1].sort((a, b) => a.t - b.t);
 
@@ -344,29 +365,49 @@ export function processSingleChartData(
     realDataPoints.push({ timestamp: now, value: finalValue });
   }
 
-  // Convert to final format
-  for (const point of realDataPoints) {
-    const date = new Date(point.timestamp * 1000);
-    let timestampString = "";
-    if (formattingInterval === "all" || formattingInterval === "1m" || formattingInterval === "1w") {
-      timestampString = date.toLocaleString("en-US", {
-        day: "numeric",
-        month: "short",
-      });
-    } else {
-      timestampString = date.toLocaleString("en-US", {
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true
-      });
-    }
+  // Convert to final format with gap filling for smoother hover
+  for (let i = 0; i < realDataPoints.length; i++) {
+    const point = realDataPoints[i];
+    const nextPoint = realDataPoints[i + 1];
 
-    result.push({
-      rawTimestamp: point.timestamp,
-      timestamp: timestampString,
-      asset1: point.value,
-      formattingInterval,
-    });
+    const pushPoint = (ts: number, value: number) => {
+      const date = new Date(ts * 1000);
+      let timestampString = "";
+      if (formattingInterval === "all" || formattingInterval === "1m" || formattingInterval === "1w") {
+        timestampString = date.toLocaleString("en-US", {
+          day: "numeric",
+          month: "short",
+        });
+      } else {
+        timestampString = date.toLocaleString("en-US", {
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true
+        });
+      }
+      result.push({
+        rawTimestamp: ts,
+        timestamp: timestampString,
+        asset1: value,
+        formattingInterval,
+      });
+    };
+
+    // Push original point
+    pushPoint(point.timestamp, point.value);
+
+    // Insert forward-filled points if gap big
+    if (nextPoint) {
+      const gap = nextPoint.timestamp - point.timestamp;
+      if (gap > step * 1.5) {
+        let inserted = 0;
+        for (let filler = point.timestamp + step; filler < nextPoint.timestamp; filler += step) {
+          pushPoint(filler, point.value); // forward fill same value for horizontal line
+          inserted++;
+          if (inserted > 1500) break; // safety cap
+        }
+      }
+    }
   }
 
   // Remove duplicates and sort

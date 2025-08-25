@@ -353,7 +353,7 @@ export function ReplyForm({
             value={reply}
             onChange={(e) => setReply(e.target.value)}
             placeholder="Add reply..."
-            className="flex-1 px-2 sm:px-4 py-2 sm:py-3 bg-[#0f0f0f] border border-input rounded-md sm:rounded-xl text-white focus:border-input focus:outline-none text-xs sm:text-sm min-w-0 !pr-16 lg:pr-32 transition-all duration-200 placeholder:text-xs sm:placeholder:text-sm"
+            className="flex-1 px-2 sm:px-4 py-2.5 sm:py-3 bg-[#0f0f0f] border border-input rounded-md sm:rounded-xl text-white focus:border-input focus:outline-none text-xs sm:text-sm min-w-0 !pr-16 lg:pr-32 transition-all duration-200 placeholder:text-xs sm:placeholder:text-sm"
             disabled={isSubmitting}
             maxLength={300}
           />

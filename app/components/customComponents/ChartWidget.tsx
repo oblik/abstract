@@ -584,7 +584,7 @@ const ChartWidget: React.FC<ChartProps> = ({
 
     return (
         <Card
-            className="w-[115vw] lg:w-[44vw] sm:w-[90vw] h-auto"
+            className="w-[115vw] lg:w-[44vw] sm:w-[100vw] h-auto max-w-full xl:max-w-[800px] 2xl:max-w-[800px]"
             style={{ backgroundColor: "transparent", borderColor: "transparent" }}
         >
             <div>

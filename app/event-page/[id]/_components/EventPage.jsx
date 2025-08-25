@@ -277,9 +277,11 @@ export default function EventPage({ categories }) {
             />
           </div>
         </div>
-        {/* Spacer to prevent content from being hidden behind the fixed header/navbar */}
-        <div style={{ height: '112px', minHeight: '112px', width: '100%' }} className="lg:mb-4 mb-0" />
-        <div className="container mx-auto px-0 sm:px-4 max-w-full overflow-hidden">
+        {/* Remove spacer and use padding-top on main content to offset header */}
+        <div
+          className="container mx-auto px-0 sm:px-4 max-w-full overflow-hidden"
+          style={{ paddingTop: typeof window !== 'undefined' && window.innerWidth < 640 ? '40px' : '112px', paddingLeft: window?.innerWidth < 640 ? 0 : undefined, paddingRight: window?.innerWidth < 640 ? 0 : undefined }}
+        >
           {eventsLoading ? (
             <div className="flex justify-center items-center h-[80vh] w-[80vw]">
               <Loader className="w-26 h-26 animate-spin bg-blend-overlay" />
@@ -441,6 +443,7 @@ export default function EventPage({ categories }) {
                                     <AccordionTrigger
                                       marketId="market-1"
                                       outcomePrice={market?.odd || 0}
+                                      volume={market?.volume || 0}
                                       className="flex sm:text-[18px] text-[18px] items-center sm:gap-2 gap-0"
                                       setSelectedOrderBookData={
                                         setSelectedOrderBookData
@@ -547,56 +550,46 @@ export default function EventPage({ categories }) {
                           </div>
                         ))}
 
-                      {/* <ExpandableTextView>
-                        <h3 className="sm:text-[18px] text-[16px] font-bold sm:m-4 m-4">
-                          Rules
-                        </h3>
-                        <SelectSeparator className="my-4" />
-                        <p className="sm:text-base pl-4 sm:pr-0 pr-4 pb-0 sm:pl-0 text-[14px]">
-                          {events?.description}
-                        </p>
-                         <p className="pl-4 sm:pl-0 pr-4 sm:pr-4 text-[14px] sm:text-base">
-                          Resolver:{" "}
-                          <Link
-                            href={`https://polygonscan.com/address/${markets?.[selectedIndex]?.resolvedBy}`}
-                            target="_blank"
-                            className="text-blue-500"
-                          >
-                            {markets?.[selectedIndex]?.resolvedBy}
-                          </Link>
-                        </p> 
-                      </ExpandableTextView> */}
                       <h3 className="sm:text-[22px] text-[15px] font-bold sm:mt-6 sm:mb-2 sm:mr-4 mt-4 mb-1">
                         Rules
                       </h3>
                       <SelectSeparator className="my-2" />
-                      <div className="sm:text-base pb-0 text-[12px] text-gray-400">
-                        {events?.description?.length > 250 ? (
-                          <div className="space-y-0">
-                            <div
-                              className={`line-clamp-5 transition-all duration-300 ${
-                                showFullText ? "line-clamp-none" : ""
-                              }`}
-                              style={{ whiteSpace: "pre-line" }}
-                            >
-                              {showFullText
-                                ? events?.description
-                                : events?.description?.slice(0, 250) + " ..."}
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <Button
-                                variant="link"
-                                onClick={() => setShowFullText(!showFullText)}
-                                className="text-[12px] sm:text-sm text-gray-400 font-bold px-0 mt-0.5 !no-underline"
-                              >
-                                {showFullText ? "Show Less" : "Show More"}
-                              </Button>
-                            </div>
-                          </div>
-                        ) : (
-                          events?.description
-                        )}
-                      </div>
+                        <div
+                          className="sm:text-base pb-0 text-[12px] text-gray-400 w-full sm:w-full px-0 mx-0"
+                          style={{
+                            paddingLeft: 0,
+                            paddingRight: 0,
+                            marginLeft: 0,
+                            marginRight: 0,
+                          }}
+                        >
+                                {events?.description?.length > 250 ? (
+                                  <div className="space-y-0 w-full">
+                                    <div
+                                      className={`block w-full sm:w-full transition-all duration-300 ${
+                                        showFullText ? "" : "line-clamp-5"
+                                      }`}
+                                      style={{ whiteSpace: "pre-line" }}
+                                    >
+                                      {showFullText
+                                        ? events?.description
+                                        : events?.description?.slice(0, 250) + " ..."}
+                                    </div>
+
+                                    <div className="flex items-center justify-between">
+                                      <Button
+                                        variant="link"
+                                        onClick={() => setShowFullText(!showFullText)}
+                                        className="text-[12px] sm:text-sm text-gray-400 font-bold px-0 mt-0.5 !no-underline"
+                                      >
+                                        {showFullText ? "Show Less" : "Show More"}
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  events?.description
+                                )}
+                        </div>
 
                       {events?.status === "closed" && (
                         <div className="flex items-start gap-3 p-4 my-3 rounded-md border border-red-500 bg-[#2a1414] text-red-300">
@@ -653,7 +646,7 @@ export default function EventPage({ categories }) {
                     </div>
                   ) : (
                     <div className="hidden lg:block lg:w-[30%] relative">
-                      <div className="fixed top-[147px] z-60 w-[300px] xl:w-[350px]">
+                      <div className="fixed top-[147px] w-[300px] xl:w-[350px]">
                         <TradingCard
                           activeView={activeView}
                           setActiveView={setActiveView}
@@ -670,18 +663,6 @@ export default function EventPage({ categories }) {
                           title={events?.title}
                         />
 
-                        {/* Spotify Embed */}
-                        {/* <div className="mt-6">
-                        <iframe
-                          style={{ borderRadius: "12px" }}
-                          src="https://open.spotify.com/embed/track/6iycYUk3oB0NPMdaDUrN1w?utm_source=generator&theme=0"
-                          width="100%"
-                          height="146"
-                          frameBorder="0"
-                          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                          loading="lazy"
-                        ></iframe>
-                      </div> */}
                       </div>
                     </div>
                   )}
@@ -689,10 +670,10 @@ export default function EventPage({ categories }) {
               </div>
 
               {/* Trading Card Drawer for Mobile */}
-              <div className="lg:hidden justify-center pt-5 pb-8 items-center mt-0 fixed bottom-[24px] left-0 w-full z-50">
+              <div className="lg:hidden justify-center pt-5 pb-8 items-center mt-0 fixed bottom-[24px] left-0 w-full">
                 {isDrawerOpen && (
                   <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                    className="fixed inset-0 bg-black bg-opacity-50"
                     onClick={() => setIsDrawerOpen(false)}
                   ></div>
                 )}
@@ -723,7 +704,7 @@ export default function EventPage({ categories }) {
                             </div>
                           </div>
                         </DrawerTrigger>
-                        <DrawerContent className="h-[80vh] z-50">
+                        <DrawerContent className="h-[90vh] overflow-auto">
                           {/* Hidden DrawerTitle to satisfy component requirements */}
                           <div hidden>
                             <DrawerHeader>
@@ -759,7 +740,7 @@ export default function EventPage({ categories }) {
                     {/* Drawer for multiple markets - controlled by accordion buttons */}
                     {markets?.length > 1 && (
                       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-                        <DrawerContent className="h-[80vh] z-50">
+                        <DrawerContent className="h-[80vh]">
                           {/* Hidden DrawerTitle to satisfy component requirements */}
                           <div hidden>
                             <DrawerHeader>
@@ -829,6 +810,8 @@ export default function EventPage({ categories }) {
       <div className="hidden sm:block">
         <Footer />
       </div>
+      {/* Add extra bottom space for mobile so HeaderFixed does not overlay content */}
+      <div className="block sm:hidden" style={{ height: '120px' }} />
       <HeaderFixed />
     </>
   );

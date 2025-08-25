@@ -242,26 +242,6 @@ export function MultipleOptionCard({
               </CardDescription>
             )}
           </span>
-          <div className="flex gap-2 items-center justify-end">
-            {forecast && (
-              <div className="">
-                <Image
-                  src={SpotifyLogo}
-                  alt="Spotify"
-                  width={20}
-                  height={20}
-                  className="opacity-70 hover:opacity-100 transition-opacity duration-200"
-                />
-              </div>
-            )}
-            {/* <Button
-              className="p-1 h-6 w-6  z-10 rounded"
-              variant="ghost"
-              onClick={handleBookmarkClick}
-            >
-              {bookmarked ? <BookmarkFilledIcon /> : <BookmarkIcon />}
-            </Button> */}
-          </div>
         </div>
       </CardFooter>
     </Card>

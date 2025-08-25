@@ -161,9 +161,16 @@ export default function Home({ infoCardCms, categories, tags }) {
         />
       </div>
       {/* Spacer to prevent content from being hidden behind the fixed header/navbar */}
-      <div style={{ height: '112px', minHeight: '112px', width: '100%' }} className="lg:mb-4 mb-0" />
+      <div
+        className="lg:mb-4 mb-0"
+        style={{
+          height: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
+          minHeight: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
+          width: '100%'
+        }}
+      />
 
-        <div className="container mx-auto px-0 sm:px-2 max-w-full overflow-hidden">
+        <div className="container mx-auto pt-0 px-0 sm:px-2 max-w-full overflow-hidden">
           <div className="px-1 sm:px-0">
             <SubcategoryBar
               subcategories={subcategoryList}
@@ -181,7 +188,7 @@ export default function Home({ infoCardCms, categories, tags }) {
             }
 
             {/* Event Cards Section */}
-            <div className={"flex pb-6 justify-center w-full mt-1"}>
+            <div className={"flex pb-6 justify-center w-full mt-0"}>
               <div className="w-full">
                 <EventLinting
                   selectCategory={selectCategory}
@@ -213,7 +220,11 @@ export default function Home({ infoCardCms, categories, tags }) {
           </div>
         </div>
       </div>
-      <Footer />
+      <div className="hidden sm:block">
+        <Footer />
+      </div>
+      {/* Add extra bottom space for mobile so HeaderFixed does not overlay content */}
+      <div className="block sm:hidden" style={{ height: '75px' }} />
       <HeaderFixed />
     </>
   );

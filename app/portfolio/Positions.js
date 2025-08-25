@@ -110,11 +110,7 @@ const Positions = (props) => {
     if (!socket) return;
     const handlePositions = (result) => {
       const resData = JSON.parse(result);
-      // console.log("resData of pos-update", resData);
-      // getUserPositionHistory()
-      // event data - id image title slug
-      // market id - grouptitle last bid
-      // position data - side quantity filled price
+
 
       setPositionHistory((prev) => {
         const eventIndex = prev.findIndex(
@@ -243,32 +239,17 @@ const Positions = (props) => {
 
   return (
     <>
-      {/* <div className="flex space-x-4 mb-3">
-            <SearchBar placeholder="Search" />
-            <select className="border bg-[#131212] border-[#262626] bg-black rounded p-1 text-sm">
-                <option>Current value</option>
-                <option>Initial value</option>
-                <option>Return ($)</option>
-                <option>Return %</option>
-            </select>
-            <select className="border border-[#262626] bg-black rounded p-1 text-sm">
-                <option>All</option>
-                <option>Live</option>
-                <option>Ended</option>
-            </select>
-        </div> */}
       <div className="overflow-x-auto">
         <table className="w-full text-left custom_table">
-          <thead>
+          <thead className="sm:text-sm h-0 py-0 text-[13px]">
             <tr>
-              <th>Market</th>
+              <th className="max-h-2">Market</th>
               <th>Contracts</th>
               <th>Avg. Price</th>
               <th>Cost</th>
               <th>Current(¢)</th>
               <th>Position Now</th>
               <th>To Win</th>
-              {/* <th>Action</th> */}
               <th></th>
             </tr>
           </thead>
@@ -423,7 +404,7 @@ const Positions = (props) => {
           </tbody>
         </table>
         {positionHistory.length === 0 && !loading && (
-          <div className="flex justify-center my-5 text-gray-500">
+          <div className="flex text-[13px] justify-center text my-5 text-gray-500">
             No positions found
           </div>
         )}
@@ -458,7 +439,7 @@ const Positions = (props) => {
                     <td
                       style={{ textTransform: "capitalize" }}
                       className={`${
-                        item.side === "yes" ? "text-green-500" : "text-red-500"
+                        item.action === "sell" ? "text-green-500" : "text-red-500"
                       } text-capitalize`}
                     >
                       {capitalize(item.action)}{" "}

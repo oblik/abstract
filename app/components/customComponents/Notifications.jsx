@@ -58,13 +58,13 @@ const Notification = () => {
                         key={index}
                     >
                         <Image
-                            src="/images/album.png"
+                            src="/images/tradecheck.png"
                             alt="Profile Icon"
                             width={48}
                             height={48}
                             className="rounded"
                         />
-                        <div>
+                        <div classname="pt-0">
                             <h5 className="text-[16px] font-semibold text-gray-100">
                                 {item.type == "trade" ? "Trade confirmed": "--"}
                             </h5>

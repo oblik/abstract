@@ -92,31 +92,31 @@ export default function HeaderFixed() {
         {/* Menu Items */}
 
         {signedIn && (
-          <div className="flex flex-col items-start gap-2 mt-4 mb-0 pl-3">
+          <div className="flex flex-col items-start gap-1 mt-4 mb-0 pl-3">
             <button
               className="px-3 py-2 text-left w-full"
               onClick={navigateToPortfolioPage}
             >
-              <div className="text-xs text-grey">Cash</div>
+              <div className="text-xs text-gray">Cash</div>
               <div className="text-lg text-[#33ff4c]">
-                ${availableBalance(walletData)}
+                ${Number(availableBalance(walletData)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </button>
             <button
               className="px-3 py-2 text-left w-full"
               onClick={() => navigateToPortfolioPage()}
             >
-              <div className="text-xs text-grey">Portfolio</div>
-              <div className="text-lg text-[#23a300]">
+              <div className="text-xs text-gray">Portfolio</div>
+              <div className="text-lg text-[#33ff4c]">
                 {PnLFormatted(
-                  formatNumber(walletData?.balance + walletData?.position, 2)
+                  Number(walletData?.balance + walletData?.position).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                 )}
               </div>
             </button>
           </div>
         )}
 
-        <nav className="flex flex-col gap-1 mt-1 px-2">
+        <nav className="flex flex-col items-start gap-1 mt-0 pt-0 mb-0 pl-3">
           {signedIn && (
             <Link
               href="/settings"

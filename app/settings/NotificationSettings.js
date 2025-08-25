@@ -58,8 +58,8 @@ export default function NotificationSettings() {
 
     return (
         <>
-            <h1 className="text-2xl font-bold mb-8">Notification Settings</h1>
-            <div className="space-y-6 rounded-lg border bg-[#131212] p-8">
+            <h1 className="sm:text-2xl text-xl font-bold sm:mb-8 sm:mt-0 mt-3 mb-4">Notification Settings</h1>
+            <div className="sm:space-y-6 space-y-5 rounded-lg border bg-[#131212] sm:p-8 p-3">
             <div className="flex items-center space-x-3">
                 <Image
                 src="/images/email_icon.png"

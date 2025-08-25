@@ -247,14 +247,20 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
   return (
     <Card className="h-auto" style={{ backgroundColor: "transparent", borderColor: "transparent" }}>
       <div className="relative">
-        {/* Volume and Date info (should be above chance/logo row) */}
-        {/* (Volume removed as requested) */}
-        {/* Chance Row: Chance value left, logo right */}
+
         <div className="flex items-center justify-between mb-3 pb-2 mt-4 w-full relative">
           <div className="flex items-center">
             <CardTitle className="text-4xl text-left ml-0" style={{ color: chanceColor }}>
-              <span>{toFixedDown(displayChance,1)}%</span>
-              <span className="text-2xl font-light">chance</span>
+                        <div className="flex flex-wrap gap-3 items-center w-full">
+                            <div className="flex items-center">
+                                <span className="text-3xl lg:text-4xl font-semibold" style={{ color: chanceColor }}>
+                                    {typeof displayChance === 'number' ? displayChance.toFixed(1) : '0.0'}%
+                                </span>
+                                <span className="text-lg font-light ml-2" style={{ color: chanceColor }}>
+                                    chance
+                                </span>
+                            </div>
+                        </div>
             </CardTitle>
           </div>
           <Button variant="ghost" size="icon" className="h-6 w-6 p-0 mr-0" onClick={() => setSelectedYes(!selectedYes)}>
@@ -266,8 +272,9 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
               <ChartContainer ref={containerRef} className="h-[300px] w-full p-0 m-0 flex justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none pb-0 mb-0" style={{ marginBottom: 0, paddingBottom: 0, overflow: 'visible' }} config={chartConfig}>
                 <LineChart 
                   data={chartData} 
-                  className="pl-0" 
+                  className="pl-0 w-full"
                   margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+                  width={undefined}
                   syncId="chart"
                   syncMethod="value"
                   onMouseMove={(e) => {
@@ -322,6 +329,8 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
                     axisLine={false}
                     tickMargin={8}
                     orientation="right"
+                    width={46}
+                    tick={{ fill: '#fff', fontSize: 12 }}
                   />
                   <Tooltip 
                     content={<CustomTooltip />}

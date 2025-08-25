@@ -197,7 +197,7 @@ const WithdrawTable = () => {
             </table>
             {
                 !loading && Withdraw.length === 0 && (
-                    <div className="flex justify-center my-5 text-gray-500">
+                    <div className="flex justify-center text-[13px] my-5 text-gray-500">
                         No Activity found
                     </div>
                 )

@@ -284,7 +284,7 @@ const MonthlyListenersChartWidget: React.FC<MultiListenersChart2Props> = ({
   if (!chartData || chartData.length === 0) {
     return (
       <Card
-        className="w-[115vw] lg:w-[55vw] sm:w-[90vw] h-auto"
+        className="w-[115vw] lg:w-[44vw] sm:w-[100vw] h-auto max-w-full xl:max-w-[800px] 2xl:max-w-[800px]"
         style={{ backgroundColor: "transparent", borderColor: "transparent" }}
       >
         <CardContent className="p-4">
@@ -300,7 +300,7 @@ const MonthlyListenersChartWidget: React.FC<MultiListenersChart2Props> = ({
     <>
 
       <Card
-        className="w-[115vw] lg:w-[44vw] sm:w-[90vw] h-auto"
+        className="w-[115vw] lg:w-[44vw] sm:w-[100vw] h-auto max-w-full xl:max-w-[780px] 2xl:max-w-[780px]"
         style={{ backgroundColor: "transparent", borderColor: "transparent" }}
       >
         <div>

@@ -308,30 +308,30 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
         style={{ backgroundColor: "transparent", borderColor: "transparent" }}
       >
         <div>
-          <CardHeader className="p-0">
+          <CardHeader className="space-y-0 p-0">
             <CardTitle style={{ lineHeight: "1.5" }} className="pt-3 sm:pb-1 pb-2 sm:pt-0">
               <div style={{ display: "flex", alignItems: "center" }}>
                 <div
                   style={{
-                    width: screenWidth < 640 ? "50px" : "65px",
-                    height: screenWidth < 640 ? "50px" : "65px",
-                    overflow: "hidden",
-                    borderRadius: "10px",
-                    flexShrink: 0,
+                   width: screenWidth < 640 ? "40px" : "65px",
+                   height: screenWidth < 640 ? "40px" : "65px",
+                   overflow: "hidden",
+                   borderRadius: "10px",
+                   flexShrink: 0,
                   }}
                 >
-                  <Image
-                    src={image || "/images/logo_icon.png"}
-                    alt="Event"
-                    width={screenWidth < 640 ? 50 : 65}
-                    height={screenWidth < 640 ? 50 : 65}
-                    style={{ 
-                      width: "100%", 
-                      height: "100%", 
-                      objectFit: "cover",
-                      transition: "all 0.3s ease" 
-                    }}
-                  />
+              <img
+                 src={image}
+                 alt="Event"
+                 width={screenWidth < 640 ? 50 : 65}
+                 height={screenWidth < 640 ? 50 : 65}
+                 style={{ 
+                 width: "100%", 
+                 height: "100%", 
+                 objectFit: "cover",
+                 transition: "all 0.3s ease" 
+                 }}
+               />
                 </div>
                 <div
                   className="text-[19px] lg:text-[26px] sm:text-[20px]"
@@ -341,12 +341,12 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                 </div>
               </div>
             </CardTitle>
-            <CardDescription className="py-2 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-              <div className="flex pb-1 flex-wrap gap-3 items-center">
+            <CardDescription className="py-0 pt-0 sm:pt-2 flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2">
+              <div className="flex flex-wrap gap-3 items-center">
                 <p className="text-[12px] sm:text-[14px]">Vol ${toTwoDecimal(volume)?.toLocaleString() || ""}</p>
                 {endDate && (
-                  <p className="flex items-center text-[12px] sm:text-[14px] gap-1">
-                    <Clock size={14} />{" "}
+                  <p className="flex items-center gap-1 text-[12px] sm:text-[14px]">
+                   <Clock size={12} className="sm:w-[14px] sm:h-[14px] w-[12px] h-[12px]" />{" "}
                     {new Date(endDate)?.toLocaleString("en-US", {
                       day: "numeric",
                       month: "short",
@@ -359,7 +359,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
               </div>
             </CardDescription>
             {displayChance !== undefined && (
-              <div className="flex items-center justify-between mt-6 mb-6 w-full">
+              <div className="flex pt-2 sm:pt-3 pb-2 flex-wrap gap-3 items-center w-full">
                 <div className="flex items-center">
                   <span className="text-3xl lg:text-4xl font-semibold" style={{ color: chanceColor }}>
                     {displayChance !== undefined && displayChance !== null ? Number(displayChance).toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
@@ -377,7 +377,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                 </CardHeader>
               <CardContent className="p-0">
                 <ChartContainer
-                  className="h-[350px] p-0 pr-0 lg:h-[300px] sm:h-[250px] w-full"
+                  className="h-[300px] sm:h-[300px] lg:h-[300px] p-0 pr-0 w-full"
                   config={chartConfig}
                   onMouseLeave={() => {
                     setHoveredChance(undefined);
@@ -428,6 +428,8 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                           });
                         }
                       }}
+                      tick={{ fontSize: screenWidth < 640 ? 9 : 12, fill: '#bdbdbd' }}
+
                     />
                     <YAxis
                       domain={[0, 'dataMax']}                    
@@ -437,6 +439,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                       tickMargin={8}
                       orientation="right"
                       width={40}
+                      tick={{ fontSize: screenWidth < 640 ? 9 : 12, fill: '#bdbdbd' }}
                     />
                     <Tooltip 
                       content={<CustomTooltipWithState isCustomData={!!customData} />}

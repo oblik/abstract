@@ -709,7 +709,7 @@ export default function Authentication() {
                 className="rounded p-2 hover:bg-[#333333] relative"
                 aria-label="Customise options"
               >
-                <BellIcon className="w-6 h-6 " />
+                <BellIcon className="sm:w-6 sm:h-6 w-5 h-5" />
                 {/* <span className="absolute top-[8px] right-[8px] w-2 h-2 bg-red-500 rounded-full block"></span> */}
               </button>
             </DropdownMenu.Trigger>
@@ -731,13 +731,6 @@ export default function Authentication() {
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
               <button className="profile_button" aria-label="Customise options">
-                {/* <img
-                  src={data?.profileImg ? data?.profileImg : "/images/default_user.png"}
-                  alt="Profile Icon"
-                  width={32}
-                  height={32}
-                  className="rounded-full"
-                /> */}
                 <Avatar className="w-6 h-6">
                     {data?.profileImg ? (
                     <AvatarImage

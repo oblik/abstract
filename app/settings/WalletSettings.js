@@ -46,8 +46,8 @@ export default function WalletSettings() {
     console.log(priority,"prioritypriority");
   return (
     <>
-        <h1 className="text-2xl font-bold mb-8">Wallet Settings</h1>
-        <div className="space-y-6 rounded-lg border bg-[#131212] p-8">
+        <h1 className="sm:text-2xl text-xl font-bold sm:mb-8 sm:mt-0 mt-3 mb-4">Wallet Settings</h1>
+        <div className="sm:space-y-6 space-y-5 rounded-lg border bg-[#131212] sm:p-8 p-3">
             <div className="flex items-center space-x-3">
                 <Image
                   src="/images/gas_icon.png"
@@ -59,23 +59,7 @@ export default function WalletSettings() {
                   Pay your own gas
                 </span>
               </div>
-              {/* <div className="flex items-center justify-between">
-                <label
-                  className="Label"
-                  htmlFor="airplane-mode"
-                  style={{ paddingRight: 15 }}
-                >
-                  Use a custom RPC (must own $SOL in your connected wallet)
-                </label>
-                <Switch.Root 
-                    className="SwitchRoot" 
-                    id="airplane-mode"
-                    checked={customRPC}
-                    onCheckedChange={handleCustomRPCChange} 
-                >
-                  <Switch.Thumb className="SwitchThumb" />
-                </Switch.Root>
-              </div> */}
+
               <RadioGroup.Root
                 className="RadioGroupRoot"
                 defaultValue="default"

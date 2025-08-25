@@ -77,7 +77,7 @@ export default function SlideshowLintingCarousel() {
                           <div
                             style={{
                               width: "70px",
-                              height: "70px",
+                              aspectRatio: "1/1",
                               overflow: "hidden",
                               borderRadius: "10px",
                               background: "#181818",
@@ -89,9 +89,9 @@ export default function SlideshowLintingCarousel() {
                             <img
                               src={event.image || "/images/logo.png"}
                               alt="Event"
-                              width={64}
-                              height={64}
-                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                              width={70}
+                              height={70}
+                              style={{ width: "100%", height: "100%", objectFit: "cover", aspectRatio: "1/1" }}
                             />
                           </div>
                           <div

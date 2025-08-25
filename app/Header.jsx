@@ -21,7 +21,7 @@ export default function Header() {
   const navigateToPortfolioPage = () => router.push("/portfolio");
 
   return (
-    <header className="flex flex-col md:flex-row items-center w-full bg-transparent h-12 md:h-16 pt-1 md:pt-2 container mx-auto px-2 md:px-4 lg:px-0">
+    <header className="flex flex-col md:flex-row items-center w-full bg-transparent sm:h-12 h-10 md:h-16 pt-1 md:pt-2 container mx-auto px-2 md:px-4 lg:px-0">
       {/* Logo and Mobile Auth */}
       <div className="flex items-center justify-between lg:ml-4 w-full lg:w-auto">
         <div className="flex items-center">
@@ -37,17 +37,6 @@ export default function Header() {
         </div>
 
         <div className="flex lg:hidden items-center gap-2">
-          {/* {signedIn && (
-            <button
-              className="px-3 py-2 hover:bg-gray-800 rounded-md transition-colors"
-              onClick={navigateToPortfolioPage}
-            >
-              <div className="text-l text-[#33ff4c]">
-                ${availableBalance(walletData)}
-              </div>
-              <div className="text-xs text-grey">Cash</div>
-            </button>
-          )} */}
           <Authentication />
         </div>
       </div>
@@ -71,7 +60,7 @@ export default function Header() {
             onClick={navigateToPortfolioPage}
           >
             <div className="text-l text-[#33ff4c]">
-              ${availableBalance(walletData)}
+              ${Number(availableBalance(walletData)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
             <div className="text-xs text-grey">Cash</div>
           </button>

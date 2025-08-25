@@ -131,6 +131,7 @@ interface AccordionTriggerProps
   isMultiMarket?: boolean;
   setIsDrawerOpen?: (open: boolean) => void;
   setActiveView?: (view: string) => void;
+  volume?: number;
 }
 
 const AccordionTrigger = React.forwardRef<
@@ -150,6 +151,7 @@ const AccordionTrigger = React.forwardRef<
       isMultiMarket,
       setIsDrawerOpen,
       setActiveView,
+      volume,
       ...props
     },
     ref
@@ -234,7 +236,7 @@ const AccordionTrigger = React.forwardRef<
                   {Array.isArray(children) ? children[1] : children}
                 </span>
                 <span className="sm:text-xs text-[12px] text-gray-400 mt-0.5 text-left">
-                  Vol $1,498.27
+                  Vol ${typeof volume === "number" ? volume.toLocaleString() : "--"}
                 </span>
               </span>
             </div>
@@ -259,7 +261,7 @@ const AccordionTrigger = React.forwardRef<
                   {Array.isArray(children) ? children[1] : children}
                 </span>
                 <span className="text-[12px] sm:text-xs text-gray-400 mt-0.5 text-left">
-                  Vol $1,498.27
+                  Vol ${typeof volume === "number" ? volume.toLocaleString() : "--"}
                 </span>
               </span>
             </div>

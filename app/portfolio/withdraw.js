@@ -142,12 +142,12 @@ export default function Withdraw() {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                width: "48%",
+                width: "48.5%",
             }}
         >
             <Dialog.Root open={open} onOpenChange={setOpen}>
                 <Dialog.Trigger asChild>
-                    <Button className="w-full flex-1 h-10 px-4 py-2 rounded-md border border-white bg-transparent text-white hover:bg-[#1a0000] hover:border-red-500 hover:text-red-500 transition-colors duration-300 text-sm font-medium flex items-center justify-center"
+                    <Button className="w-full flex-1 max-h-9 gap-0 sm:max-h-10 px-4 pl-0 py-2 rounded-md border border-white bg-transparent text-white hover:bg-[#1a0000] hover:border-red-500 hover:text-red-500 transition-colors duration-300 sm:text-sm text-[13px] font-medium flex items-center justify-center"
                         onClick={async () => {
                             setWithdraw(initialValue)
                             setError({})
@@ -155,7 +155,7 @@ export default function Withdraw() {
                             setLoader(false)
                             await getCoinData()
                         }}>
-                        <span className="mr-2 text-lg">-</span>Withdraw
+                        <span className="mr-1 text-lg">-</span>Withdraw
                     </Button>
                 </Dialog.Trigger>
                 <Dialog.Portal>

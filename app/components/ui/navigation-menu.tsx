@@ -62,7 +62,7 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName;
 const NavigationMenuItem = NavigationMenuPrimitive.Item;
 
 const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
+  "group inline-flex h-10 w-max items-center justify-center rounded-md px-4 sm:py-2 py-1 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50"
 );
 
 const NavigationMenuTrigger = React.forwardRef<
@@ -198,17 +198,17 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
         {/* "LIVE" Tag - Only shown if showLiveTag is true */}
         {showLiveTag && (
           <div className="flex items-center flex-shrink-0">
-            <h1 className="pb-[2%] text-xl leading-tight pl-0">
+            <h1 className="pb-[2%] text-xl leading-tight pl-0 sm:text-xl text-base">
               <span
-                className="font-semibold text-red-500"
+                className="font-semibold text-red-500 sm:text-[18px] text-[15px]"
                 style={{
-                  fontSize: "18px",
+                  fontSize: undefined,
                 }}
               >
                 LIVE
               </span>
             </h1>
-            <div className="text-4xl pb-[6%]">
+            <div className="sm:text-4xl text-3xl pb-[6%]">
               <span className="live-dot">•</span>
             </div>
           </div>
@@ -216,30 +216,17 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
 
         {/* Horizontal category list with arrows */}
         <div className="flex items-center w-full mx-4">
-          {/* <button
-            className="p-2 text-white bg-[transparent] mr-2 disabled:opacity-0"
-            onClick={() => {
-              categoryListRef.current?.scrollBy({
-                left: -150,
-                behavior: "smooth",
-              });
-            }}
-            aria-label="Scroll left"
-            disabled={categoryScrollAtStart}
-            type="button"
-          >
-            <ChevronLeftIcon height={24} width={24} />
-          </button> */}
+
 
           <div
             ref={categoryListRef}
-            className="flex flex-nowrap gap-2 py-3 overflow-x-auto snap-x scroll-px-3 snap-mandatory min-w-0 no-scrollbar"              
+            className="flex flex-nowrap gap-2 sm:py-3 py-0 overflow-x-auto snap-x scroll-px-3 snap-mandatory min-w-0 no-scrollbar"              
             style={{ scrollBehavior: "smooth" }}
             onScroll={handleCategoryScroll}
           >
             <div
               className={cn(
-                "px-3 py-1 rounded-md transition-colors text-xs sm:text-sm font-medium whitespace-nowrap text-left pl-0 cursor-pointer",
+                "px-3 sm:py-1 py-0 rounded-md transition-colors text-xs sm:text-sm font-medium whitespace-nowrap text-left pl-0 cursor-pointer",
                 "text-[#666] hover:text-gray-400",
                 selectedCategory === "all" && "text-white"
               )}
@@ -255,7 +242,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
                 <div
                   key={item.title}
                   className={cn(
-                    "px-3 py-1 rounded-md transition-colors text-xs sm:text-sm font-medium whitespace-nowrap text-left pl-0 cursor-pointer",
+                    "px-3 sm:py-1 py-0 rounded-md transition-colors text-xs sm:text-sm font-medium whitespace-nowrap text-left pl-0 cursor-pointer",
                     "text-[#666] hover:text-gray-400",
                     selectedCategory === item.slug && "text-white"
                   )}
@@ -269,20 +256,6 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
               ))}
           </div>
 
-          {/* <button
-            className="p-2 text-white bg-[transparent] ml-2 disabled:opacity-0"
-            onClick={() => {
-              categoryListRef.current?.scrollBy({
-                left: 150,
-                behavior: "smooth",
-              });
-            }}
-            aria-label="Scroll right"
-            disabled={categoryScrollAtEnd}
-            type="button"
-          >
-            <ChevronRightIcon height={24} width={24} />
-          </button> */}
         </div>
       </div>
       {/* Right fade overlay positioned at the edge of the scroll area */}

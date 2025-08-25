@@ -157,7 +157,7 @@ export default function ProfileSettings() {
     };
     return (
         <>
-            <h1 className="text-2xl font-bold mb-8">Profile Settings</h1>
+            <h1 className="sm:text-2xl text-xl font-bold sm:mb-8 sm:mt-0 mt-3 mb-4">Profile Settings</h1>
             {false ? (
             <div className="text-center p-8 bg-[#131212] rounded-lg">
                 <p className="mb-4">
@@ -177,7 +177,7 @@ export default function ProfileSettings() {
             ) : (
             <form
                 onSubmit={handleSubmit}
-                className="space-y-6 rounded-lg border bg-[#131212] p-8"
+                className="sm:space-y-6 space-y-5 rounded-lg border bg-[#131212] sm:p-8 p-3"
             >
                 <div className="relative w-24 h-24 mb-6 mx-auto">
                 <input
@@ -216,7 +216,8 @@ export default function ProfileSettings() {
                 </button>
                 </div>
 
-                <div className="space-y-2">
+
+                <div className="sm:space-y-2 space-y-1">
                 <Label htmlFor="username">Username</Label>
                 <Input
                     id="username"
@@ -233,7 +234,7 @@ export default function ProfileSettings() {
                 )}
                 </div>
 
-                <div className="space-y-2">
+                <div className="sm:space-y-2 space-y-1">
                 <Label htmlFor="name">Name</Label>
                 <Input
                     id="name"
@@ -244,7 +245,7 @@ export default function ProfileSettings() {
                 />
                 </div>
 
-                <div className="space-y-2">
+                <div className="sm:space-y-2 space-y-1">
                 <Label htmlFor="bio">Bio</Label>
                 <textarea
                     id="bio"

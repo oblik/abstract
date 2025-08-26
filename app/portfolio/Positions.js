@@ -260,8 +260,8 @@ const Positions = (props) => {
           </thead>
           <tbody>
             {positionHistory?.map((item, index) => (
-              <>
-                <React.Fragment key={item._id}>
+              <React.Fragment key={item._id}>
+                <React.Fragment>
                   <tr>
                     <td colSpan={8}>
                       <div className="flex items-center justify-between">
@@ -404,7 +404,7 @@ const Positions = (props) => {
                 <tr>
                   <td colSpan={9} className="border-b border-[#262626]"></td>
                 </tr>
-              </>
+              </React.Fragment>
             ))}
           </tbody>
         </table>

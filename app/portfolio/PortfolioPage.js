@@ -305,8 +305,8 @@ export default function PortfolioPage({ categories }) {
         setCoin(respData?.result);
         setDepositData((prev) => ({
           ...prev,
-          currency: respData?.result[0].symbol,
-          minDeposit: respData?.result[0].minDeposit,
+          currency: respData?.result?.[0]?.symbol,
+          minDeposit: respData?.result?.[0]?.minDeposit,
         }));
         const solCoin = respData.result.find((c) => c.symbol === "SOL");
         if (solCoin && solCoin.cnvPrice) {

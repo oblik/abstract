@@ -129,7 +129,7 @@ export const getLocation = async () => {
       loginHistory.country_capital = respData.country_capital;
       loginHistory.city = respData.cityName;
       loginHistory.country = respData.countryName;
-      loginHistory.broswername = browserRes.name;
+      loginHistory.browsername = browserRes.name;
       loginHistory.ismobile = browserRes.mobile;
       loginHistory.os = browserRes.os;
       return loginHistory;

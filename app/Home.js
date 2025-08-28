@@ -16,7 +16,7 @@ import {
   CarouselPrevious,
 } from "@/app/components/ui/carousel";
 import EventLinting from "@/app/components/customComponents/EventLinting";
-import SlideshowLinting from "@/app/components/customComponents/SlideshowLinting";
+import SlideshowListing from "@/app/components/customComponents/SlideshowListing";
 // import { infoCards } from "@/app/components/constants";
 import { getCategories, getTagsByCategory } from "@/services/market";
 import { getInfoCards } from "@/services/user";
@@ -180,7 +180,7 @@ export default function Home({ infoCardCms, categories, tags }) {
             {
               isEmpty(categoryParam) && (
                 <>
-                  <SlideshowLinting />
+                  <SlideshowListing />
                   {/* Info Cards Section */}
                   <InfoCards infoCardCms={infoCardCms} />
                 </>

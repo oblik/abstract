@@ -7,17 +7,22 @@ const PUBLIC_FILE = /\.(.*)$/;
 export function middleware(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
     const currentUser = request.cookies.get("user-token");
+    console.log("current user test console/.......")
+    console.log("currentUser",currentUser)
+    if(currentUser){
+        console.log("currentUser is true.......")
+    }
 
     if (pathname.startsWith("/_next") || pathname.includes("/api/") || PUBLIC_FILE.test(pathname)) {
         return;
     }
 
-    const authPathnameRegex = new RegExp(
-        `^(${authRoutes
-            .map((route) => (route.includes("[") ? route.replace(/\[.*?\]/g, "[^/]+") : route))
-            .join("|")})/?$`,
-        "i"
-    );
+    // const authPathnameRegex = new RegExp(
+    //     `^(${authRoutes
+    //         .map((route) => (route.includes("[") ? route.replace(/\[.*?\]/g, "[^/]+") : route))
+    //         .join("|")})/?$`,
+    //     "i"
+    // );
 
     const protectedPathnameRegex = new RegExp(
         `^(${protectedRoutes
@@ -37,13 +42,12 @@ export function middleware(request: NextRequest) {
         return response;
     }
 
-    if (authPathnameRegex.test(pathname) && currentUser) {
-        return NextResponse.redirect(new URL(request.url));
-    }
+    // if (authPathnameRegex.test(pathname) && currentUser) {
+    //     return NextResponse.redirect(new URL("/",request.url));
+    // }
 
 }
 
 export const config = {
-    // Matcher ignoring `/_next/` and `/api/`
     matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };

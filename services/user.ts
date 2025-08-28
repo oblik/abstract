@@ -177,7 +177,7 @@ export const getPositionsByEvtId = async (data:any) => {
     });
     return handleResp(respData, "success");
   } catch (error: any) {
-    return handleResp(error, "positionerror");
+    return handleResp(error, "error");
   }
 };
 

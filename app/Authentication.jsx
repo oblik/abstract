@@ -45,7 +45,6 @@ import { availableBalance } from "@/lib/utils.js";
 import { Connection, PublicKey } from '@solana/web3.js';
 import { PnLFormatted } from "@/utils/helpers.js";
 import { Copy } from "lucide-react";
-import Web3 from "web3"
 import Notifications from "./components/customComponents/Notifications";
 
 let initialData = {

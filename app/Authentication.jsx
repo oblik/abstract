@@ -511,7 +511,7 @@ console.log(data?.walletAddress,isConnected,"data");
                 />
                 <span>Continue with Google</span>
               </Button> */}
-            <div className="custom_seperator">
+            <div className="custom_separator">
               <Separator.Root
                 className="SeparatorRoot"
                 style={{ margin: "15px 0" }}

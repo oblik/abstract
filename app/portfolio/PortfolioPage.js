@@ -1520,7 +1520,7 @@ export default function PortfolioPage({ categories }) {
             </div>
             <TabsContent value="positions">
 
-              <Positions uniqueId={data?.uniqueId} />
+              <Positions uniqueId={data?.uniqueId} isPrivate={true} />
             </TabsContent>
             <TabsContent value="openorders">
 

@@ -64,7 +64,7 @@ const Notification = () => {
                             height={48}
                             className="rounded"
                         />
-                        <div classname="pt-0">
+                        <div className="pt-0">
                             <h5 className="text-[16px] font-semibold text-gray-100">
                                 {item.type == "trade" && "Trade confirmed"}
                                 {item.type == "reply" && "Someone replied to your comment"}

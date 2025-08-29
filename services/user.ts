@@ -1,5 +1,5 @@
 import config from "@/config/config";
-import axios, { handleResp } from "@/config/axios";
+import axios, { handleResp, axiosNoCredentials } from "@/config/axios";
 import { setUser } from "@/store/slices/auth/userSlice";
 
 
@@ -171,7 +171,8 @@ export const getWalletSettings = async () => {
 
 export const getPositionsByEvtId = async (data:any) => {
   try {
-    let respData = await axios({
+    // Use axios instance without credentials to avoid CORS issues
+    let respData = await axiosNoCredentials({
       url: `${config.backendURL}/api/v1/user/positions/event/${data?.id}`,
       method: "get",
     });
@@ -183,7 +184,8 @@ export const getPositionsByEvtId = async (data:any) => {
 
 export const getOpenOrdersByEvtId = async (data:any) => {
   try {
-    let respData = await axios({
+    // Use axios instance without credentials to avoid CORS issues
+    let respData = await axiosNoCredentials({
       url: `${config.backendURL}/api/v1/user/open-orders/event/${data?.id}`,
       method: "get",
     });

@@ -1,5 +1,3 @@
-export const runtime = 'edge';
-
 import EventPage from "./_components/EventPage.jsx";
 import { getCategories } from "@/services/market";
 

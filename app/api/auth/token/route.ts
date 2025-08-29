@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     response.cookies.set('user-token', token, {
       httpOnly: true,
       secure: true,
-      sameSite: 'lax',
+      sameSite: 'strict',
       path: '/',
       maxAge: 60 * 60 * 24 * 7,
     });
@@ -22,7 +22,7 @@ export async function DELETE() {
   response.cookies.set('user-token', '', {
     httpOnly: true,
     secure: true,
-    sameSite: 'lax',
+    sameSite: 'strict',
     path: '/',
     expires: new Date(0),
   });

@@ -39,17 +39,17 @@ interface PaginationState {
   offset: number;
 }
 
-interface EventLintingProps {
+interface EventListingProps {
   selectCategory: string;
   showClosed: boolean;
   selectedSubcategory: string;
 }
 
-export default function EventLinting({
+export default function EventListing({
   selectCategory,
   showClosed,
   selectedSubcategory,
-}: EventLintingProps) {
+}: EventListingProps) {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category");
   const [events, setEvents] = useState<Event[]>([]);
@@ -60,9 +60,7 @@ export default function EventLinting({
     limit: 16,
     offset: 0,
   });
-  // Backend expects 'active' for currently trading events.
-  // Keep compatibility if any UI sets 'open' by mapping it to 'active' on request.
-  const [selectedMarket, setSelectedMarket] = useState("active");
+  const [selectedMarket, setSelectedMarket] = useState("open");
 
   useEffect(() => {
     // Reset pagination when category or showClosed changes
@@ -74,14 +72,12 @@ export default function EventLinting({
       try {
         setLoading(true);
         const finCategory = categoryParam ? categoryParam : selectCategory;
-        // Normalize status for backend API
-        const normalizedStatus = selectedMarket === "open" ? "active" : selectedMarket;
         let { success, result } = await getEvents({
           id: finCategory,
           page: pagination.page,
           limit: pagination.limit,
           tag: selectedSubcategory,
-          status: normalizedStatus,
+          status: selectedMarket,
         });
         if (success) {
           setEvents(result?.data);
@@ -100,7 +96,7 @@ export default function EventLinting({
   return (
     <>
         {loading && (
-          <Loader className="w-26 h-26 animate-spin" />
+          <Loader className="w-6 h-6 animate-spin" />
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[10px] w-full">

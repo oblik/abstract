@@ -99,4 +99,38 @@ export const handleResp = (respData, type = 'success', doc) => {
   }
 }
 
+// Create an axios instance without credentials for CORS issues
+export const axiosNoCredentials = axios.create();
+axiosNoCredentials.defaults.withCredentials = false;
+
+// Add interceptor to handle authorization for axiosNoCredentials
+axiosNoCredentials.interceptors.request.use(
+  async (config) => {
+    let authorizationToken = null;
+
+    if (isClient) {
+      authorizationToken = getCookie("user-token");
+    } else {
+      try {
+        const { cookies } = await import("next/headers");
+        const cookieStore = await cookies();
+        const token = cookieStore.get("user-token");
+        if (token) {
+          authorizationToken = token.value;
+        }
+      } catch (error) {
+        console.error("Error accessing server-side cookies:", error);
+      }
+    }
+
+    if (authorizationToken) {
+      config.headers.Authorization = `Bearer ${authorizationToken}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export default axios;

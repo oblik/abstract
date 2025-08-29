@@ -1,11 +1,11 @@
 "use client";
 import React from "react";
-import EventLinting from "../components/customComponents/EventLinting";
+import EventListing from "../components/customComponents/EventListing";
 
 const Tst = () => {
   return (
     <div>
-      <EventLinting selectedSubcategory={"all"} selectCategory={"music"} showClosed={false}/>
+      <EventListing selectedSubcategory={"all"} selectCategory={"music"} showClosed={false}/>
     </div>
   );
 };

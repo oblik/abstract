@@ -30,8 +30,8 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx",
-    "app/components/CustomComponents/EventLinting.jsx",
-    "app/components/CustomComponents/Pagination.tsx"
+    "app/components/customComponents/EventListing.tsx",
+    "app/components/customComponents/PaginationComp.tsx"
   ],
   "exclude": ["node_modules"]
 }

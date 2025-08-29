@@ -3,6 +3,7 @@ export const runtime = 'edge';
 // app/api/profile/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/utils/supabaseClient';
+import { verifyAuth, sanitizeInput, rateLimit, validateWalletAddress, validateUsername } from '@/lib/authMiddleware';
 
 interface ProfileRequestBody {
   wallet: string;
@@ -12,7 +13,7 @@ interface ProfileRequestBody {
   bio?: string;
 }
 
-// 获取用户资料
+// Get user profile
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const wallet = searchParams.get('wallet');
@@ -32,20 +33,32 @@ export async function GET(request: NextRequest) {
       throw error;
     }
 
-    // 如果用户不存在，返回空对象
+    // If user doesn't exist, return empty object
     if (!data) {
       return NextResponse.json({});
     }
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Failed to get user profile:', error);
+    console.error('获取用户资料失败 ❌ Failed to get user profile:', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
 
-// 创建或更新用户资料
+// Create or update user profile
 export async function POST(request: NextRequest) {
+  // Rate limiting
+  const rateLimitResult = await rateLimit(request, 5, 60 * 1000) // 5 updates per minute
+  if (!rateLimitResult.allowed) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
+  // Verify authentication
+  const auth = await verifyAuth(request);
+  if (!auth.authenticated) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body: ProfileRequestBody = await request.json();
     const { wallet, username, name, avatar_url, bio } = body;
@@ -54,13 +67,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Wallet address is required' }, { status: 400 });
     }
 
-    // 检查用户名是否已存在（如果提供了用户名）
+    // Validate wallet address format
+    if (!validateWalletAddress(wallet)) {
+      return NextResponse.json({ error: 'Invalid wallet address' }, { status: 400 });
+    }
+
+    // Verify user is authorized to update this wallet address's profile
+    if (auth.walletAddress !== wallet) {
+      return NextResponse.json({ error: 'Not authorized to update this wallet address profile' }, { status: 403 });
+    }
+
+    // Check if username already exists (if username is provided)
     if (username) {
+      // Validate username format
+      if (!validateUsername(username)) {
+        return NextResponse.json({ error: 'Invalid username format (3-20 characters, letters, numbers, underscores only)' }, { status: 400 });
+      }
+
       const { data: existingUser } = await supabase
         .from('profiles')
         .select('wallet_address')
         .eq('username', username)
-        .neq('wallet_address', wallet) // 排除当前用户
+        .neq('wallet_address', wallet) // Exclude current user
         .single();
 
       if (existingUser) {
@@ -68,38 +96,70 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 检查用户是否已存在
+    // Check if user already exists
     const { data: existingProfile } = await supabase
       .from('profiles')
       .select('wallet_address')
       .eq('wallet_address', wallet)
       .single();
 
-    let result;
+    let result: any;
 
     if (existingProfile) {
-      // 更新现有用户
+      // Update existing user
+      // Clean input
+      const cleanUsername = username ? sanitizeInput(username) : undefined;
+      const cleanName = name ? sanitizeInput(name) : undefined;
+      const cleanBio = bio ? sanitizeInput(bio) : undefined;
+      
+      // Validate avatar_url format
+      let cleanAvatarUrl = avatar_url;
+      if (avatar_url) {
+        try {
+          new URL(avatar_url); // Validate URL format
+          cleanAvatarUrl = avatar_url;
+        } catch {
+          cleanAvatarUrl = undefined;
+        }
+      }
+      
       result = await supabase
         .from('profiles')
         .update({
-          username,
-          name,
-          avatar_url,
-          bio,
+          username: cleanUsername,
+          name: cleanName,
+          avatar_url: cleanAvatarUrl,
+          bio: cleanBio,
           updated_at: new Date().toISOString()
         })
         .eq('wallet_address', wallet);
     } else {
-      // 创建新用户
+      // Create new user
+      // Clean input
+      const cleanUsername = username ? sanitizeInput(username) : undefined;
+      const cleanName = name ? sanitizeInput(name) : undefined;
+      const cleanBio = bio ? sanitizeInput(bio) : undefined;
+      
+      // Validate avatar_url format
+      let cleanAvatarUrl = avatar_url;
+      if (avatar_url) {
+        try {
+          new URL(avatar_url); // Validate URL format
+          cleanAvatarUrl = avatar_url;
+        } catch {
+          cleanAvatarUrl = undefined;
+        }
+      }
+      
       result = await supabase
         .from('profiles')
         .insert([
           {
             wallet_address: wallet,
-            username,
-            name,
-            avatar_url,
-            bio,
+            username: cleanUsername,
+            name: cleanName,
+            avatar_url: cleanAvatarUrl,
+            bio: cleanBio,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           }
@@ -112,7 +172,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Failed to save user profile:', error);
+    console.error('保存用户资料失败 ❌ Failed to save user profile:', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

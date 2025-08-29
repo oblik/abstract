@@ -15,7 +15,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/app/components/ui/carousel";
-import EventLinting from "@/app/components/customComponents/EventLinting";
+import EventListing from "@/app/components/customComponents/EventListing";
 import SlideshowListing from "@/app/components/customComponents/SlideshowListing";
 // import { infoCards } from "@/app/components/constants";
 import { getCategories, getTagsByCategory } from "@/services/market";
@@ -28,6 +28,28 @@ import DiscordLogo from "@/public/images/discordnew.png";
 
 const InfoCards = ({ infoCardCms }) => {
 
+  // Sanitize HTML content to prevent XSS attacks while preserving safe formatting
+  const sanitizeHTML = (html) => {
+    if (typeof html !== 'string') return '';
+    
+    // Remove only dangerous tags and attributes, preserve safe formatting tags
+    let sanitized = html
+      // Remove script tags and their content
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      // Remove iframe tags
+      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+      // Remove on* event handlers (onclick, onmouseover, etc.)
+      .replace(/on\w+="[^"]*"/g, '')
+      .replace(/on\w+='[^']*'/g, '')
+      // Remove javascript: protocol
+      .replace(/javascript:\s*[^\s]*/gi, '')
+      // Remove potentially dangerous attributes
+      .replace(/data-\w+="[^"]*"/g, '')
+      .replace(/data-\w+='[^']*'/g, '');
+    
+    return sanitized;
+  };
+
   const renderInfoCard = (emoji, title, footer) => {
     return (
       <div className="h-28 p-3 rounded-md" style={{ backgroundColor: '#00111a', height: '7rem' }}>
@@ -38,7 +60,7 @@ const InfoCards = ({ infoCardCms }) => {
         <div>
           <p
             className="text-xs pt-2 leading-snug"
-            dangerouslySetInnerHTML={{ __html: footer }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHTML(footer) }}
           ></p>
         </div>
       </div>
@@ -208,7 +230,7 @@ export default function Home({ infoCardCms, categories, tags }) {
             {/* Event Cards Section */}
             <div className={"flex pb-6 justify-center w-full mt-0"}>
               <div className="w-full">
-                <EventLinting
+                <EventListing
                   selectCategory={selectCategory}
                   showClosed={showClosed}
                   selectedSubcategory={selectedSubcategory}

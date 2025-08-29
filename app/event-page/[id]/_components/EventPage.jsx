@@ -55,8 +55,8 @@ import { toFixedDown } from "@/lib/roundOf";
 export default function EventPage({ categories }) {
   const param = useParams();
   const id = param.id;
-  const disContainer = document.getElementById("event-discription")
   const socketContext = useContext(SocketContext);
+  const [disContainer, setDisContainer] = useState(null);
   const [windowSize, setWindowSize] = useState({
     width: 0,
     height: 0,
@@ -70,10 +70,7 @@ export default function EventPage({ categories }) {
   const [forecastGraph, setForecastGraph] = React.useState(false);
   const [interval, setInterval] = useState("all");
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [selectedOrderBookData, setSelectedOrderBookData] = useState([
-    books[0],
-    books[1],
-  ]);
+  const [selectedOrderBookData, setSelectedOrderBookData] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [openItem, setOpenItem] = useState("orderbook");
   const [openOrders, setOpenOrders] = useState([]);
@@ -120,11 +117,17 @@ export default function EventPage({ categories }) {
       });
     };
 
-    // Set initial size
-    handleResize();
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    // Set initial size only on client side
+    if (typeof window !== 'undefined') {
+      handleResize();
+      window.addEventListener("resize", handleResize);
+    }
+    
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener("resize", handleResize);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -250,7 +253,7 @@ export default function EventPage({ categories }) {
     fetchEvents();
   }, [id]);
 
-  const fetchAllBooks = async () => {
+  const fetchAllBooks = useCallback(async () => {
     try {
       const { success, orderbook } = await getOrderBook({ id: id });
       if (success) {
@@ -259,7 +262,7 @@ export default function EventPage({ categories }) {
     } catch (error) {
       console.error("Error fetching PriceHistory:", error);
     }
-  };
+  }, [id]);
 
   const checkOverflow =(container)=> {
     if (container.scrollHeight > container.clientHeight) {
@@ -270,6 +273,14 @@ export default function EventPage({ categories }) {
       setShowFullText(true);
     }
   }
+
+  useEffect(() => {
+    // Only run on client side
+    if (typeof window !== 'undefined') {
+      const container = document.getElementById("event-discription");
+      setDisContainer(container);
+    }
+  }, []);
 
   useEffect(() => {
     if(!isEmpty(disContainer)) checkOverflow(disContainer);
@@ -318,25 +329,25 @@ export default function EventPage({ categories }) {
     }
   }
 
-  const isWinning = useCallback((events, market) => {
+  const isWinning = useCallback((eventsParam, marketParam) => {
     try {
-      if (isEmpty(events)) return false;
-      if (isEmpty(market)) return false;
+      if (isEmpty(eventsParam)) return false;
+      if (isEmpty(marketParam)) return false;
       
-      const outcomeType = events?.outcomeType;
+      const outcomeType = eventsParam?.outcomeType;
       if (outcomeType == 'single') {
-        if (events?.marketId.length == 1) {
-          return events?.marketId?.[0]?.outcome?.[0]._id == events?.outcomeId;
+        if (eventsParam?.marketId.length == 1) {
+          return eventsParam?.marketId?.[0]?.outcome?.[0]._id == eventsParam?.outcomeId;
         } else {
-          return events?.outcomeId == market?._id;
+          return eventsParam?.outcomeId == marketParam?._id;
         }
       } else if (outcomeType == 'multi') {
-        return market?.outcome?.[0]._id == market?.outcomeId;
+        return marketParam?.outcome?.[0]._id == marketParam?.outcomeId;
       }
     } catch {
       return false;
     }
-  }, [events, markets, outcomeType]);
+  }, []);
 
   return (
     <>
@@ -357,7 +368,11 @@ export default function EventPage({ categories }) {
         {/* Remove spacer and use padding-top on main content to offset header */}
         <div
           className="container mx-auto px-0 sm:px-4 max-w-full overflow-hidden"
-          style={{ paddingTop: windowSize.width < 640 ? '40px' : '112px', paddingLeft: windowSize.width < 640 ? 0 : undefined, paddingRight: windowSize.width < 640 ? 0 : undefined }}
+          style={{ 
+            paddingTop: typeof window !== 'undefined' ? (windowSize.width < 640 ? '40px' : '112px') : '112px',
+            paddingLeft: typeof window !== 'undefined' ? (windowSize.width < 640 ? 0 : undefined) : undefined,
+            paddingRight: typeof window !== 'undefined' ? (windowSize.width < 640 ? 0 : undefined) : undefined
+          }}
         >
           {eventsLoading ? (
             <div className="flex justify-center items-center h-[80vh] w-[80vw]">
@@ -390,8 +405,8 @@ export default function EventPage({ categories }) {
                       />
                     ) : (
                       <Chart
-                        title1={event.marketId?.[0]?.outcome?.[0]?.title || "Yes"}
-                        title2={event.marketId?.[0]?.outcome?.[1]?.title || "No"}
+                        title1={events?.marketId?.[0]?.outcome?.[0]?.title || "Yes"}
+                        title2={events?.marketId?.[0]?.outcome?.[1]?.title || "No"}
                         id={id}
                         title={events?.title}
                         volume={
@@ -530,7 +545,7 @@ export default function EventPage({ categories }) {
                                                 : "text-red-500"
                                             }`}
                                           >
-                                            {events?.outcomeType == "single" ? capitalize(events.outcome): getOutcomeTitle(market.outcome, market.outcomeId)}
+                                            {events?.outcomeType == "single" ? capitalize(events?.outcome || ""): getOutcomeTitle(market.outcome, market.outcomeId)}
                                           </p>
                                           {isWinning(events, market) ? (
                                             <CheckCircle

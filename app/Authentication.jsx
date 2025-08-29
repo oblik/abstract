@@ -60,7 +60,8 @@ export default function Authentication() {
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const style = document.createElement('style');
-      style.innerHTML = `@media (max-width: 640px) { .sono-auth-btn { font-size: 12px !important; padding: 0.25rem 0.75rem !important; height: 1.75rem !important; min-height: 1.75rem !important; border-radius: 0.375rem !important; } }`;
+      // CSS is hardcoded and safe, no user input involved
+      style.textContent = `@media (max-width: 640px) { .sono-auth-btn { font-size: 12px !important; padding: 0.25rem 0.75rem !important; height: 1.75rem !important; min-height: 1.75rem !important; border-radius: 0.375rem !important; } }`;
       document.head.appendChild(style);
       return () => { document.head.removeChild(style); };
     }

@@ -1,4 +1,15 @@
-export const chartPerformance = [
+interface ChartPerformanceItem {
+  title: string;
+  description: string;
+}
+
+interface InfoCardItem {
+  emoji: string;
+  title: string;
+  footer: string;
+}
+
+export const chartPerformance: ChartPerformanceItem[] = [
   {
     title: "Chart Performance",
     description:
@@ -41,7 +52,7 @@ export const chartPerformance = [
   },
 ];
 
-export const infoCards = [
+export const infoCards: InfoCardItem[] = [
   {
     emoji: "🎬",
     title: "The first Blockchain prediction market for music, film, and pop culture",

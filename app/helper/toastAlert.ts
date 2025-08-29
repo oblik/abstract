@@ -1,10 +1,12 @@
 "use client";
 import { useSnackbar } from "notistack";
 
+type VariantType = 'default' | 'error' | 'success' | 'warning' | 'info';
+
 export function useToast() {
     const { enqueueSnackbar } = useSnackbar();
 
-    return (errorType, message) => {
+    return (errorType: VariantType, message: string) => {
         enqueueSnackbar(message, {
             variant: errorType,
             autoHideDuration: 2500,

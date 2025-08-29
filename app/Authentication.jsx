@@ -20,7 +20,7 @@ import {
 } from "@radix-ui/react-icons";
 import config from "../config/config.js";
 import { Button } from "./components/ui/button";
-import { toastAlert } from "../lib/toast.js"
+import { toastAlert } from "../lib/toast"
 import {
   regInputValidate,
   regValidate,
@@ -41,7 +41,7 @@ import { reset } from "../store/slices/auth/userSlice"
 import { signOut } from "@/store/slices/auth/sessionSlice";
 import { setWalletConnect } from "@/store/slices/walletconnect/walletSlice";
 import local from "next/font/local/index.js";
-import { availableBalance } from "@/lib/utils.js";
+import { availableBalance } from "@/lib/utils";
 import { Connection, PublicKey } from '@solana/web3.js';
 import { PnLFormatted } from "@/utils/helpers.js";
 import { Copy } from "lucide-react";

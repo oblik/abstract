@@ -9,7 +9,7 @@ import { formatNumber } from "../helper/custommath";
 import { toastAlert } from "../../lib/toast"
 import { useDispatch } from "react-redux";
 import { useSelector } from "@/store";
-import isEmpty from "is-empty";
+import isEmpty from "@/app/helper/isEmpty";
 import {
     Cross2Icon,
     InfoCircledIcon,

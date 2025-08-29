@@ -1,4 +1,6 @@
-export const getTimeframeDate = (timeframe = "all") => {
+type Timeframe = "1h" | "6h" | "1d" | "1w" | "1m" | "6m" | "1y" | "all";
+
+export const getTimeframeDate = (timeframe: Timeframe = "all"): Date => {
     const now = new Date();
   
     switch (timeframe) {
@@ -20,4 +22,3 @@ export const getTimeframeDate = (timeframe = "all") => {
         return new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
     }
 };
-  

@@ -4,7 +4,7 @@ import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import { cva } from "class-variance-authority";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { ScrollArea } from "radix-ui";
 import { useRouter, useSearchParams } from "next/navigation";
 interface MenuItem {
@@ -183,14 +183,14 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
     handleCategoryScroll();
   }, []);
 
-  const handleCategoryClick = (category: string) => {
+  const handleCategoryClick = useCallback((category: string) => {
     setSelectedCategory(category);
     router.replace(window.location.pathname);
-  };
+  }, [router, setSelectedCategory]);
 
   useEffect(() => {
     if (categoryParam) setSelectedCategory(categoryParam);
-  }, [categoryParam]);
+  }, [categoryParam, setSelectedCategory]);
 
   return (
     <div className="container mx-auto px-4 max-w-full overflow-hidden relative">

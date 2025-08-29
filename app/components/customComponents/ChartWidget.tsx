@@ -402,7 +402,7 @@ const ChartWidget: React.FC<ChartProps> = ({
     
     useEffect(() => {
         fetchData();
-    }, [market, selectedYes]); // Remove interval from dependencies
+    }, [id, market, selectedYes]); // Remove interval from dependencies
 
     // Add separate effect to handle interval changes using stored data (like MonthlyListenersChart2)
     useEffect(() => {

@@ -91,7 +91,7 @@ export default function ProfilePage(props: ProfilePageProps) {
     if (signedIn && user?.uniqueId && user?.uniqueId == props?.user?.uniqueId) {
       setIsOwnProfile(true);
     }
-  }, [signedIn, user?.uniqueId]);
+  }, [signedIn, user?.uniqueId, props?.user]);
 
   const NavigateSettings = () => {
     router.push(`/settings`);

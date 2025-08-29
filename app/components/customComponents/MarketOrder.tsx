@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useState, useCallback } from "react";
 
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
@@ -54,7 +54,7 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
   const feeFactor = takerFee ? 1 - takerFee / 100 : 1;
   const feeAdjustedOrdVal = Number(ordVal) * feeFactor;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     setFormValue((prev: any) => {
@@ -75,9 +75,9 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
       }
       return prev;
     });
-  };
+  }, []);
 
-  const marketOrderValidation = () => {
+  const marketOrderValidation = useCallback(() => {
     let errors: any = {};
     if (buyorsell === "buy") {
       if (!ordVal) errors.ordVal = "Amount field is required";
@@ -89,14 +89,14 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
     }
     setErrors(errors);
     return Object.keys(errors).length === 0;
-  };
+  }, [buyorsell, ordVal, amount]);
 
   useEffect(() => {
     setFormValue(initialFormValue);
     setErrors({});
   }, [activeView, buyorsell, marketId]);
 
-  const handlePlaceOrder = async (action: any) => {
+  const handlePlaceOrder = useCallback(async (action: any) => {
     if (!marketOrderValidation()) return;
 
     let activeTab = activeView?.toLowerCase();
@@ -121,19 +121,19 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
       toastAlert("error", message, "order-failed");
     }
 
-  };
+  }, [marketOrderValidation, activeView, user?._id, ordVal, amount, marketId]);
 
   useEffect(() => {
     if (isEmpty(selectedOrder)) return;
 
     if (buyorsell == "buy" && selectedOrder?.bidOrAsk == "ask") {
-      setFormValue({ ...formValue, ordVal: selectedOrder?.ordCost || "" });
+      setFormValue(f => ({ ...f, ordVal: selectedOrder?.ordCost || "" }));
     } else if (buyorsell == "sell" && selectedOrder?.bidOrAsk == "bid") {
-      setFormValue({ ...formValue, amount: selectedOrder?.row[1] || "" });
+      setFormValue(f => ({ ...f, amount: selectedOrder?.row[1] || "" }));
     } else {
       setFormValue(initialFormValue);
     }
-  }, [selectedOrder]);
+  }, [selectedOrder, buyorsell]);
 
   // Market order summary calculations
   let priceLevels: [string, number][] = [];

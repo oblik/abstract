@@ -2,6 +2,7 @@
 //that table have coloums like excecute time, execUserId,price, quantity, side
 "use client";
 import { Fragment, useEffect, useState } from 'react';
+import Image from 'next/image';
 import { formatNumber, shortText } from "@/app/helper/custommath";
 import { useSelector } from 'react-redux';
 import { getTradeHistory } from '@/services/user';
@@ -88,7 +89,7 @@ const ActivityTable = () => {
               <tr>
                 <td colSpan={5} className='py-3 px-6'>
                   <div className="flex items-center gap-4">
-                    <img
+                    <Image
                       src={trade.marketId?.eventId?.image}
                       alt="Icon"
                       width={45}

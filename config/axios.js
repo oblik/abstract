@@ -1,6 +1,7 @@
 // import packages
 import axios from "axios";
 import { getCookie } from "cookies-next";
+import { removeAuthToken } from "@/lib/cookies";
 
 // import lib
 import config from "./config";
@@ -11,6 +12,7 @@ import { toastAlert } from "@/lib/toast";
 const isClient = typeof window !== "undefined";
 
 axios.defaults.baseURL = config.baseUrl;
+axios.defaults.withCredentials = true;
 
 axios.interceptors.request.use(
   async (config) => {
@@ -68,6 +70,7 @@ export const handleResp = (respData, type = 'success', doc) => {
       // disconnectWallet();
       // dispatch(reset());
       document.cookie = "user-token" + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+      removeAuthToken();
       store.dispatch(signOut());
       toastAlert("error", "Your session has expired, please login again", "session-expired");
       setTimeout(() => {

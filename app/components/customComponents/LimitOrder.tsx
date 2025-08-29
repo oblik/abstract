@@ -260,7 +260,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
         amount: "",
       });
     }
-  }, [selectedOrder]);
+  }, [selectedOrder, buyorsell]);
 
   return (
     <>

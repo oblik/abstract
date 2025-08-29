@@ -46,6 +46,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { PnLFormatted } from "@/utils/helpers.js";
 import { Copy } from "lucide-react";
 import Notifications from "./components/customComponents/Notifications";
+import { removeAuthToken } from "@/lib/cookies";
 
 let initialData = {
   otp: "",
@@ -67,6 +68,7 @@ export default function Authentication() {
   const router = useRouter();
   const dispatch = useDispatch();
   const previousWalletRef = useRef(null);
+const disconnectWalletRef = useRef(null);
   
   const { signedIn } = useSelector((state) => state.auth?.session);
   const data = useSelector(state => state?.auth?.user);
@@ -173,7 +175,7 @@ export default function Authentication() {
     }
   }
 
-  async function disconnectWallet() {
+  const disconnectWallet = useCallback(async () => {
     if (window.solana && window.solana.isPhantom) {
       window.solana.disconnect();
       dispatch(
@@ -186,7 +188,12 @@ export default function Authentication() {
           balance: 0
         }));
     }
-  }
+  }, [dispatch]);
+
+  // Update ref when disconnectWallet changes
+  useEffect(() => {
+    disconnectWalletRef.current = disconnectWallet;
+  }, [disconnectWallet, dispatch]);
 
   const getUserLogindetails = async () => {
     try {
@@ -197,17 +204,9 @@ export default function Authentication() {
     }
   };
 
-  let getTime = async () => {
-    if (expireTime > 0) {
-      setTimeout(() => {
-        if (expireTime != 0) {
-          setExpireTime(prev => (prev > 1 ? prev - 1 : 0));
-        }
-      }, 1000);
-    }
-  };
+  // Removed useCallback - will be defined inline where needed
 
-  const walletAdd = async (address) => {
+  const walletAdd = useCallback(async (address) => {
     if (isConnected) {
       var valuedata = {
         address: address,
@@ -228,22 +227,44 @@ export default function Authentication() {
         toastAlert("error", message, "login");
       }
     }
-  };
+  }, [isConnected, LoginHistory, dispatch]);
 
   useEffect(() => {
     const handleWalletAdd = async () => {
       if (isConnected && connect) {
         console.log(address, "connecttt");
-        await walletAdd(address);
+        // Inline the walletAdd logic to avoid dependency issues
+        if (isConnected) {
+          var valuedata = {
+            address: address,
+            LoginHistory,
+          };
+          let { success, message, result } = await walletLogin(valuedata, dispatch);
+          if (success) {
+            if (isEmpty(result?.user?.email) && address || result?.user?.status == "unverified") {
+              setOpenEmailVerify(true);
+              setOpen(false);
+            } else {
+              setOpen(false);
+              toastAlert("success", message, "login");
+            }
+          } else {
+            toastAlert("error", message, "login");
+          }
+        }
       }
     };
 
     handleWalletAdd();
-  }, [isConnected]);
+  }, [isConnected, address, connect, LoginHistory, dispatch]);
 
   useEffect(() => {
     if (expireTime > 0 && expireTime != 0) {
-      getTime();
+      setTimeout(() => {
+        if (expireTime != 0) {
+          setExpireTime(prev => (prev > 1 ? prev - 1 : 0));
+        }
+      }, 1000);
     }
   }, [expireTime]);
 
@@ -381,7 +402,7 @@ export default function Authentication() {
 
   async function logout() {
     disconnectWallet();
-    document.cookie = "user-token" + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+    removeAuthToken();
     localStorage.removeItem("eventData");
     dispatch(reset());
     dispatch(signOut());
@@ -412,9 +433,8 @@ export default function Authentication() {
           console.log("🔁 Wallet switched from", previousWalletRef.current, "to", newPublicKey);
   
           if (isConnected) {
-            disconnectWallet();
-            document.cookie =
-              "user-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+            disconnectWalletRef.current?.();
+            removeAuthToken();
             dispatch(reset());
             dispatch(signOut());
             toastAlert(
@@ -436,7 +456,7 @@ export default function Authentication() {
     }, 1000);
   
     return () => clearInterval(interval);
-  }, [data?.walletAddress, isConnected]);
+  }, [data?.walletAddress, isConnected, signedIn]);
 console.log(data?.walletAddress,isConnected,"data");
   return (
     <>

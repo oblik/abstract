@@ -57,6 +57,10 @@ export default function EventPage({ categories }) {
   const id = param.id;
   const disContainer = document.getElementById("event-discription")
   const socketContext = useContext(SocketContext);
+  const [windowSize, setWindowSize] = useState({
+    width: 0,
+    height: 0,
+  });
   const [events, setEvents] = useState([]);
   const [eventsLoading, setEventsLoading] = useState(true);
   const [markets, setMarkets] = useState([]);
@@ -106,6 +110,22 @@ export default function EventPage({ categories }) {
 
     return yesPrice;
   };
+
+  useEffect(() => {
+    // Only run on client
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    // Set initial size
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const eventId = events?._id;
@@ -274,7 +294,7 @@ export default function EventPage({ categories }) {
       fetchAllBooks();
       setBookLabels(bookLabelsTemp);
     }
-  }, [id, markets, interval]);
+  }, [id, markets, interval, fetchAllBooks]);
 
   const getOpenOrders = async (id) => {
     try {
@@ -316,7 +336,7 @@ export default function EventPage({ categories }) {
     } catch {
       return false;
     }
-  }, [events]);
+  }, [events, markets, outcomeType]);
 
   return (
     <>
@@ -337,7 +357,7 @@ export default function EventPage({ categories }) {
         {/* Remove spacer and use padding-top on main content to offset header */}
         <div
           className="container mx-auto px-0 sm:px-4 max-w-full overflow-hidden"
-          style={{ paddingTop: typeof window !== 'undefined' && window.innerWidth < 640 ? '40px' : '112px', paddingLeft: window?.innerWidth < 640 ? 0 : undefined, paddingRight: window?.innerWidth < 640 ? 0 : undefined }}
+          style={{ paddingTop: windowSize.width < 640 ? '40px' : '112px', paddingLeft: windowSize.width < 640 ? 0 : undefined, paddingRight: windowSize.width < 640 ? 0 : undefined }}
         >
           {eventsLoading ? (
             <div className="flex justify-center items-center h-[80vh] w-[80vw]">
@@ -557,7 +577,7 @@ export default function EventPage({ categories }) {
                                         setActiveView={setActiveView}
                                       >
                                         <div className="pr-6">
-                                          <img
+                                          <Image
                                             src={events?.image}
                                             alt="Market 1"
                                             width={42}
@@ -677,7 +697,7 @@ export default function EventPage({ categories }) {
                           rel="noopener noreferrer"
                           className="bg-[#5865F2] hover:bg-[#4752c4] text-white font-semibold px-2 py-2 rounded-md transition-colors duration-200 text-xs sm:text-sm flex items-center gap-1"
                         >
-                          <img src="/images/discordnew.png" alt="Discord" width={16} height={16} className="mr-1" />
+                          <Image src="/images/discordnew.png" alt="Discord" width={16} height={16} className="mr-1" />
                           Join Discord
                         </a>
                       </div>
@@ -856,7 +876,7 @@ export default function EventPage({ categories }) {
             rel="noopener noreferrer"
             className="bg-[#5865F2] hover:bg-[#4752c4] text-white font-semibold px-2 py-2 rounded-md transition-colors duration-200 text-xs flex items-center gap-1"
           >
-            <img src="/images/discordnew.png" alt="Discord" width={16} height={16} className="mr-1" />
+            <Image src="/images/discordnew.png" alt="Discord" width={16} height={16} className="mr-1" />
             Join Discord
           </a>
         </div>

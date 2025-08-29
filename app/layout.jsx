@@ -3,7 +3,7 @@ import "./globals.css";
 // import { WalletProvider } from "@/app/walletconnect/walletContext";
 import SnackbarClient from "@/app/helper/SnackbarClient";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import { ToastContainer } from "react-toastify";
+import ToastContainerClient from "./components/ui/ToastContainerClient";
 import { StoreProvider } from "@/providers/store-provider";
 import ClientLayoutEffect from "./ClientLayoutEffect";
 
@@ -35,7 +35,7 @@ export default function RootLayout({ children }) {
            {/* <WalletProvider>{children}</WalletProvider> */}
           </SnackbarClient>
         </StoreProvider>
-        <ToastContainer />
+        <ToastContainerClient />
       </body>
     </html>
   );

@@ -59,7 +59,7 @@ export default function ProfileSettings() {
         return () => {
           isMounted = false;
         };
-      }, []);
+      }, [fetchProfile, dispatch]);
 
     const validateUsername = (value)  => {
         if (!value.trim()) {

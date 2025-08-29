@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef, useCallback } from "react";
 import {
   Avatar,
   AvatarImage,
@@ -414,7 +414,7 @@ export function CommentSection({ eventId }: CommentSectionProps) {
   const [total, setTotal] = useState(0);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   
-  const fetchComments = async (pageToFetch = 1, isInitialLoad = false) => {
+  const fetchComments = useCallback(async (pageToFetch = 1, isInitialLoad = false) => {
     try {
       if (isInitialLoad) {
         setIsLoading(true);
@@ -485,13 +485,13 @@ export function CommentSection({ eventId }: CommentSectionProps) {
       setIsLoading(false);
       setIsFetching(false);
     }
-  };
+  }, [eventId, limit]);
   
   useEffect(() => {
     if (eventId) {
       fetchComments(1, true);
     }
-  }, [eventId]);
+  }, [eventId, fetchComments]);
 
   const handleReply = (commentId: string) => {
     setReplyingTo((prevState) => (prevState === commentId ? null : commentId));
@@ -538,9 +538,9 @@ export function CommentSection({ eventId }: CommentSectionProps) {
     }
   };
     
-  const handleCommentAdded = () => {
+  const handleCommentAdded = useCallback(() => {
     fetchComments(1, true);
-  };
+  }, [fetchComments]);
 
   useEffect(() => {
     const socket = socketContext?.socket;
@@ -552,7 +552,7 @@ export function CommentSection({ eventId }: CommentSectionProps) {
     return () => {
       socket.off("comment", handleCommentAdded);
     };
-  }, [socketContext?.socket]);
+  }, [socketContext?.socket, handleCommentAdded]);
 
   return (
     <div className="mt-6">

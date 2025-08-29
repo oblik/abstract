@@ -60,7 +60,9 @@ export default function EventLinting({
     limit: 16,
     offset: 0,
   });
-  const [selectedMarket, setSelectedMarket] = useState("open");
+  // Backend expects 'active' for currently trading events.
+  // Keep compatibility if any UI sets 'open' by mapping it to 'active' on request.
+  const [selectedMarket, setSelectedMarket] = useState("active");
 
   useEffect(() => {
     // Reset pagination when category or showClosed changes
@@ -72,12 +74,14 @@ export default function EventLinting({
       try {
         setLoading(true);
         const finCategory = categoryParam ? categoryParam : selectCategory;
+        // Normalize status for backend API
+        const normalizedStatus = selectedMarket === "open" ? "active" : selectedMarket;
         let { success, result } = await getEvents({
           id: finCategory,
           page: pagination.page,
           limit: pagination.limit,
           tag: selectedSubcategory,
-          status: selectedMarket,
+          status: normalizedStatus,
         });
         if (success) {
           setEvents(result?.data);
@@ -91,7 +95,7 @@ export default function EventLinting({
     };
 
     fetchEvents();
-  }, [pagination, selectCategory, showClosed, categoryParam, selectedMarket]);
+  }, [pagination, selectCategory, showClosed, categoryParam, selectedMarket, selectedSubcategory]);
 
   return (
     <>

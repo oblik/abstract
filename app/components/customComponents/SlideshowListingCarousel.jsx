@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Divide, Loader } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, CarouselPagination } from "@/app/components/ui/carousel";
 import ChartWidget from "@/app/components/customComponents/ChartWidget";
@@ -86,7 +87,7 @@ export default function SlideshowListingCarousel() {
                               justifyContent: "center"
                             }}
                           >
-                            <img
+                            <Image
                               src={event.image || "/images/logo.png"}
                               alt="Event"
                               width={70}

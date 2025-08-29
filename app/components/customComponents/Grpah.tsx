@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import Ye from "/public/images/Ye.png";
 // import Polymarket from "/public/images/polymarket.png";
 import Image from "next/image";
@@ -96,7 +96,7 @@ const Graph: React.FC<GraphProps> = ({
   const [screenWidth, setScreenWidth] = useState<number>(
     typeof window !== "undefined" ? window.innerWidth : 1024
   );
-  const ChartColors = [
+  const ChartColors = useMemo(() => [
     "hsl(var(--chart-1))",
     "hsl(var(--chart-2))",
     "hsl(var(--chart-3))",
@@ -117,7 +117,7 @@ const Graph: React.FC<GraphProps> = ({
     "hsl(var(--chart-3))",
     "hsl(var(--chart-4))",
     "hsl(var(--chart-5))",
-  ];
+  ], []);
 
   // Update screen width on resize
   useEffect(() => {
@@ -128,57 +128,58 @@ const Graph: React.FC<GraphProps> = ({
     }
   }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = {
-          market: selectedYes ? "yes" : "no",
-          interval,
-          fidelity: 30,
-        };
-        const { success, result } = await getPriceHistory(id, data);
-        if (success) {
-          let assetKeysData = result
-            .filter(
-              (item: any) =>
-                item.groupItemTitle === selectedMarket.groupItemTitle
-            )
-            .map((item: any, index: any) => {
-              return {
-                label: item.groupItemTitle,
-                color: ChartColors[index],
-                asset: `asset${index + 1}`,
-              };
-            });
+  const fetchData = useCallback(async () => {
+    try {
+      const data = {
+        market: selectedYes ? "yes" : "no",
+        interval,
+        fidelity: 30,
+      };
+      const { success, result } = await getPriceHistory(id, data);
+      if (success) {
+        let assetKeysData = result
+          .filter(
+            (item: any) =>
+              item.groupItemTitle === selectedMarket.groupItemTitle
+          )
+          .map((item: any, index: any) => {
+            return {
+              label: item.groupItemTitle,
+              color: ChartColors[index],
+              asset: `asset${index + 1}`,
+            };
+          });
 
-          if (market.length > 1) {
-            market.forEach((item: any) => {
-              const asset = assetKeysData.find(
-                (asset: any) => asset.label === item.groupItemTitle
-              );
-              if (asset) {
-                asset.last = selectedYes ? item.last : 100 - item.last;
-              }
-            });
-            setChartConfig(assetKeysData);
-          }
-          const filteredResult = result.filter(
-            (item: any) => item.groupItemTitle === selectedMarket.groupItemTitle
-          );
-          let processedData = processSingleChartData(filteredResult, interval);
-
-          if (selectedYes) {
-            setChartDataYes(processedData);
-          } else {
-            setChartDataNo(processedData);
-          }
+        if (market.length > 1) {
+          market.forEach((item: any) => {
+            const asset = assetKeysData.find(
+              (asset: any) => asset.label === item.groupItemTitle
+            );
+            if (asset) {
+              asset.last = selectedYes ? item.last : 100 - item.last;
+            }
+          });
+          setChartConfig(assetKeysData);
         }
-      } catch (error) {
-        console.log(error);
+        const filteredResult = result.filter(
+          (item: any) => item.groupItemTitle === selectedMarket.groupItemTitle
+        );
+        let processedData = processSingleChartData(filteredResult, interval);
+
+        if (selectedYes) {
+          setChartDataYes(processedData);
+        } else {
+          setChartDataNo(processedData);
+        }
       }
-    };
+    } catch (error) {
+      console.log(error);
+    }
+  }, [id, market, selectedMarket, selectedYes, interval, ChartColors]);
+
+  useEffect(() => {
     fetchData();
-  }, [id, market, selectedMarket, selectedYes]);
+  }, [fetchData]);
 
   useEffect(() => {
     if (selectedYes) {

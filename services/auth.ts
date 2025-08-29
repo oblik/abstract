@@ -3,11 +3,10 @@ import browser from "browser-detect";
 import isEmpty from "@/app/helper/isEmpty";
 
 import config from "@/config/config";
-import { handleResp, setAuthorization } from "@/config/axios";
+import { handleResp } from "@/config/axios";
 import { signIn } from "@/store/slices/auth/sessionSlice";
 import { setUser } from "@/store/slices/auth/userSlice";
 import { setWallet } from "@/store/slices/wallet/dataSlice";
-import { setAuthToken } from "@/lib/cookies";
 import { subscribe } from "@/config/socketConnectivity";
 
 export const register = async (data: any) => {
@@ -35,8 +34,11 @@ export const googleLogin = async (reqBody: any, dispatch: any) => {
     dispatch(signIn(result.token));
     dispatch(setUser(result.user));
     dispatch(setWallet(result.wallet));
-    setAuthorization(result.token);
-    setAuthToken(result.token);
+    await fetch("/api/auth/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: result.token }),
+    });
     return {
       success: true,
       message,
@@ -64,8 +66,11 @@ export const walletLogin = async (reqBody: any, dispatch: any) => {
       dispatch(signIn(result?.token));
       dispatch(setUser(result?.user));
       dispatch(setWallet(result?.wallet));
-      setAuthorization(result?.token);
-      setAuthToken(result?.token);
+      await fetch("/api/auth/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: result?.token }),
+      });
     }
     return {
       success: true,
@@ -94,8 +99,11 @@ export const verifyEmail = async (data: any, dispatch: any) => {
     dispatch(signIn(result.token));
     dispatch(setUser(result.user));
     dispatch(setWallet(result.wallet));
-    setAuthorization(result.token);
-    setAuthToken(result.token);
+    await fetch("/api/auth/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: result.token }),
+    });
     return {
       success: true,
       message,

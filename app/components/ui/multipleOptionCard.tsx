@@ -108,7 +108,7 @@ export function MultipleOptionCard({
                 flexShrink: 0,
               }}
             >
-              <img
+              <Image
                 src={imageSrc}
                 alt="Event"
                 width={40}

@@ -180,7 +180,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchTags();
-  }, [selectCategory]);
+  }, [selectCategory, fetchTags]);
 
   return (
     <div className="min-h-screen flex flex-col bg-black text-white h-auto items-center justify-items-center p-0 m-0">

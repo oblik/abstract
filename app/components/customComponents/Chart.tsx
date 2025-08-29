@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback, useMemo } from "react";
 import Ye from "/public/images/Ye.png";
 // import Polymarket from "/public/images/polymarket.png";
 import Image from "next/image";
@@ -160,7 +160,7 @@ const Chart: React.FC<ChartProps> = ({
     const [screenWidth, setScreenWidth] = useState<number>(
         typeof window !== "undefined" ? window.innerWidth : 1024
     );
-    const ChartColors = [
+    const ChartColors = useMemo(() => [
         "hsl(var(--chart-1))",
         "hsl(var(--chart-2))",
         "hsl(var(--chart-3))",
@@ -181,7 +181,7 @@ const Chart: React.FC<ChartProps> = ({
         "hsl(var(--chart-3))",
         "hsl(var(--chart-4))",
         "hsl(var(--chart-5))",
-    ]
+    ], [])
     
     // Update screen width on resize
     useEffect(() => {
@@ -230,7 +230,7 @@ const Chart: React.FC<ChartProps> = ({
     };
 
     // Update fetchData logic to fetch all data once like MonthlyListenersChart2
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             // Fetch all data without timestamp filtering (like MonthlyListenersChart2)
             const data = {
@@ -387,11 +387,11 @@ const Chart: React.FC<ChartProps> = ({
         } catch (error) {
             console.log(error);
         }
-    };
+    }, [id, market, selectedYes, interval, ChartColors]);
     
     useEffect(() => {
         fetchData();
-    }, [market, selectedYes]); // Remove interval from dependencies
+    }, [fetchData]); // Remove interval from dependencies
 
     // Add separate effect to handle interval changes using stored data (like MonthlyListenersChart2)
     useEffect(() => {
@@ -443,7 +443,7 @@ const Chart: React.FC<ChartProps> = ({
         //   socket.off("chart-update");
         // };
 
-    }, [market, selectedYes]); // Remove interval from dependencies here too
+    }, [socketContext, fetchData]); // Remove interval from dependencies here too
 
     const getSeriesData = async(id:any)=>{
         try{
@@ -511,7 +511,7 @@ const Chart: React.FC<ChartProps> = ({
                 }));
             }
         }
-    }, [market, multiHoveredChance, selectedYes]);
+    }, [market, multiHoveredChance, selectedYes, ChartColors]);
 
 
     const CustomDot = (props: any) => {
@@ -585,7 +585,7 @@ const Chart: React.FC<ChartProps> = ({
                                     flexShrink: 0,
                                 }}
                             >
-                                <img
+                                <Image
                                     src={image}
                                     alt="Event"
                                     width={screenWidth < 640 ? 50 : 65}

@@ -59,7 +59,8 @@ import History from "./History";
 import { Footer } from "../components/customComponents/Footer";
 import { setWalletConnect } from "@/store/slices/walletconnect/walletSlice";
 import { PnLFormatted } from "@/utils/helpers";
-import { parsePriceData } from "@pythnetwork/client";
+// Import pyth client safely (server-side only)
+import pythClient from "@/lib/pyth-client";
 import { getWalletSettings, getCoinList } from "@/services/user";
 import depositIDL from "../../components/IDL/DEPOSITIDL.json";
 import Withdraw from "./withdraw";
@@ -134,11 +135,7 @@ export default function PortfolioPage({ categories }) {
 
   var { currency, amount, minDeposit } = depositData;
 
-  useEffect(() => {
-    getPnl();
-  }, [walletData, interval]);
-
-  const getPnl = async () => {
+  const getPnl = useCallback(async () => {
     try {
       const { success, result } = await getUserPnL(interval);
       console.log("success,result", success, result);
@@ -149,7 +146,11 @@ export default function PortfolioPage({ categories }) {
     } catch (err) {
       console.log("error ", err);
     }
-  };
+  }, [interval]);
+
+  useEffect(() => {
+    getPnl();
+  }, [walletData, interval, getPnl]);
 
   useEffect(() => {
     if (!wallet) return;
@@ -167,7 +168,7 @@ export default function PortfolioPage({ categories }) {
     fetchProfile();
   }, [wallet]);
 
-  const balanceData = async () => {
+  const balanceData = useCallback(async () => {
     try {
       if (address) {
         const publicKey = new PublicKey(address);
@@ -192,7 +193,7 @@ export default function PortfolioPage({ categories }) {
     } catch (err) {
       console.error("Error fetching POL balance:", err);
     }
-  };
+  }, [address, connection, config?.tokenMint]);
 
   async function disconnectWallet() {
     if (window.solana && window.solana.isPhantom) {
@@ -378,7 +379,7 @@ export default function PortfolioPage({ categories }) {
 
   useEffect(() => {
     balanceData();
-  }, [address]);
+  }, [address, balanceData]);
 
   var step2Click = () => {
     if (!isEmpty(currency)) {

@@ -204,7 +204,7 @@ const OrderbookAccordionContent = React.forwardRef<
       }
     
       return '--';
-    }, [bids, asks]);
+    }, []);
 
     useEffect(() => {
       const descending = (a: any, b: any) => Number(b[0]) - Number(a[0]);
@@ -254,7 +254,7 @@ const OrderbookAccordionContent = React.forwardRef<
       });
     }, [asks, bids, activeView, isOpen]);
 
-    const getOpenOrders = async () => {
+    const getOpenOrders = React.useCallback(async () => {
       try {
         const respData = await getOpenOrdersByEvtId({
           id: selectedMarket?._id,
@@ -267,11 +267,11 @@ const OrderbookAccordionContent = React.forwardRef<
       } catch (error) {
         console.log(error, "error");
       }
-    };
+    }, [selectedMarket?._id, setOpenOrders]);
 
     useEffect(() => {
       getOpenOrders();
-    }, [selectedMarket]);
+    }, [selectedMarket, getOpenOrders]);
 
     const  matchPriceAndQuantity = (data:any, targetPrice:number, side: any)=> {
       let totalQty = 0;
@@ -367,7 +367,7 @@ const OrderbookAccordionContent = React.forwardRef<
         socket.off("order-update");
       };
     
-    }, [socketContext?.socket]);
+    }, [socketContext?.socket, selectedMarket?._id, setOpenOrders]);
   
     useEffect(() => {
       if (!id) {

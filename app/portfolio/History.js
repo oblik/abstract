@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { getClosedPnL } from "@/services/portfolio";
 import { toFixedDown } from "../helper/roundOf";
 import { useRouter } from "next/navigation";
@@ -111,7 +112,7 @@ const History = () => {
 
   useEffect(() => {
     getUserClosedPnL();
-  }, []);
+  }, [getUserClosedPnL]);
 
   const getTradeHistory = async (id) => {
     try {
@@ -187,7 +188,7 @@ const History = () => {
                       <td colSpan={8}>
                         <div className="flex items-center space-x-2 cursor-pointer">
                           <span className="text-2xl">
-                            <img
+                            <Image
                               src={event?.eventInfo?.image}
                               alt="Icon"
                               width={42}

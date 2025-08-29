@@ -25,6 +25,32 @@ const nextConfig = {
       }
     ],
   },
+  // Fix for camelcase module resolution in @pythnetwork/client
+  transpilePackages: ['@pythnetwork/client', '@coral-xyz/anchor'],
+  webpack: (config, { isServer }) => {
+    // Add alias for camelcase to help webpack resolve it
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'camelcase': 'camelcase',
+    };
+    
+    // Handle Node.js modules in browser environment
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        "crypto": false,
+        "stream": false,
+        "assert": false,
+        "http": false,
+        "https": false,
+        "os": false,
+        "url": false,
+        "zlib": false,
+      };
+    }
+    
+    return config;
+  },
 };
 
 export default nextConfig;

@@ -136,7 +136,7 @@ export default function PortfolioPage() {
     fetchProfile();
     fetchPositions()
     fetchTradeOverview()
-  }, []);
+  }, [fetchProfile, fetchPositions, fetchTradeOverview]);
 
   const router = useRouter();
 

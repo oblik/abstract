@@ -123,6 +123,9 @@ const SubcategoryBar = ({
 );
 
 export default function Home({ infoCardCms, categories, tags }) {
+  const [windowSize, setWindowSize] = useState({
+    width: 0,
+  });
   const [selectCategory, setSelectedCategory] = useState("all");
   const [showClosed, setShowClosed] = useState(false);
   const [selectedSubcategory, setSelectedSubcategory] = useState("all");
@@ -131,21 +134,36 @@ export default function Home({ infoCardCms, categories, tags }) {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category");
 
-  const fetchTags = async () => {
-    try {
-      const { success, result } = await getTagsByCategory(selectCategory);
-      if (success) {
-        setSubcategoryList(result);
-        setSelectedSubcategory("all");
-      }
-    } catch (error) {
-      console.error("Error fetching tags:", error);
-    }
-  };
-
   useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const { success, result } = await getTagsByCategory(selectCategory);
+        if (success) {
+          setSubcategoryList(result);
+          setSelectedSubcategory("all");
+        }
+      } catch (error) {
+        console.error("Error fetching tags:", error);
+      }
+    };
+    
     fetchTags();
   }, [selectCategory]);
+
+  useEffect(() => {
+    // Only run on client
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+      });
+    };
+
+    // Set initial size
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <>
@@ -164,8 +182,8 @@ export default function Home({ infoCardCms, categories, tags }) {
       <div
         className="lg:mb-4 mb-0"
         style={{
-          height: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
-          minHeight: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
+          height: windowSize.width < 1024 ? '95px' : '112px',
+          minHeight: windowSize.width < 1024 ? '95px' : '112px',
           width: '100%'
         }}
       />

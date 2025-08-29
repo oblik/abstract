@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/app/components/ui/button";
 import { Legend, Line, LineChart, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
@@ -192,32 +192,32 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
     setChartData(chartDataYes);
   }, [chartDataYes]);
 
-  useEffect(() => {
-    const fetchAllPriceHistories = async () => {
-      try {
-        const payload = {
-          start_ts: getIntervalDate("all"),
-          end_ts: new Date().getTime(),
-        };
-        const { success, result } = await getForecastHistory(eventSlug, payload);
-        if (success) {
-          const formattedData = result.map((item: any) => ({
-            t: Math.floor(new Date(item.createdAt).getTime() / 1000),
-            p: item.forecast / 100,
-          }));
-          setAllChartData(formattedData);
-          const processedData = processSingleChartData(formattedData, interval);
-          setChartDataYes(processedData);
-        } else {
-          console.error("MonthlyListenersChart2: Failed to fetch data");
-        }
-      } catch (error) {
-        console.error("Error fetching all market data:", error);
+  const fetchAllPriceHistories = useCallback(async () => {
+    try {
+      const payload = {
+        start_ts: getIntervalDate("all"),
+        end_ts: new Date().getTime(),
+      };
+      const { success, result } = await getForecastHistory(eventSlug, payload);
+      if (success) {
+        const formattedData = result.map((item: any) => ({
+          t: Math.floor(new Date(item.createdAt).getTime() / 1000),
+          p: item.forecast / 100,
+        }));
+        setAllChartData(formattedData);
+        const processedData = processSingleChartData(formattedData, interval);
+        setChartDataYes(processedData);
+      } else {
+        console.error("MonthlyListenersChart2: Failed to fetch data");
       }
-    };
+    } catch (error) {
+      console.error("Error fetching all market data:", error);
+    }
+  }, [eventSlug, interval]);
 
+  useEffect(() => {
     fetchAllPriceHistories();
-  }, [eventSlug]);
+  }, [fetchAllPriceHistories]);
 
   useEffect(() => {
     if (allChartData.length > 0) {
@@ -359,7 +359,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                    flexShrink: 0,
                   }}
                 >
-              <img
+              <Image
                  src={image}
                  alt="Event"
                  width={screenWidth < 640 ? 50 : 65}

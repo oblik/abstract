@@ -72,22 +72,22 @@ export function TradingCard({
   const [positions, setPositions] = React.useState({});
   // Calculate days left when customDate changes
 
-  const fetchPositions = async () => {
-    try {
-      const { success, result } = await getPositionsByEvtId({
-        id: market?._id,
-      });
-      if (success) {
-        setPositions(result[0] || {});
-      } else {
-        setPositions({});
-      }
-    } catch (error) {
-      console.error("Error fetching positions:", error);
-    }
-  };
-
   useEffect(() => {
+    const fetchPositions = async () => {
+      try {
+        const { success, result } = await getPositionsByEvtId({
+          id: market?._id,
+        });
+        if (success) {
+          setPositions(result[0] || {});
+        } else {
+          setPositions({});
+        }
+      } catch (error) {
+        console.error("Error fetching positions:", error);
+      }
+    };
+
     if (market) {
       fetchPositions();
     }
@@ -141,7 +141,7 @@ export function TradingCard({
                   flexShrink: 0,
                 }}
               >
-                <img
+                <Image
                   src={image}
                   alt="Event"
                   width={45}

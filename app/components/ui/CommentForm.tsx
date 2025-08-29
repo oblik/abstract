@@ -1,5 +1,6 @@
-import React, { useSelector, useDispatch } from "@/store";
+import React from "react";
 import { useState } from "react";
+import { useSelector, useDispatch } from "@/store";
 import { Button } from "./button";
 import { CommentProps } from "@/types/comments";
 import { postComment } from "@/services/market";
@@ -19,7 +20,7 @@ const CommentForm = ({ eventId, onCommentAdded }: CommentFormProps) => {
   const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modelError, setModelError] = useState("");
+  const [modalError, setModalError] = useState("");
 
   const { signedIn } = useSelector((state) => state?.auth?.session);
   const { _id, userName } = useSelector((state) => state?.auth?.user || {});
@@ -82,19 +83,19 @@ const CommentForm = ({ eventId, onCommentAdded }: CommentFormProps) => {
   const handleSaveUsername = async (username: string): Promise<boolean> => {
     try {
       if (!username.trim()) {
-        setModelError("Username cannot be empty.");
+        setModalError("Username cannot be empty.");
         return false;
       }
       if (username.length < 6) {
-        setModelError("Username must be at least 6 characters long.");
+        setModalError("Username must be at least 6 characters long.");
         return false;
       }
       if (username.length > 20) {
-        setModelError("Username must be at most 20 characters long.");
+        setModalError("Username must be at most 20 characters long.");
         return false;
       }
       if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-        setModelError(
+        setModalError(
           "Username can only contain letters, numbers, and underscores."
         );
         return false;
@@ -113,7 +114,7 @@ const CommentForm = ({ eventId, onCommentAdded }: CommentFormProps) => {
       }
       console.log("result: ", result);
 
-      setModelError("");
+      setModalError("");
       dispatch(setUser(result));
 
       toastAlert("success", "Username saved successfully!");
@@ -151,8 +152,8 @@ const CommentForm = ({ eventId, onCommentAdded }: CommentFormProps) => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveUsername}
-        error={modelError}
-        setError={setModelError}
+        error={modalError}
+        setError={setModalError}
       />
     </>
   );

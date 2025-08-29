@@ -92,7 +92,7 @@ export function PreviewCard({
                     flexShrink: 0 
                   }}
                 >
-                  <img 
+                  <Image 
                     src={eventImageSrc} 
                     alt="Event" 
                     width={85} 

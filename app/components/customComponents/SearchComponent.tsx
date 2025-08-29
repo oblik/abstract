@@ -83,7 +83,7 @@ export default function SearchComponent() {
     } catch (error) {
       console.error("Error fetching filter events:", error);
     }
-  }, []);
+  }, [selectCategory]);
 
   const fetchCategoryList = useCallback(async () => {
     try {
@@ -111,7 +111,7 @@ export default function SearchComponent() {
     if (storedActivity) {
       setRecentActivity(JSON.parse(storedActivity));
     }
-  }, []);
+  }, [fetchCategoryList]);
 
   return (
     <div

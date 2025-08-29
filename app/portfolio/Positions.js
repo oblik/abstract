@@ -77,7 +77,7 @@ const Positions = (props) => {
 
   useEffect(() => {
     getUserPositionHistory();
-  }, []);
+  }, [getUserPositionHistory]);
 
   const getTradeHistory = async (id) => {
     try {
@@ -266,7 +266,7 @@ const Positions = (props) => {
                     <td colSpan={8}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <img
+                          <Image
                             src={item.eventImage}
                             alt="Icon"
                             width={45}
@@ -499,7 +499,7 @@ const Positions = (props) => {
               className="bg-[#0e1c14] p-4 rounded-lg mt-4 w-full"
             >
               <div className="flex gap-3 mb-4 items-center">
-                <img
+                <Image
                   src={shareData?.eventImage}
                   alt="Icon"
                   width={60}

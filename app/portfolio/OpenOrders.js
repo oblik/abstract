@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
+import Image from 'next/image'
 import SearchBar from '../components/ui/SearchBar'
 import { getOpenOrders } from '@/services/portfolio'
 import { cancelOrder } from '@/services/market'
@@ -131,7 +132,7 @@ const OpenOrders = () => {
         return () => {
             socket.off("order-update", handleOrders)
         }
-    }, [socketContext])
+    }, [socketContext?.socket, user, setOpenOrders])
     return (
         <>
             {/* <div className="flex space-x-4 mb-3">
@@ -168,7 +169,7 @@ const OpenOrders = () => {
                                         <td colSpan={8}>
                                             <div className="flex items-center space-x-2 cursor-pointer" onClick={() => route.push(`/event-page/${item?.eventSlug}`)}>
                                                 <span className="text-2xl">
-                                                    <img
+                                                    <Image
                                                         src={item?.eventImage}
                                                         alt="Icon"
                                                         width={45}

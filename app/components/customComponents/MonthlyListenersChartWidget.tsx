@@ -190,9 +190,9 @@ const MonthlyListenersChartWidget: React.FC<MultiListenersChart2Props> = ({
         console.error("Error fetching all market data:", error);
       }
     };
-
+    
     fetchAllPriceHistories();
-  }, [eventSlug]);
+  }, [eventSlug, interval]);
 
   useEffect(() => {
     if (allChartData.length > 0) {

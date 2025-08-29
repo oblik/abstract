@@ -101,7 +101,7 @@ const EventCard: React.FC<EventCardProps> = ({
                 flexShrink: 0,
               }}
             >
-              <img
+              <Image
                 src={imageSrc}
                 alt="Event"
                 width={40}

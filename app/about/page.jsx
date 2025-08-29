@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import "../globals.css"; // Ensure global styles are correctly imported
@@ -166,7 +166,7 @@ export default function Home() {
     fetchMenuItems();
   }, []);
 
-   const fetchTags = async () => {
+   const fetchTags = useCallback(async () => {
       try {
         const { success, result } = await getTagsByCategory(selectCategory);
         if (success) {
@@ -176,11 +176,11 @@ export default function Home() {
       } catch (error) {
         console.error("Error fetching tags:", error);
       }
-    };
+    }, [selectCategory]);
   
     useEffect(() => {
       fetchTags();
-    }, [selectCategory]);
+    }, [selectCategory, fetchTags]);
     
   return (
     <div className="min-h-screen flex flex-col bg-black text-white h-auto items-center justify-items-center p-0 m-0">

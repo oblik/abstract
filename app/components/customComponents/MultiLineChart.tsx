@@ -208,7 +208,7 @@ export default function MultiLineChart({
                   flexShrink: 0,
                 }}
               >
-                <img
+                <Image
                   src={image as string}
                   alt="Event"
                   width={screenWidth < 640 ? 40 : 40}

@@ -1,5 +1,6 @@
 "use client";
 import { Fragment, useEffect, useState } from 'react';
+import Image from 'next/image';
 import { formatNumber } from "@/app/helper/custommath";
 import { useSelector } from 'react-redux';
 import { getTradeHistory } from '@/services/user';
@@ -80,7 +81,7 @@ const ActivityTable: React.FC<ActivityTableProps> = (props) => {
               <tr>
                 <td colSpan={5} className='sm:py-3 py-2 px-6'>
                   <div className="flex items-center gap-4">
-                    <img
+                    <Image
                       src={trade.marketId?.eventId?.image}
                       alt="Icon"
                       width={45}

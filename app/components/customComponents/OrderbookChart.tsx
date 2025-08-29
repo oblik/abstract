@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState, useCallback } from "react";
 import { Button } from "@/app/components/ui/button";
 import { Legend, Line, LineChart, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 import { ArrowRightLeft } from "lucide-react";
@@ -101,7 +101,7 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
     }
   }, []);
 
-  const fetchData = async() => {
+  const fetchData = useCallback(async() => {
     try {
       // Fetch all data without timestamp filtering (like Chart.tsx)
       const data = {
@@ -145,11 +145,11 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
     } catch (error) {
       console.log(error)
     }
-  }
+  }, [id, selectedYes, selectedMarket, interval]);
 
   useEffect(() => {
     fetchData();
-  }, [id, market, selectedMarket, selectedYes]); // Remove interval from dependencies like Chart.tsx
+  }, [fetchData]); // Remove interval from dependencies like Chart.tsx
 
   // Add separate effect to handle interval changes using stored data (like Chart.tsx)
   useEffect(() => {
@@ -182,7 +182,7 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
       // return () => {
       //   socket.off("chart-update", chartUpdate);
       // };
-  }, [market, selectedYes]); // Remove interval from dependencies like Chart.tsx
+  }, [fetchData, socketContext]); // Remove interval from dependencies like Chart.tsx
 
   useEffect(() => {
     if (selectedYes) {

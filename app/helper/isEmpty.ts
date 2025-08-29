@@ -10,7 +10,6 @@ export const isBoolean = (value: AnyType): boolean =>
   (typeof value === "boolean" && (value === true || value === false)) ||
   (typeof value === "string" && (value === "true" || value === "false"));
 
-// export const const isEmptyObject = obj => Object.values(obj).some(value => value === "");
 export const isEmptyObject = (obj: Record<string, AnyType>): boolean =>
   Object.values(obj).every(
     value => value === null || value === undefined || value === ""

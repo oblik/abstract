@@ -325,8 +325,8 @@ const CarouselPagination = React.forwardRef<HTMLDivElement, CarouselPaginationPr
                 'h-2 w-2 rounded-full transition-colors',
                 'hover:scale-125 hover:opacity-80', // Add hover effect
                 index === selectedIndex 
-                  ? 'bg-[#7dfdfe] shadow-sm shadow-[#7dfdfe]/50' // Add shadow effect for selected state
-                  : 'bg-gray-500/50 hover:bg-gray-400/70' // Hover effect for non-selected state
+? 'bg-[#7dfdfe] shadow-sm shadow-[#7dfdfe]/50'
+: 'bg-gray-500/50 hover:bg-gray-400/70'
               )}
             />
           </button>

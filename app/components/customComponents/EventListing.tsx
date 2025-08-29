@@ -6,6 +6,7 @@ import EventCard from "@/app/components/ui/eventCard";
 import { MultipleOptionCard } from "@/app/components/ui/multipleOptionCard";
 import Link from "next/link";
 import { getEvents } from "@/services/market";
+import { Event as MarketEvent } from "@/types";
 import { useSearchParams } from "next/navigation";
 import {
   Select,
@@ -52,7 +53,7 @@ export default function EventListing({
 }: EventListingProps) {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category");
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<MarketEvent[]>([]);
   const [hasMore, setHasMore] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [pagination, setPagination] = useState<PaginationState>({
@@ -80,8 +81,8 @@ export default function EventListing({
           status: selectedMarket,
         });
         if (success) {
-          setEvents(result?.data);
-          setHasMore(result?.count > pagination.page * pagination.limit);
+          setEvents(result?.data || []);
+          setHasMore((result?.total || 0) > pagination.page * pagination.limit);
         }
         setLoading(false);
       } catch (error) {
@@ -109,22 +110,20 @@ export default function EventListing({
                   event.status + "_event"
                 }`}
               >
-                {event.marketId?.length < 2 ? (
+                {(event.marketId?.length || 0) < 2 ? (
                   <Link
-                    href={`/event-page/${event.slug}`}
+                    href={`/event-page/${event.slug || ''}`}
                     className="w-full block"
                   >
                     <EventCard
                       imageSrc={event?.image || "/images/logo.png"} // 提供默认图片路径
                       question={event?.title}
                       probability={
-                        // (event.marketId[0]?.outcomePrices &&
-                        // JSON.parse(event.marketId[0]?.outcomePrices)[0] ) || 50
-                        event.marketId[0]?.last
+                        event.marketId?.[0]?.last
                       }
                       totalPool={`$${
                         event.marketId?.[0]?.volume
-                          ? (event.marketId[0].volume / 100).toLocaleString(
+                          ? (event.marketId?.[0]?.volume / 100).toLocaleString(
                               undefined,
                               {
                                 minimumFractionDigits: 2,
@@ -134,43 +133,44 @@ export default function EventListing({
                           : "0.00"
                       }`}
                       yesButtonLabel={`Buy ${
-                        firstLetterCase(event.marketId[0]?.outcome?.[0]?.title) || "Yes"
+                        firstLetterCase(event.marketId?.[0]?.outcome?.[0]?.title || "") || "Yes"
                       }`}
                       noButtonLabel={`Buy ${
-                        firstLetterCase(event.marketId[0]?.outcome?.[1]?.title) || "No"
+                        firstLetterCase(event.marketId?.[0]?.outcome?.[1]?.title || "") || "No"
                       }`}
                       yesPotential={
-                        (event.marketId[0]?.outcomePrices &&
-                          JSON.parse(event.marketId[0]?.outcomePrices)[0]) ||
+                        (event.marketId?.[0]?.outcomePrices &&
+                          JSON.parse(event.marketId?.[0]?.outcomePrices)[0]) ||
                         50
                       }
                       noPotential={
-                        (event.marketId[0]?.outcomePrices &&
-                          JSON.parse(event.marketId[0]?.outcomePrices)[1]) ||
+                        (event.marketId?.[0]?.outcomePrices &&
+                          JSON.parse(event.marketId?.[0]?.outcomePrices)[1]) ||
                         50
                       }
                       id={event._id}
                       status={event.status}
-                      outcome={event?.outcome}
+                      outcome={event?.outcome || ""}
                     />
                   </Link>
                 ) : (
                   <Link
-                    href={`/event-page/${event.slug}`}
+                    href={`/event-page/${event.slug || ''}`}
                     className="w-full block"
                   >
                     <MultipleOptionCard
                       imageSrc={event?.image || "/images/logo.png"} // 提供默认图片路径
                       question={event?.title}
-                      totalPool={
-                        event.marketId
-                          ? event.marketId?.reduce(
-                              (acc, mark) => acc + (mark.volume || 0),
-                              0
-                            )
-                          : 0
-                      }
-                      options={event?.marketId}
+                      totalPool={(
+                        (event.marketId?.reduce(
+                          (acc, mark) => acc + (mark.volume || 0),
+                          0
+                        ) || 0) / 100
+                      ).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                      options={event?.marketId || []}
                       forecast={event?.forecast}
                       status={event.status}
                     />

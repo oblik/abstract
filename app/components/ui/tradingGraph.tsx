@@ -105,7 +105,7 @@ export function TradingGraph({
                   tickMargin={8}
                   tickFormatter={(value) => value.slice(0, 3)}
                 />
-                {/* Added YAxis for percentage chances */}
+                {}
                 <YAxis
                   domain={[0, 100]} // Set range between 0% and 100%
                   tickFormatter={(tick) => `${tick}%`} // Format the ticks as percentages

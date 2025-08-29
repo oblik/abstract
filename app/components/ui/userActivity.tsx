@@ -7,7 +7,7 @@ export function Transition(): React.ReactElement {
       {/* Avatar and username */}
       <div className="flex items-start">
         <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+<AvatarImage src="https://i.pravatar.cc/150?u=user2" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       </div>

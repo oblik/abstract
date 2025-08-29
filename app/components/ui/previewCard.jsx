@@ -63,8 +63,6 @@ export function PreviewCard({
     }
   }, [eventID]);
 
-  // if (!events) {
-  //   return <div>Loading...</div>;
   // }
 
   return (

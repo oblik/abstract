@@ -56,7 +56,6 @@ let initialValue = {
 };
 
 export default function Authentication() {
-  // Responsive style for auth buttons
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const style = document.createElement('style');
@@ -88,7 +87,6 @@ const disconnectWalletRef = useRef(null);
   const [walletEmail, setWalletEmail] = useState(false);
   const [emailOpen, setEmailOpen] = useState(false);
 
-  //const wallet = useWallet();
   const [expireTime, setExpireTime] = useState(0);
 
   //get proileImg from redux
@@ -108,7 +106,6 @@ const disconnectWalletRef = useRef(null);
     router.push("/profile");
   };
   const navigateToPortfolioPage = () => {
-    // router.push("/portfolio");
     window.location.href = "/portfolio";
   };
 
@@ -130,15 +127,16 @@ const disconnectWalletRef = useRef(null);
 
 
         const signedMessage = await window.solana.signMessage(encodedMessage, "utf8");
-
         console.log("Signature:", signedMessage);
+
    if(signedMessage){
         const connection = new Connection(config?.rpcUrl);
 
         const publicKey = new PublicKey(response.publicKey.toString());
         const balanceLamports = await connection.getBalance(publicKey);
+        console.log(balanceSOL, balanceLamports, 'balanceSOLbalanceSOL');
         const balanceSOL = balanceLamports / 1e9;
-        console.log(balanceSOL, balanceLamports, 'balanceSOLbalanceSOL')
+
         dispatch(
           setWalletConnect({
             isConnected: true,
@@ -154,7 +152,11 @@ const disconnectWalletRef = useRef(null);
         walletAdd();
    }
       } catch (err) {
-        console.log(err, "errerr");
+        console.log(err, "errr")
+        console.log(err, "err")
+        console.log(err, "err")
+        console.log(err, "errerr")
+
         if (err?.code === 4001) {
           toastAlert("error", "Connection request was rejected", "wallet");
         }
@@ -205,7 +207,6 @@ const disconnectWalletRef = useRef(null);
     }
   };
 
-  // Removed useCallback - will be defined inline where needed
 
   const walletAdd = useCallback(async (address) => {
     if (isConnected) {
@@ -215,7 +216,7 @@ const disconnectWalletRef = useRef(null);
       };
       let { success, message, result } = await walletLogin(valuedata, dispatch);
       if (success) {
-        if (isEmpty(result?.user?.email) && address || result?.user?.status == "unverified") {
+        if (isEmpty(result?.user?.email) && address || result?.user?.status === "unverified") {
           setWalletEmail(true)
           setEmailOpen(true)
           setUserData({})
@@ -233,7 +234,7 @@ const disconnectWalletRef = useRef(null);
   useEffect(() => {
     const handleWalletAdd = async () => {
       if (isConnected && connect) {
-        console.log(address, "connecttt");
+
         // Inline the walletAdd logic to avoid dependency issues
         if (isConnected) {
           var valuedata = {
@@ -242,7 +243,7 @@ const disconnectWalletRef = useRef(null);
           };
           let { success, message, result } = await walletLogin(valuedata, dispatch);
           if (success) {
-            if (isEmpty(result?.user?.email) && address || result?.user?.status == "unverified") {
+            if (isEmpty(result?.user?.email) && address || result?.user?.status === "unverified") {
               setOpenEmailVerify(true);
               setOpen(false);
             } else {
@@ -260,9 +261,9 @@ const disconnectWalletRef = useRef(null);
   }, [isConnected, address, connect, LoginHistory, dispatch]);
 
   useEffect(() => {
-    if (expireTime > 0 && expireTime != 0) {
+    if (expireTime > 0 && expireTime !== 0) {
       setTimeout(() => {
-        if (expireTime != 0) {
+        if (expireTime !== 0) {
           setExpireTime(prev => (prev > 1 ? prev - 1 : 0));
         }
       }, 1000);
@@ -275,7 +276,6 @@ const disconnectWalletRef = useRef(null);
 
   const handleGoogleLogin = async (credentialResponse) => {
     const token = credentialResponse.credential;
-    // console.log("Google Token:", token);
 
     try {
       let data = {
@@ -283,10 +283,11 @@ const disconnectWalletRef = useRef(null);
         LoginHistory: LoginHistory,
       };
       let { success, message } = await googleLogin(data, dispatch);
-      console.log(message, success, "message")
+
       if (success) {
         setOpen(false);
         toastAlert("success", message, "login");
+      console.log(message, success, "message")
       } else {
         toastAlert("error", message, "login");
       }
@@ -317,7 +318,6 @@ const disconnectWalletRef = useRef(null);
         }
       }
     } catch (err) {
-      // console.log(err, "errr");
     }
   };
 
@@ -332,11 +332,10 @@ const disconnectWalletRef = useRef(null);
 
   let handleOtpClick = async () => {
     try {
-      // console.log("onCLick");
       let errMsg = await otpValidate(otpData);
       setError(errMsg);
       if (isEmpty(errMsg)) {
-        if (expireTime == 0) {
+        if (expireTime === 0) {
           toastAlert("error", "OTP expired,Please resend");
           setOtpData({});
         } else {
@@ -352,7 +351,7 @@ const disconnectWalletRef = useRef(null);
         }
       }
     } catch (err) {
-      console.log(err, "err");
+
     }
   };
 
@@ -370,7 +369,7 @@ const disconnectWalletRef = useRef(null);
         toastAlert("error", message, "login");
       }
     } catch (err) {
-      console.log(err, "err");
+
     }
   };
 
@@ -397,7 +396,7 @@ const disconnectWalletRef = useRef(null);
         }
       }
     } catch (err) {
-      console.log(err, "errr");
+
     }
   };
 
@@ -422,6 +421,7 @@ const disconnectWalletRef = useRef(null);
         const savedAddress = data?.walletAddress?.toLowerCase();
   
         if (!previousWalletRef.current) {
+          console.log("🔁 Wallet switched from", previousWalletRef.current, "to", newPublicKey);
           previousWalletRef.current = newPublicKey;
         }
   
@@ -431,8 +431,7 @@ const disconnectWalletRef = useRef(null);
           newPublicKey !== previousWalletRef.current &&
           newPublicKey !== savedAddress
         ) {
-          console.log("🔁 Wallet switched from", previousWalletRef.current, "to", newPublicKey);
-  
+
           if (isConnected) {
             disconnectWalletRef.current?.();
             removeAuthToken();
@@ -452,18 +451,15 @@ const disconnectWalletRef = useRef(null);
         previousWalletRef.current = newPublicKey;
       }
       } catch (err) {
-        // console.warn("Phantom not connected yet");
       }
     }, 1000);
   
     return () => clearInterval(interval);
   }, [data?.walletAddress, isConnected, signedIn]);
-console.log(data?.walletAddress,isConnected,"data");
+
   return (
     <>
-      {/* {signedIn && (
-        <Button onClick={() => navigateToPortfolioPage()}>Deposit</Button>
-      )} */}
+      {}
       {signedIn && (
         <button
           className="px-3 py-2 hover:bg-gray-800 rounded-md transition-colors hidden lg:block"
@@ -522,16 +518,7 @@ console.log(data?.walletAddress,isConnected,"data");
                 />
               </div>
             </GoogleOAuthProvider>
-            {/* <Button className="mt-4 w-full google_btn">
-                <Image
-                  src="/images/google_icon.png"
-                  alt="Profile Icon"
-                  width={24}
-                  height={27}
-                  className="rounded-full"
-                />
-                <span>Continue with Google</span>
-              </Button> */}
+            {}
             <div className="custom_separator">
               <Separator.Root
                 className="SeparatorRoot"
@@ -577,31 +564,7 @@ console.log(data?.walletAddress,isConnected,"data");
                   height={40}
                 />
               </Button>
-              {/* <Button className="w-full h-13 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]">
-                  <Image
-                    src="/images/wallet_icon_02.png"
-                    alt="Icon"
-                    width={40}
-                    height={40}
-                  />
-                </Button>
-                <Button className="w-full h-13 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]">
-                  <Image
-                    src="/images/wallet_icon_03.png"
-                    alt="Icon"
-                    width={40}
-                    height={40}
-                  />
-                </Button>
-                <Button className="w-full h-13 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]">
-                  <Image
-                    src="/images/wallet_icon_04.png"
-                    alt="Icon"
-                    width={40}
-                    height={40}
-                  />
-
-                </Button> */}
+              {}
             </div>
             <Dialog.Close asChild>
               <button className="modal_close_brn" aria-label="Close">
@@ -612,7 +575,7 @@ console.log(data?.walletAddress,isConnected,"data");
         </Dialog.Portal>
       </Dialog.Root>
 
-      {verifystatus == true && (
+      {verifystatus === true && (
         <Dialog.Root open={otpopen} onOpenChange={setOtpOpen}>
           <Dialog.Portal>
             <Dialog.Overlay className="DialogOverlay" />
@@ -638,7 +601,7 @@ console.log(data?.walletAddress,isConnected,"data");
                   onChange={handleOtpChange}
                   placeholder="Enter OTP"
                 />
-                {expireTime == 0 ? (
+                {expireTime === 0 ? (
                   <Button onClick={resendCode}>Resend OTP</Button>
                 ) : (
                   <Button>{`${expireTime}`}</Button>
@@ -670,7 +633,7 @@ console.log(data?.walletAddress,isConnected,"data");
         </Dialog.Root>
       )}
 
-      {walletEmail == true && (
+      {walletEmail === true && (
         <Dialog.Root open={emailOpen} onOpenChange={setEmailOpen}>
           <Dialog.Portal>
             <Dialog.Overlay className="DialogOverlay" />
@@ -732,7 +695,7 @@ console.log(data?.walletAddress,isConnected,"data");
                 aria-label="Customise options"
               >
                 <BellIcon className="sm:w-6 sm:h-6 w-5 h-5" />
-                {/* <span className="absolute top-[8px] right-[8px] w-2 h-2 bg-red-500 rounded-full block"></span> */}
+                {}
               </button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
@@ -774,13 +737,7 @@ console.log(data?.walletAddress,isConnected,"data");
               <div className="custom_dropdown_portal">
                 <DropdownMenu.Content className="profile_menu" sideOffset={5}>
                   <div className="flex items-center space-x-3">
-                    {/* <img
-                      src={data?.profileImg ? data?.profileImg : "/images/default_user.png"}
-                      alt="Profile Icon"
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    /> */}
+                    {}
                     <Avatar className="w-10 h-10">
                     {data?.profileImg ? (
                     <AvatarImage
@@ -801,9 +758,6 @@ console.log(data?.walletAddress,isConnected,"data");
                       </span>
                       <div className="text-sm text-gray-100 flex items-center space-x-2">
                         <button className="IconButton bg-[#131212] px-2 py-1 rounded" 
-                              // onClick={() => {
-                              //   navigator.clipboard.writeText(address ? address : data?.email);
-                              //   toastAlert("success", "Address copied to clipboard");
                               // }}
                               >
                                 <span className="text-[12px]">
@@ -833,9 +787,7 @@ console.log(data?.walletAddress,isConnected,"data");
                             </Tooltip.Portal>
                           </Tooltip.Root>
                         </Tooltip.Provider>
-                        {/* <Link href="#" target="_blank">
-                          <OpenInNewWindowIcon className="h-[16px] w-[16px]" />
-                        </Link> */}
+                        {}
                       </div>
                     </div>
                   </div>
@@ -846,18 +798,7 @@ console.log(data?.walletAddress,isConnected,"data");
                   <DropdownMenu.Item className="DropdownMenuItem">
                     <Link href="/settings">Settings</Link>
                   </DropdownMenu.Item>
-                  {/* <DropdownMenu.Item className="DropdownMenuItem" disabled>
-                    <Link href="/">Watchlist</Link>
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item className="DropdownMenuItem" disabled>
-                    <Link href="/">Rewards</Link>
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item className="DropdownMenuItem" disabled>
-                    <Link href="/">Learn</Link>
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item className="DropdownMenuItem" disabled>
-                    <Link href="/">Documentation</Link>
-                  </DropdownMenu.Item> */}
+                  {}
                   <DropdownMenu.Item className="DropdownMenuItem" disabled>
                     <Link href="/">Terms of Use</Link>
                   </DropdownMenu.Item>

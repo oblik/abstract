@@ -26,7 +26,9 @@ export default function ClientLayoutEffect() {
         }));
       }
     } catch (error) {
-      console.log("error on getWalletData", error);
+      console.log("error on getWalletData", error)
+      console.log("error on getWalletData", error)
+
     }
   }, [dispatch]);
 
@@ -59,7 +61,7 @@ export default function ClientLayoutEffect() {
           }));
         }
       } catch (error) {
-        console.log("error on getWalletData", error);
+
       }
     };
 

@@ -58,7 +58,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
 
   const { signedIn } = useSelector((state) => state?.auth.session);
   const user = useSelector((state) => state?.auth.user);
-  const asset = useSelector((state) => state?.wallet?.data);
+  const asset = useSelector((state) => state?.walletconnect);
 
   // state
   const [formValue, setFormValue] = useState<FormState>(initialFormValue);
@@ -75,7 +75,6 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
 
   const { price, amount } = formValue;
 
-  // function
   const handleChangeBtn = (op: "+" | "-", key: string, increment: number) => {
     if (op === "+") {
       setFormValue((prev) => {
@@ -83,10 +82,11 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
           price: 100,
           amount: 100001,
         };
-        console.log("maxNum[key]", maxNum[key]);
+
         if (Number(prev[key]) + increment >= maxNum[key]) {
           return { ...prev, [key]: maxNum[key] - 1 };
         } else {
+          console.log("maxNum[key]", maxNum[key])
           return { ...prev, [key]: Number(prev[key]) + increment };
         }
       });
@@ -172,7 +172,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
       action: action,
       capped: action === "sell" ? true : false,
       marketId,
-      userId: user?._id,
+      userId: user?.userId,
       quantity: amount,
       type: "limit",
       timeInForce: isExpirationEnabled ? "GTD" : "GTC",
@@ -180,7 +180,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
     if (isExpirationEnabled) {
       data["expiration"] = expirationSeconds;
     }
-    const { success, message } = await placeOrder(data);
+    const { success, message } = await placeOrder(data as any);
     if (success) {
       toastAlert("success", "Order placed successfully!", "order-success");
       setFormValue({ ...formValue, price: "", amount: "" });
@@ -244,12 +244,12 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
       return;
     }
 
-    if (buyorsell == "buy" && selectedOrder?.bidOrAsk == "ask") {
+    if (buyorsell === "buy" && selectedOrder?.bidOrAsk === "ask") {
       setFormValue({
         price: selectedOrder?.row[0],
         amount: selectedOrder?.row[1],
       });
-    } else if (buyorsell == "sell" && selectedOrder?.bidOrAsk == "bid") {
+    } else if (buyorsell === "sell" && selectedOrder?.bidOrAsk === "bid") {
       setFormValue({
         price: selectedOrder?.row[0],
         amount: selectedOrder?.row[1],
@@ -342,7 +342,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
         </div>
       )}
 
-      {buyorsell == "buy" && !isEmpty(price) && !isEmpty(amount) ? (
+      {buyorsell === "buy" && !isEmpty(price) && !isEmpty(amount) ? (
         <>
           <div className="pt-2 space-y-2 pb-2">
             <div className="flex justify-between text-sm pt-2">
@@ -387,7 +387,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
     <span className="text-muted-foreground">Total return if</span>
     <span className="text-white">
       {` ${
-        activeView == "Yes"
+        activeView === "Yes"
           ? firstLetterCase(outcomes?.[0]?.title || "yes")
           : firstLetterCase(outcomes?.[1]?.title || "no")
       }`}
@@ -443,7 +443,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
               : orderFailed
                 ? 'Insufficient balance'
                 : `${buyorsell === "buy" ? "Buy" : "Sell"} ${
-                    activeView == "Yes"
+                    activeView === "Yes"
                       ? firstLetterCase(outcomes?.[0]?.title || "yes")
                       : firstLetterCase(outcomes?.[1]?.title || "no")
                   }`}

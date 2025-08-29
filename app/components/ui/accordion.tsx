@@ -105,7 +105,7 @@ const AccordionItem = React.forwardRef<
     className={cn(
       "border-t border-[#222] first:border-t last:border-b border-b-0",
       className
-    )} // Add hover effect for the entire item
+)}
     {...props}
   />
 ));
@@ -159,7 +159,6 @@ const AccordionTrigger = React.forwardRef<
     const { activeMarket, activeSelection, setSelection } = useSelection();
     const triggerRef = React.useRef<HTMLButtonElement | null>(null);
 
-    // Calculate prices from order book data (same logic as TradingCard)
     const descending = (a, b) => Number(b[0]) - Number(a[0]);
     
     const calculateYesPrice = () => {
@@ -196,7 +195,6 @@ const AccordionTrigger = React.forwardRef<
       // Case 3: Selecting a button in a different market
       else {
         setSelection(marketId, value);
-        // Force open the accordion if it's closed
         if (triggerRef.current) {
           const state = triggerRef.current.getAttribute("data-state");
           if (state === "closed") {
@@ -230,12 +228,12 @@ const AccordionTrigger = React.forwardRef<
           {/* Mobile layout - single row with title, volume, and odds */}
           <div className="flex md:hidden items-center justify-between w-full">
             <div className="flex items-center pr-0">
-              {/* Icon on the left, if present in children[0] */}
+              {}
               {Array.isArray(children) && children[0] ? (
                 <span>{children[0]}</span>
               ) : null}
               <span className="flex flex-col items-start justify-center h-full">
-                {/* Market name: children[1] or children if not array */}
+                {}
                 <span className="sm:text-[16px] text-[14px] lg:text-sm text-left">
                   {Array.isArray(children) ? children[1] : children}
                 </span>
@@ -255,12 +253,12 @@ const AccordionTrigger = React.forwardRef<
           {/* Desktop layout - matches header structure exactly */}
           <div className="hidden md:flex items-center w-full">
             <div className="flex items-center sm:pr-6 pr-4" style={{ width: 320 }}>
-              {/* Icon on the left, if present in children[0] */}
+              {}
               {Array.isArray(children) && children[0] ? (
                 <span className="flex-shrink-0">{children[0]}</span>
               ) : null}
               <span className="flex flex-col items-start justify-center h-full">
-                {/* Market name: children[1] or children if not array */}
+                {}
                 <span className="text-[16px] lg:text-sm text-left">
                   {Array.isArray(children) ? children[1] : children}
                 </span>

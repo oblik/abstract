@@ -106,7 +106,6 @@ export default function ProfileSettings() {
           setSaving(true);
           setSubmitError("");
           
-          // Check if username is already taken (if it's changed)
           if (!isDisable) {
             const { data: existingUser } = await supabase
               .from('users')
@@ -148,10 +147,7 @@ export default function ProfileSettings() {
     const handleFile = e => {
         e.preventDefault();
         const { files } = e.target;
-        // let formData = { ...formValue, ...{ [name]: files[0] } };
-        // setFormValue(formData);
-        // setError(prev => ({ ...prev, image: "" }));
-        console.log("files",files[0])
+
         setUpdateImage(files[0]);
         setAvatarUrl(URL.createObjectURL(files[0]));
     };

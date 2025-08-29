@@ -19,7 +19,7 @@ export interface ChartDataItem {
 export interface ChartDataPoint {
   timestamp: string;
   asset1: number | null;
-  [key: string]: any;
+  [key: string]: number | null | string | undefined;
 }
 
 export function processMultiChartData(
@@ -43,7 +43,6 @@ export function processMultiChartData(
   const firstDataPoint = Math.min(...allDataTimestamps);
   const actualRangeSec = now - firstDataPoint;
   
-  // Check if selected interval is greater than data range, if so use "all"
   const adjustedInterval = getAdjustedInterval(interval, actualRangeSec);
   const intervalSec = getIntervalSeconds(adjustedInterval);
   
@@ -63,14 +62,12 @@ export function processMultiChartData(
   const sorted3 = [...data3].sort((a, b) => a.t - b.t);
   const sorted4 = [...data4].sort((a, b) => a.t - b.t);
 
-    // Find forward-fill baseline values from the last data point before startTime for each dataset
   let last1 = sorted1[0]?.p * 100 || 0;
   let last2 = sorted2[0]?.p * 100 || 0;
   let last3 = sorted3[0]?.p * 100 || 0;
   let last4 = sorted4[0]?.p * 100 || 0;
   let idx1 = 0, idx2 = 0, idx3 = 0, idx4 = 0;
 
-  // Handle baseline values based on interval type
   if (adjustedInterval === "all" || intervalSec > actualRangeSec) {
     // Start from the very first data points
     idx1 = 0; idx2 = 0; idx3 = 0; idx4 = 0;
@@ -217,8 +214,7 @@ export function processMultiChartData(
     const nextReal = sortedTimestamps[i + 1];
     if (nextReal) {
       const gap = nextReal - timestamp;
-      if (gap > step * 1.5) { // only fill if gap clearly larger than step
-        // Limit number of inserted points to avoid huge arrays (safety cap ~1500 extra)
+if (gap > step * 1.5) {
         let inserted = 0;
         for (let filler = timestamp + step; filler < nextReal; filler += step) {
           pushPoint(filler);
@@ -273,13 +269,12 @@ function getFormattingInterval(rangeSec: number): string {
 
 function getFixedStep(interval: string, rangeSec: number): number {
   switch (interval) {
-    case "1h": return 2 * 60; // 2 minutes (increased from 30 seconds)
-    case "6h": return 10 * 60; // 10 minutes (increased from 1 minute)
-    case "1d": return 30 * 60; // 30 minutes (increased from 2 minutes)
-    case "1w": return 2 * 60 * 60; // 2 hours (increased from 10 minutes)
-    case "1m": return 6 * 60 * 60; // 6 hours (increased from 1 hour)
+case "1h": return 2 * 60;
+case "6h": return 10 * 60;
+case "1d": return 30 * 60;
+case "1w": return 2 * 60 * 60;
+case "1m": return 6 * 60 * 60;
     case "all":
-      // Use range-based thresholds for "all" with more frequent points
       if (rangeSec <= 60 * 60) return 2 * 60; // 0-1h: 2 minutes
       if (rangeSec <= 6 * 60 * 60) return 10 * 60; // 1h-6h: 10 minutes
       if (rangeSec <= 24 * 60 * 60) return 30 * 60; // 6h-1d: 30 minutes
@@ -303,7 +298,6 @@ export function processSingleChartData(
   const adjustedInterval = getAdjustedInterval(interval, actualRangeSec);
   const intervalSec = getIntervalSeconds(adjustedInterval);
 
-  // Start exactly X hours ago for specific intervals
   let startTime = adjustedInterval === "all" ? firstDataPoint : now - intervalSec;
   if (adjustedInterval !== "all" && intervalSec > actualRangeSec) {
     startTime = firstDataPoint;
@@ -338,10 +332,8 @@ export function processSingleChartData(
 
   let result: (ChartDataPoint & { rawTimestamp: number; formattingInterval?: string })[] = [];
 
-  // Only include real data points - let step chart handle the connections
   const realDataPoints: { timestamp: number; value: number }[] = [];
   
-  // Add start point with baseline value (only if not starting from first data point)
   if (adjustedInterval !== "all" && intervalSec <= actualRangeSec) {
     realDataPoints.push({ timestamp: startTime, value: lastValue });
   }
@@ -365,7 +357,6 @@ export function processSingleChartData(
     realDataPoints.push({ timestamp: now, value: finalValue });
   }
 
-  // Convert to final format with gap filling for smoother hover
   for (let i = 0; i < realDataPoints.length; i++) {
     const point = realDataPoints[i];
     const nextPoint = realDataPoints[i + 1];
@@ -396,13 +387,12 @@ export function processSingleChartData(
     // Push original point
     pushPoint(point.timestamp, point.value);
 
-    // Insert forward-filled points if gap big
     if (nextPoint) {
       const gap = nextPoint.timestamp - point.timestamp;
       if (gap > step * 1.5) {
         let inserted = 0;
         for (let filler = point.timestamp + step; filler < nextPoint.timestamp; filler += step) {
-          pushPoint(filler, point.value); // forward fill same value for horizontal line
+pushPoint(filler, point.value);
           inserted++;
           if (inserted > 1500) break; // safety cap
         }

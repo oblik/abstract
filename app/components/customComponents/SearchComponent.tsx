@@ -2,7 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter,usePathname } from "next/navigation";
 import SearchBar from "@/app/components/ui/SearchBar";
 import { getCategories, getEventsByRegex } from "@/services/market";
+import { checkApiSuccess, getResponseResult } from '@/lib/apiHelpers';
 import Image from "next/image";
+import { Event } from "@/types";
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
@@ -21,8 +23,8 @@ export default function SearchComponent() {
   const currentPath = usePathname();
 
   const [selectCategory, setSelectCategory] = useState("");
-  const [filterEvent, setFilterEvent] = useState([]);
-  const [categoryList, setCategoryList] = useState([]);
+  const [filterEvent, setFilterEvent] = useState<Event[]>([]);
+  const [categoryList, setCategoryList] = useState<string[]>([]);
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -34,7 +36,6 @@ export default function SearchComponent() {
     if (!e.target.value) {
       setFilterEvent([]);
       setIsSearchActive(true);
-      // setIsSearchActive(false);
     } else {
       setIsSearchActive(true);
     }
@@ -75,10 +76,11 @@ export default function SearchComponent() {
         limit: 10,
         category: selectCategory,
       };
-      const { success, result } = await getEventsByRegex(reqData);
-      if (success) {
+      const response = await getEventsByRegex(reqData);
+      if (checkApiSuccess(response)) {
+        const result = getResponseResult(response);
         setIsRecentActivity(false);
-        setFilterEvent(result);
+        setFilterEvent(result?.data || []);
       }
     } catch (error) {
       console.error("Error fetching filter events:", error);
@@ -87,8 +89,8 @@ export default function SearchComponent() {
 
   const fetchCategoryList = useCallback(async () => {
     try {
-      const { success, result } = await getCategories();
-      if (success) setCategoryList(result);
+      const response = await getCategories();
+      if (checkApiSuccess(response)) setCategoryList(getResponseResult(response) || []);
     } catch (error) {
       console.error("Error fetching category list:", error);
     }
@@ -136,13 +138,13 @@ export default function SearchComponent() {
               <p className="text-sm font-medium ">Browse</p>
               <div className="flex gap-2 flex-wrap">
                 {categoryList.length !== 0 &&
-                  categoryList.map(({ slug, title, _id }) => (
+                  categoryList.map((category, index) => (
                     <p
-                      key={_id}
+                      key={index}
                       className="border cursor-pointer rounded-md px-2 text-sm"
-                      onClick={() => router.push(`/?category=${slug}`)}
+                      onClick={() => router.push(`/?category=${category}`)}
                     >
-                      {title}
+                      {category}
                     </p>
                   ))}
               </div>
@@ -186,12 +188,7 @@ export default function SearchComponent() {
                             {event.title || "Untitled Event"}
                           </span>
                         </div>
-                        {/* <button
-                                aria-label="Close"
-                                onClick={() =>ClearRecentActivity(event)}
-                              >
-                                <Cross2Icon className="h-4 w-4" />
-                              </button> */}
+                        {}
                       </div>
                     ))
                   )}

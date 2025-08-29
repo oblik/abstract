@@ -9,7 +9,6 @@ import { Comment } from "@/app/components/ui/comment";
 import Concert from "/public/images/concert1.png";
 import EventCard from "./eventCard";
 import { useRouter } from "next/navigation";
-// import Polymarket from "/public/images/polymarket.png";
 
 
 import {
@@ -97,7 +96,7 @@ export function ImageCard({
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: "cover", // Ensures image covers the card
         backgroundPosition: "center", // Centers the image in the background
-        height: "510px", // Set a height for the card to properly display the background
+height: "510px",
       }}
     >
       {/* Dark Overlay */}

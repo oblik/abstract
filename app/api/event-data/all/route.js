@@ -9,7 +9,7 @@ export async function GET(req) {
 
   try {
     const response = await fetch(
-      `https://gamma-api.polymarket.com/events/pagination?limit=${limit}&active=true&archived=false&closed=${closed}&order=startDate&ascending=false&offset=${offset}&tag_slug=${tag_slug}`,
+      `https://api-dev.orderly.network/v1/client/events?limit=${limit}&offset=${offset}&closed=${closed}&tag_slug=${tag_slug}`,
       {
         method: "GET",
         headers: {

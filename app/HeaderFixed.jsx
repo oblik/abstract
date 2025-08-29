@@ -81,12 +81,7 @@ export default function HeaderFixed() {
         style={{ borderRight: '1px solid #282828' }}
       >
         {/* Close Button */}
-        {/* <button
-          className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl"
-          onClick={() => setIsOpen(false)}
-        >
-          &times;
-        </button> */}
+        {}
 
         {/* Menu Items */}
 

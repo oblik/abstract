@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import Ye from "/public/images/Ye.png";
-// import Polymarket from "/public/images/polymarket.png";
 import Image from "next/image";
 import { Button } from "@/app/components/ui/button";
 import { Legend, Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
@@ -23,6 +22,7 @@ import { toTwoDecimal } from "@/utils/helpers";
 import { HoverCard } from "radix-ui";
 import { CountdownTimerIcon } from "@radix-ui/react-icons";
 import { getPriceHistory, getSeriesByEvent } from "@/services/market";
+import { checkApiSuccess, getResponseResult } from '@/lib/apiHelpers';
 import { capitalize } from "@/lib/stringCase";
 import * as Popover from "@radix-ui/react-popover";
 import Link from "next/link";
@@ -135,8 +135,9 @@ const Graph: React.FC<GraphProps> = ({
         interval,
         fidelity: 30,
       };
-      const { success, result } = await getPriceHistory(id, data);
-      if (success) {
+      const response = await getPriceHistory(id, data as any);
+      if (checkApiSuccess(response)) {
+        const result = getResponseResult(response) || [];
         let assetKeysData = result
           .filter(
             (item: any) =>
@@ -156,7 +157,7 @@ const Graph: React.FC<GraphProps> = ({
               (asset: any) => asset.label === item.groupItemTitle
             );
             if (asset) {
-              asset.last = selectedYes ? item.last : 100 - item.last;
+              (asset as any).last = selectedYes ? item.last : 100 - item.last;
             }
           });
           setChartConfig(assetKeysData);
@@ -164,7 +165,7 @@ const Graph: React.FC<GraphProps> = ({
         const filteredResult = result.filter(
           (item: any) => item.groupItemTitle === selectedMarket.groupItemTitle
         );
-        let processedData = processSingleChartData(filteredResult, interval);
+        let processedData = processSingleChartData(filteredResult as any, interval);
 
         if (selectedYes) {
           setChartDataYes(processedData);
@@ -173,7 +174,8 @@ const Graph: React.FC<GraphProps> = ({
         }
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
+
     }
   }, [id, market, selectedMarket, selectedYes, interval, ChartColors]);
 
@@ -293,10 +295,11 @@ const Graph: React.FC<GraphProps> = ({
               data={chartData}
               onMouseMove={(e) => {
                 if (e && e.activePayload && e.activePayload.length > 0) {
-                  console.log(e.activePayload, "e.activePayload");
+
                   const value = e.activePayload[0].payload.asset1;
                   setHoveredChance(value);
                 }
+                console.log(e.activePayload, "e.activePayload")
                 // no dynamic radius
               }}
               onMouseLeave={() => {

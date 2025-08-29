@@ -13,7 +13,6 @@ import { useEffect, useState } from "react";
 import { ArrowRightLeft, Clock } from "lucide-react";
 import { toTwoDecimal } from "@/utils/helpers";
 import Image from "next/image";
-// import Polymarket from "/public/images/polymarket.png";
 import { StaticImageData } from "next/image";
 import { HoverCard } from "radix-ui";
 import { CountdownTimerIcon } from "@radix-ui/react-icons";
@@ -108,10 +107,7 @@ export default function MultiLineChart({
 
         try {
           const fetchPromises = ids.slice(0, idsLength).map(async (id) => {
-            // const response = await fetch(
-            //   `/api/event-data/price-history?interval=${interval}&market=${id}&fidelity=30`
             // );
-            // const data = await response.json();
             const data = {
               history:[]
             }
@@ -277,7 +273,6 @@ export default function MultiLineChart({
                 </HoverCard.Portal>
               </HoverCard.Root>
               <Button
-                // className="w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] active:bg-[#262626] active:text-[#fff]"
                 className={`w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] ${
                   activeDate === "Jun 18"
                     ? "bg-[#fff] text-[#262626] border-[#262626]"

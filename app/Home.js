@@ -17,7 +17,6 @@ import {
 } from "@/app/components/ui/carousel";
 import EventListing from "@/app/components/customComponents/EventListing";
 import SlideshowListing from "@/app/components/customComponents/SlideshowListing";
-// import { infoCards } from "@/app/components/constants";
 import { getCategories, getTagsByCategory } from "@/services/market";
 import { getInfoCards } from "@/services/user";
 import { Footer } from "./components/customComponents/Footer";
@@ -28,7 +27,6 @@ import DiscordLogo from "@/public/images/discordnew.png";
 
 const InfoCards = ({ infoCardCms }) => {
 
-  // Sanitize HTML content to prevent XSS attacks while preserving safe formatting
   const sanitizeHTML = (html) => {
     if (typeof html !== 'string') return '';
     
@@ -38,7 +36,6 @@ const InfoCards = ({ infoCardCms }) => {
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
       // Remove iframe tags
       .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-      // Remove on* event handlers (onclick, onmouseover, etc.)
       .replace(/on\w+="[^"]*"/g, '')
       .replace(/on\w+='[^']*'/g, '')
       // Remove javascript: protocol
@@ -263,7 +260,7 @@ export default function Home({ infoCardCms, categories, tags }) {
       <div className="hidden sm:block">
         <Footer />
       </div>
-      {/* Add extra bottom space for mobile so HeaderFixed does not overlay content */}
+      {}
       <div className="block sm:hidden" style={{ height: '75px' }} />
       <HeaderFixed />
     </>

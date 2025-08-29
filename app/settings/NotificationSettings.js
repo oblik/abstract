@@ -16,6 +16,7 @@ export default function NotificationSettings() {
             setEmailNotification(enabled);
           }
         } catch (error) {
+          console.log("error: ",err)
           console.error("Error updating email notification:", error);
         }
     }
@@ -48,7 +49,7 @@ export default function NotificationSettings() {
                 }
             }
         } catch(err){
-            console.log("error: ",err)
+
         }
     }
 

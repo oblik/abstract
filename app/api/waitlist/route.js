@@ -8,7 +8,6 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.
 export async function POST(request) {
   const { name, email } = await request.json();
 
-  // Check if the user already exists
   const { data: existingUser, error: findError } = await supabase
     .from('users')
     .select('id')
@@ -20,7 +19,6 @@ export async function POST(request) {
   }
 
   if (findError && findError.code !== 'PGRST116') {
-    // If there's a database error that's not related to "no rows found," return an error
     return NextResponse.json({ error: 'Database error. Please try again.' }, { status: 500 });
   }
 

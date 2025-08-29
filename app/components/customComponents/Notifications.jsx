@@ -21,8 +21,9 @@ const Notification = () => {
             try {
                 const { success, result } = await getNotifications();
                 setLoading(false);
-                console.log(success, result, "success, result");
+
                 if (success) {
+                  console.log(success, result, "success, result")
                     setData(result);
                 }
             } catch (err) {
@@ -41,7 +42,7 @@ const Notification = () => {
             </div>
         )
 
-    if (data?.length == 0)
+    if (data?.length === 0)
         return (
             <div className="text-center text-gray-100 text-sm min-h-[200px] flex items-center justify-center">
                 No notifications yet
@@ -66,16 +67,16 @@ const Notification = () => {
                         />
                         <div className="pt-0">
                             <h5 className="text-[16px] font-semibold text-gray-100">
-                                {item.type == "trade" && "Trade confirmed"}
-                                {item.type == "reply" && "Someone replied to your comment"}
-                                {item.type == "deposit" && "Deposit confirmed"}
-                                {item.type == "withdraw" && "Withdraw approved"}
+                                {item.type === "trade" && "Trade confirmed"}
+                                {item.type === "reply" && "Someone replied to your comment"}
+                                {item.type === "deposit" && "Deposit confirmed"}
+                                {item.type === "withdraw" && "Withdraw approved"}
                             </h5>
                             <p className="text-sm text-gray-300">
-                                {item.type == "trade" && (item?.content?.marketTitle)}
-                                {item.type == "reply" && (item?.content?.eventName ?? "--")}
-                                {item.type == "deposit" && (item?.content?.message ?? "--")}
-                                {item.type == "withdraw" && (item?.content?.message ?? "--")}
+                                {item.type === "trade" && (item?.content?.marketTitle)}
+                                {item.type === "reply" && (item?.content?.eventName ?? "--")}
+                                {item.type === "deposit" && (item?.content?.message ?? "--")}
+                                {item.type === "withdraw" && (item?.content?.message ?? "--")}
 
                             </p>
                             <p className="text-[12px] text-gray-400 mb-0">

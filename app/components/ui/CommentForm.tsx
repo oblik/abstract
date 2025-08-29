@@ -23,7 +23,7 @@ const CommentForm = ({ eventId, onCommentAdded }: CommentFormProps) => {
   const [modalError, setModalError] = useState("");
 
   const { signedIn } = useSelector((state) => state?.auth?.session);
-  const { _id, userName } = useSelector((state) => state?.auth?.user || {});
+  const { userId, userName } = useSelector((state) => state?.auth?.user || {});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,18 +33,17 @@ const CommentForm = ({ eventId, onCommentAdded }: CommentFormProps) => {
     }
 
     try {
-      if (!_id) {
+      if (!userId) {
         toastAlert("error", "Failed to post comment. Please try again later.");
         return;
       }
       setIsSubmitting(true);
       const reqData = {
-        userId: _id,
+        userId: userId,
         eventId: eventId,
         content: newComment,
         parentId: null,
       };
-      console.log("reqData: ", reqData);
 
       const { success, message } = await postComment(reqData);
       if (!success) {
@@ -52,7 +51,6 @@ const CommentForm = ({ eventId, onCommentAdded }: CommentFormProps) => {
         return;
       }
       toastAlert("success", "Comment posted successfully!");
-      // onCommentAdded(comment);
       setNewComment("");
     } catch (error) {
       console.error("Comment submission error:", error);
@@ -104,15 +102,14 @@ const CommentForm = ({ eventId, onCommentAdded }: CommentFormProps) => {
       const reqData = {
         userName: username,
       };
-      const { status, message, result } = await addUserName(reqData);
+      const { success, message, result } = await addUserName(reqData);
 
-      if (!status) {
+      if (!success) {
         if (message) {
           toastAlert("error", message);
         }
         return false;
       }
-      console.log("result: ", result);
 
       setModalError("");
       dispatch(setUser(result));

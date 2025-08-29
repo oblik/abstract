@@ -136,7 +136,6 @@ const NavigationMenuIndicator = React.forwardRef<
 NavigationMenuIndicator.displayName =
   NavigationMenuPrimitive.Indicator.displayName;
 
-// ListItem component for navigation menu content
 const ListItem: React.FC<ListItemProps> = ({ title, children }) => {
   return (
     <li>
@@ -195,7 +194,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
   return (
     <div className="container mx-auto px-4 max-w-full overflow-hidden relative">
       <div className="w-full flex justify-start mt-0">
-        {/* "LIVE" Tag - Only shown if showLiveTag is true */}
+        {}
         {showLiveTag && (
           <div className="flex items-center flex-shrink-0">
             <h1 className="pb-[2%] text-xl leading-tight pl-0 sm:text-xl text-base">

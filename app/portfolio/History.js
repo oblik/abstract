@@ -58,12 +58,12 @@ const History = () => {
           const isBinaryMarket = event?.marketId?.length >= 2;
           if (isBinaryMarket) {
             marketGroup[marketId].resolution =
-              event?.outcomeId == marketId ? "yes" : "no";
+              event?.outcomeId === marketId ? "yes" : "no";
           } else {
             const matchingOutcome = item?.marketId?.outcome?.findIndex(
-              (o) => o._id == event?.outcomeId
+              (o) => o._id === event?.outcomeId
             );
-            marketGroup[marketId].resolution = matchingOutcome == 0 ? "yes" : "no";
+            marketGroup[marketId].resolution = matchingOutcome === 0 ? "yes" : "no";
           }
         }        
       }
@@ -74,19 +74,12 @@ const History = () => {
       }
       marketGroup[marketId].qty += item.qty
       
-      if(item.exitType == "resolution"){
+      if(item.exitType === "resolution"){
         marketGroup[marketId].shares = item.qty
-        marketGroup[marketId].closedSide = item.direction == "closed_yes" ? "yes" : "no"
-        marketGroup[marketId].isResolved = marketGroup[marketId].resolution == marketGroup[marketId].closedSide;
-        // if(marketGroup[marketId].isResolved){
-        //   marketGroup[marketId].exit += (item.exitPrice * item.qty) / 100;
+        marketGroup[marketId].closedSide = item.direction === "closed_yes" ? "yes" : "no"
+        marketGroup[marketId].isResolved = marketGroup[marketId].resolution === marketGroup[marketId].closedSide;
         // }
-        // marketGroup[marketId].entry += (item.entryPrice * item.qty) / 100;
-        // marketGroup[marketId].pnl += item.pnl / 100;
       } else {
-        // marketGroup[marketId].entry += (item.entryPrice * item.qty) / 100;
-        // marketGroup[marketId].exit += (item.exitPrice * item.qty) / 100;
-        // marketGroup[marketId].pnl += item.pnl / 100;
       }
     }
 
@@ -134,32 +127,7 @@ const History = () => {
   }
   return (
     <>
-      {/* <div className="flex space-x-4 mb-3">
-        <SearchBar placeholder="Search" />
-        <DatePicker
-          placeholderText="Select date"
-          selectsRange={true}
-          startDate={startDate}
-          endDate={endDate}
-          onChange={(update) => {
-            setDateRange(update);
-          }}
-          className="custom_datepicker"
-        />
-        <select className="border border-[#262626] bg-black rounded p-1 text-sm">
-          <option>All</option>
-          <option>All Trades</option>
-          <option>Buy</option>
-          <option>Sell</option>
-          <option>Reward</option>
-        </select>
-        <select className="border bg-[#131212] border-[#262626] bg-black rounded p-1 text-sm">
-          <option>Newest</option>
-          <option>Oldest</option>
-          <option>Value</option>
-          <option>Shares</option>
-        </select>
-      </div> */}
+      {}
       <div className="overflow-x-auto">
         <table className="w-full text-left custom_table table table-responsive">
           <thead>
@@ -212,7 +180,7 @@ const History = () => {
                       return (
                         <tr key={marketId}>
                           <td>{ m.groupItemTitle || ""}</td>
-                          <td className={`${m.shares > 0 ? "" : "text-gray-500"}`}>{m.shares > 0 ? `${m.shares} ${capitalize(m.closedSide == "yes" ? (m.outcome?.[0]?.title || "yes") : (m.outcome?.[1]?.title || "no"))}` : "None"}</td>
+                          <td className={`${m.shares > 0 ? "" : "text-gray-500"}`}>{m.shares > 0 ? `${m.shares} ${capitalize(m.closedSide === "yes" ? (m.outcome?.[0]?.title || "yes") : (m.outcome?.[1]?.title || "no"))}` : "None"}</td>
                           <td className={`${(m.resolution && m.isResolved) ? "text-green-500" : (!m.isResolved && m.resolution) ? "text-red-500" :"text-gray-500"}`}>${m.isResolved ? m.shares : "0"   }</td>
                           <td>${toFixedDown(m.entry, 2)}</td>
                           <td>${toFixedDown(m.exit, 2)}</td>
@@ -285,7 +253,7 @@ const History = () => {
               <tbody>
                 {tradeHistory?.map((item, index) => (
                   <tr key={index}>
-                    <td style={{ textTransform: "capitalize" }} className={`${item.side === 'yes' ? 'text-green-500' : 'text-red-500'} text-capitalize`}>{capitalize(item.action)} {item.side == "yes" ? (selectedMarketOutcome?.[0]?.title || "yes") : (selectedMarketOutcome?.[1]?.title || "no") } ({item.type} at {item.price}¢)</td>
+                    <td style={{ textTransform: "capitalize" }} className={`${item.side === 'yes' ? 'text-green-500' : 'text-red-500'} text-capitalize`}>{capitalize(item.action)} {item.side === "yes" ? (selectedMarketOutcome?.[0]?.title || "yes") : (selectedMarketOutcome?.[1]?.title || "no") } ({item.type} at {item.price}¢)</td>
                     <td>{item.price}¢</td>
                     <td>{toFixedDown(item.quantity, 2)}</td>
                     <td>${toFixedDown((item.price * item.quantity) / 100, 2)}</td>

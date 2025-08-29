@@ -33,7 +33,6 @@ export async function GET(request: NextRequest) {
       throw error;
     }
 
-    // If user doesn't exist, return empty object
     if (!data) {
       return NextResponse.json({});
     }
@@ -77,7 +76,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Not authorized to update this wallet address profile' }, { status: 403 });
     }
 
-    // Check if username already exists (if username is provided)
     if (username) {
       // Validate username format
       if (!validateUsername(username)) {
@@ -96,7 +94,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Check if user already exists
     const { data: existingProfile } = await supabase
       .from('profiles')
       .select('wallet_address')

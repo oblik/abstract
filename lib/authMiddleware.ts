@@ -26,8 +26,8 @@ export async function verifyAuth(request: NextRequest) {
   }
 }
 
-export function createAuthHandler(handler: (req: NextRequest, context: any) => Promise<NextResponse>) {
-  return async (request: NextRequest, context: any) => {
+export function createAuthHandler(handler: (req: NextRequest, context: { auth?: any }) => Promise<NextResponse>) {
+  return async (request: NextRequest, context: { auth?: any }) => {
     const auth = await verifyAuth(request)
     
     if (!auth.authenticated) {
@@ -113,7 +113,6 @@ export function validateEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
-// CSRF verification middleware function
 export async function verifyCSRF(request: NextRequest): Promise<boolean> {
   try {
     // Get CSRF token from header
@@ -139,15 +138,14 @@ export async function verifyCSRF(request: NextRequest): Promise<boolean> {
 }
 
 // Create handler wrapper with CSRF verification
-export function withCSRF(handler: (req: NextRequest, context?: any) => Promise<NextResponse>) {
-  return async (request: NextRequest, context?: any) => {
+export function withCSRF(handler: (req: NextRequest, context?: { auth?: any }) => Promise<NextResponse>) {
+  return async (request: NextRequest, context?: { auth?: any }) => {
     // For GET, HEAD, OPTIONS requests, no CSRF verification needed
     const method = request.method
     if (['GET', 'HEAD', 'OPTIONS'].includes(method)) {
       return handler(request, context)
     }
     
-    // For state-changing operations (POST, PUT, DELETE, etc.), CSRF verification required
     const isValidCSRF = await verifyCSRF(request)
     if (!isValidCSRF) {
       return NextResponse.json(

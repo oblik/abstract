@@ -4,7 +4,7 @@ export async function GET(request) {
 
   try {
     const response = await fetch(
-      `https://gamma-api.polymarket.com/events/${id}`,
+      `https://api-dev.orderly.network/v1/client/events/${id}`,
       {
         method: "GET",
         headers: {

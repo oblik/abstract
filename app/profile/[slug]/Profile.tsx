@@ -18,12 +18,14 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { getTradeOverviewById } from "@/services/user";
+import { checkApiSuccess, getResponseResult } from '@/lib/apiHelpers';
 import ActivityTable from "./activity";
 import DepositTable from "./deposit-history"
 import WithdrawTable from "./withdraw-history"
 import Positions from "../../portfolio/Positions";
 import { Footer } from "../../components/customComponents/Footer";
 import { firstLetter } from "@/lib/stringCase";
+import { User } from "@/types";
 import { NavigationBar } from "@/app/components/ui/navigation-menu";
 
 const initialTradeOverview = {
@@ -34,13 +36,7 @@ const initialTradeOverview = {
 }
 
 interface ProfilePageProps {
-  user: {
-    uniqueId: '',
-    userName: '',
-    email: '',
-    bio: '',
-    profileImg: ''
-  } | null;
+  user: User | null;
   categories: any;
 }
 
@@ -64,13 +60,14 @@ export default function ProfilePage(props: ProfilePageProps) {
   const fetchTradeOverview = async (id: string) => {
     setTradeOverviewLoading(true);
     try {
-      const { success, result } = await getTradeOverviewById(id);
-      if (success) {
+      const response = await getTradeOverviewById(id);
+      if (checkApiSuccess(response)) {
+        const result = getResponseResult(response);
         setTradeOverview({
-          total_value: result.totalPositionValue.toFixed(2),
-          total_profit_loss: result.totalTradeProfitLoss.toFixed(2),
-          total_volume_traded: result.totalTradeVolume.toFixed(2),
-          total_events_traded: result.totalTradeEventTraded,
+          total_value: (result as any).totalPositionValue?.toFixed(2) || "0",
+          total_profit_loss: (result as any).totalTradeProfitLoss?.toFixed(2) || "0",
+          total_volume_traded: (result as any).totalTradeVolume?.toFixed(2) || "0",
+          total_events_traded: (result as any).totalTradeEventTraded || 0,
         });
         setTradeOverviewLoading(false);
       }
@@ -88,7 +85,7 @@ export default function ProfilePage(props: ProfilePageProps) {
   }, [props?.user]);
 
   useEffect(() => {
-    if (signedIn && user?.uniqueId && user?.uniqueId == props?.user?.uniqueId) {
+    if (signedIn && user?.uniqueId && user?.uniqueId === props?.user?.uniqueId) {
       setIsOwnProfile(true);
     }
   }, [signedIn, user?.uniqueId, props?.user]);
@@ -213,7 +210,7 @@ export default function ProfilePage(props: ProfilePageProps) {
               <TabsTrigger className="sm:text-sm text-[13px]" value="positions">Positions</TabsTrigger>
               <TabsTrigger className="sm:text-sm text-[13px]" value="activity">Activity</TabsTrigger>
             </TabsList>
-            {activeTab == "deposit" || activeTab == "withdraw" ?
+            {activeTab === "deposit" || activeTab === "withdraw" ?
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -269,15 +266,15 @@ export default function ProfilePage(props: ProfilePageProps) {
               )
             }
             {
-              activeTab == "activity" &&
+              activeTab === "activity" &&
               <ActivityTable uniqueId={props.user?.uniqueId} />
             }
             {
-              isOwnProfile && activeTab == "deposit" &&
+              isOwnProfile && activeTab === "deposit" &&
               <DepositTable statusFilter = {statusFilter}/>
             }
             {
-              isOwnProfile && activeTab == "withdraw" &&
+              isOwnProfile && activeTab === "withdraw" &&
               <WithdrawTable statusFilter = {statusFilter}/>
             }
           </TabsContent>

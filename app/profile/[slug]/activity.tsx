@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { formatNumber } from "@/app/helper/custommath";
 import { useSelector } from 'react-redux';
 import { getTradeHistory } from '@/services/user';
+import { checkApiSuccess, getResponseResult } from '@/lib/apiHelpers';
 import PaginationComp from '../../components/customComponents/PaginationComp';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -45,10 +46,11 @@ const ActivityTable: React.FC<ActivityTableProps> = (props) => {
     const fetchTradeHistory = async () => {
       try {
         setLoading(true)
-        const { success, result } = await getTradeHistory({ id: props.uniqueId, ...pagination });
-        if (success) {
-            setTrades(result.data);
-            setHasMore(result.count > pagination.page * pagination.limit);
+        const response = await getTradeHistory({ id: props.uniqueId, ...pagination });
+        if (checkApiSuccess(response)) {
+            const result = getResponseResult(response);
+            setTrades((result as any).data || []);
+            setHasMore((result as any).count > pagination.page * pagination.limit);
         } 
       } catch (error) {
         console.error('Error fetching trade history:');
@@ -114,7 +116,7 @@ const ActivityTable: React.FC<ActivityTableProps> = (props) => {
                 {trade.action}
               </td>
               <td className={`px-6 sm:py-4 sm:py-2 ${trade.side === 'yes' ? 'text-green-500' : 'text-red-500'} capitalize`}>
-                {trade.side == "yes" ? (trade?.marketId?.outcome?.[0]?.title || "yes") : (trade?.marketId?.outcome?.[1]?.title || "no") }
+                {trade.side === "yes" ? (trade?.marketId?.outcome?.[0]?.title || "yes") : (trade?.marketId?.outcome?.[1]?.title || "no") }
               </td>
             </tr>
             </Fragment>

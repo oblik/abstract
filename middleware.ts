@@ -41,25 +41,17 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    // const authPathnameRegex = new RegExp(
     //     `^(${authRoutes
-    //         .map((route) => (route.includes("[") ? route.replace(/\[.*?\]/g, "[^/]+") : route))
-    //         .join("|")})/?$`,
     //     "i"
     // );
 
-    //   const authPathnameRegex = new RegExp(`^(/(${i18n.locales.join("|")}))?(${authRoutes.map((route) => (route.includes("[") ? route.replace(/\[.*?\]/g, "[^/]+") : route)).join("|")})/?$`, "i");
 
-    //   const protectedPathnameRegex = new RegExp(`^(/(${i18n.locales.join("|")}))?(${protectedRoutes.map((route) => (route.includes("[") ? route.replace(/\[.*?\]/g, "[^/]+") : route)).join("|")})/?$`, "i");
-    //   const locale = getLocale(request);
 
     if (protectedPathnameRegex.test(pathname) && !tokenValid) {
         request.cookies.delete("user-token");
         return NextResponse.redirect(new URL("/", request.url));
     }
 
-    // if (authPathnameRegex.test(pathname) && currentUser) {
-    //     return NextResponse.redirect(new URL("/",request.url));
     // }
 
 }

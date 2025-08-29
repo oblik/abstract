@@ -1,9 +1,7 @@
-// import packages
 import axios from "axios";
 import { getCookie } from "cookies-next";
 import { removeAuthToken } from "@/lib/cookies";
 
-// import lib
 import config from "./config";
 import store from "../store";
 import { signOut } from "@/store/slices/auth/sessionSlice";
@@ -56,8 +54,6 @@ export const removeAuthorization = () => {
 export const handleResp = (respData, type = 'success', doc) => {
   try {
     const { signedIn } = store.getState()?.auth?.session;
-    // console.log(signedIn, "signedIn");
-    // console.log(respData, "respData");
     if (
       signedIn &&
       type === "error" &&
@@ -65,10 +61,6 @@ export const handleResp = (respData, type = 'success', doc) => {
       respData.response &&
       respData.response.status === 401
     ) {
-      // store.dispatch(clearUser());
-      // store.dispatch(clearWallet());
-      // disconnectWallet();
-      // dispatch(reset());
       document.cookie = "user-token" + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
       removeAuthToken();
       store.dispatch(signOut());
@@ -78,12 +70,12 @@ export const handleResp = (respData, type = 'success', doc) => {
       }, 2000);
       return true;
     }
-    if (doc === true && type == 'success' && respData && respData.data) {
+    if (doc === true && type === 'success' && respData && respData.data) {
       return { data: respData.data }
     }
-    if (type == 'success' && respData && respData.data) {
+    if (type === 'success' && respData && respData.data) {
       return respData.data
-    } else if (type == 'error' && respData && respData.response && respData.response.data) {
+    } else if (type === 'error' && respData && respData.response && respData.response.data) {
       return respData.response.data
     } else {
       return {
@@ -99,11 +91,9 @@ export const handleResp = (respData, type = 'success', doc) => {
   }
 }
 
-// Create an axios instance without credentials for CORS issues
 export const axiosNoCredentials = axios.create();
 axiosNoCredentials.defaults.withCredentials = false;
 
-// Add interceptor to handle authorization for axiosNoCredentials
 axiosNoCredentials.interceptors.request.use(
   async (config) => {
     let authorizationToken = null;

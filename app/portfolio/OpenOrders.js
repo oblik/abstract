@@ -38,7 +38,6 @@ const OpenOrders = () => {
     }, [])
 
     const handleCancelOrder = async (orderId) => {
-        // console.log("orderId", orderId);
         try {
             const { success, message } = await cancelOrder(orderId)
             if (success) {
@@ -104,8 +103,6 @@ const OpenOrders = () => {
                         updatedMarkets[marketIndex] = updatedMarket;
 
                         return updatedMarkets;
-                        // findMarket.orders.push(resData)
-                        // return [...prev, findMarket]
                     }
                 } else {
                     let orderData = {
@@ -135,15 +132,7 @@ const OpenOrders = () => {
     }, [socketContext?.socket, user, setOpenOrders])
     return (
         <>
-            {/* <div className="flex space-x-4 mb-3">
-            <SearchBar placeholder="Search" />
-            <select className="border bg-[#131212] border-[#262626] bg-black rounded p-1 text-sm">
-                <option>Market</option>
-                <option>Filled Quantity</option>
-                <option>Total Quantity</option>
-                <option>Order Date</option>
-            </select>
-        </div> */}
+            {}
             <div className="overflow-x-auto">
                 <table className="w-full text-left custom_table">
                     <thead>
@@ -187,14 +176,14 @@ const OpenOrders = () => {
                                         ?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                                         .map((data, index) => (
                                             <tr key={index}>
-                                                <td>{data.marketGroupTitle} <span style={{ color: data.userSide == 'yes' ? "rgba(125, 253, 254, 1)" : "rgba(236, 72, 153, 1)", textTransform: "capitalize" }}>{data.action} {data.userSide == "yes" ? (data?.outcomes?.[0]?.title || "yes") : (data?.outcomes?.[1]?.title || "no")}</span></td>
-                                                {/* <td>{data.side}</td> */}
-                                                {/* <td>{data.side}</td> */}
+                                                <td>{data.marketGroupTitle} <span style={{ color: data.userSide === 'yes' ? "rgba(125, 253, 254, 1)" : "rgba(236, 72, 153, 1)", textTransform: "capitalize" }}>{data.action} {data.userSide === "yes" ? (data?.outcomes?.[0]?.title || "yes") : (data?.outcomes?.[1]?.title || "no")}</span></td>
+                                                {}
+                                                {}
                                                 <td>{data.filledQuantity ?? 0}</td>
                                                 <td>{data.quantity}</td>
-                                                <td>{data.action == "sell" ? (100 - data.price) : data.price}¢</td>
+                                                <td>{data.action === "sell" ? (100 - data.price) : data.price}¢</td>
                                                 <td>
-                                                    {(isEmpty(data.currentPrice) || data.currentPrice == 0)
+                                                    {(isEmpty(data.currentPrice) || data.currentPrice === 0)
                                                         ? "--"
                                                         : data.userSide === "no"
                                                             ? `${100 - data.currentPrice}¢`
@@ -202,7 +191,7 @@ const OpenOrders = () => {
                                                 </td>
                                                 <td>${toFixedDown((data.price * data.quantity) / 100, 2)}</td>
                                                 <td>{momentFormat(data.createdAt, "DD/MM/YYYY HH:mm")}</td>
-                                                <td>{data.timeInForce == "GTC" ? "Good 'til canceled" : momentFormat(data.expiration, "MMM D, YYYY · hh:mm A")}</td>
+                                                <td>{data.timeInForce === "GTC" ? "Good 'til canceled" : momentFormat(data.expiration, "MMM D, YYYY · hh:mm A")}</td>
                                                 <td>
                                                     <button className="text-red-500" onClick={() => handleCancelOrder(data._id)}>
                                                         <X size={20} />

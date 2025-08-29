@@ -49,8 +49,6 @@ export const MacbookScroll = ({ src, showGradient, title, badge }) => {
   const translate = useTransform(scrollYProgress, [0, 0.25, 1], [0, 600, 10]);
   const rotate = useTransform(scrollYProgress, [0, 0.2, 1], [-28, 0, 0]);
 
-  // 3. Adjust the min-h if you want the Macbook to start
-  //    "lifting" earlier (less empty scroll space up front).
   return (
     <div
       className="
@@ -81,7 +79,7 @@ export const MacbookScroll = ({ src, showGradient, title, badge }) => {
         translate={translate}
       />
 
-      {/* Base (keyboard + trackpad) */}
+      {}
       <div className="h-[22rem] w-[32rem] bg-gray-200 dark:bg-[#272729] rounded-2xl overflow-hidden relative -z-10">
         {/* The black bar above the keyboard */}
         <div className="h-10 w-full relative">

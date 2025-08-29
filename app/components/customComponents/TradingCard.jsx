@@ -98,8 +98,7 @@ export function TradingCard({
     if (!socket) return;
     const handlePositions = (result) => {
       const resData = JSON.parse(result);
-      // console.log("Received position update:", resData)
-      if (resData?.quantity == 0) {
+      if (resData?.quantity === 0) {
         setPositions({});
       } else {
         setPositions((prev) => {
@@ -153,22 +152,13 @@ export function TradingCard({
                 className="text-[14px]"
                 style={{ paddingLeft: "8px", marginRight: "0px" }}
               >
-                {market?.groupItemTitle != ""
+                {market?.groupItemTitle !== ""
                   ? firstLetterCase(market?.groupItemTitle)
                   : firstLetterCase(title)}
               </div>
             </div>
           </CardTitle>
-          {/* <CardDescription>
-            {" "}
-            $
-            {market?.volume
-              ? (market.volume / 100).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })
-              : "0.00"}
-          </CardDescription> */}
+          {}
         </CardHeader>
 
         <CardContent className="sm:p-4 pt-0 sm:pt-0 p-3">
@@ -259,7 +249,7 @@ export function TradingCard({
                     value="Yes"
                   >
                     {firstLetterCase(market?.outcome?.[0]?.title) || "Yes"}{" "}
-                    {tab == "buy"
+                    {tab === "buy"
                       ? buyYes?.length > 0 &&
                         `${toFixedDown(100 - buyYes?.[0], 2)}¢`
                       : sellYes?.length > 0 &&
@@ -293,7 +283,7 @@ export function TradingCard({
                     value="No"
                   >
                     {firstLetterCase(market?.outcome?.[1]?.title) || "No"}{" "}
-                    {tab == "buy"
+                    {tab === "buy"
                       ? buyNo?.length > 0 &&
                         `${toFixedDown(100 - buyNo?.[0], 2)}¢`
                       : sellNo?.length > 0 && `${toFixedDown(sellNo?.[0], 2)}¢`}
@@ -332,7 +322,7 @@ export function TradingCard({
                       <h1 className="text-xs text-gray-500">
                         {toFixedDown(positions?.quantity, 2)} &middot;{" "}
                         {capitalize(
-                          positions?.side == "yes"
+                          positions?.side === "yes"
                             ? firstLetterCase(
                                 market?.outcome?.[0]?.title || "yes"
                               )

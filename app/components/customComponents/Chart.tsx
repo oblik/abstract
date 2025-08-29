@@ -2,7 +2,6 @@
 
 import React, { useContext, useEffect, useState, useCallback, useMemo } from "react";
 import Ye from "/public/images/Ye.png";
-// import Polymarket from "/public/images/polymarket.png";
 import Image from "next/image";
 import { Button } from "@/app/components/ui/button";
 import { Legend, Line, LineChart, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
@@ -20,6 +19,7 @@ import { toTwoDecimal } from "@/utils/helpers";
 import { HoverCard } from "radix-ui";
 import { CountdownTimerIcon } from "@radix-ui/react-icons";
 import { getPriceHistory, getSeriesByEvent, getForecastHistory } from "@/services/market";
+import { checkApiSuccess, getResponseResult } from '@/lib/apiHelpers';
 import { capitalize } from "@/lib/stringCase";
 import * as Popover from "@radix-ui/react-popover";
 import Link from "next/link";
@@ -196,15 +196,12 @@ const Chart: React.FC<ChartProps> = ({
         if (selectedYes) {
             setChartData(chartDataYes);
             // setChartConfig({
-            //     asset1: { label: "Yes", color: "#7dfdfe" },
             // });
         } else {
             setChartData(chartDataNo);
-            // setChartConfig({ asset1: { label: "No", color: "#ec4899" } });
         }
     }, [selectedYes, chartDataYes, chartDataNo]);
 
-    // Add getIntervalDate function for consistent interval handling
     const getIntervalDate = (interval: string) => {
         const now = new Date();
         const endOfToday = new Date(now);
@@ -229,22 +226,21 @@ const Chart: React.FC<ChartProps> = ({
         }
     };
 
-    // Update fetchData logic to fetch all data once like MonthlyListenersChart2
     const fetchData = useCallback(async () => {
         try {
-            // Fetch all data without timestamp filtering (like MonthlyListenersChart2)
+            console.log('Chart fetchData called with:', { selectedYes, interval });
             const data = {
                 market: selectedYes ? "yes" : "no",
-                interval: "all", // Always fetch all data
+interval: "all",
                 fidelity: 30,
                 // Remove timestamp parameters to get all available data
             };
-            console.log('Chart fetchData - Request data:', data);
-            
-            const { success, result } = await getPriceHistory(id, data);
-            console.log('Chart fetchData - API response:', { success, result });
-            
-            if (success) {
+
+            const response = await getPriceHistory(id, data as any);
+
+            if (checkApiSuccess(response)) {
+                console.log('Chart API response success');
+                const result = getResponseResult(response) || [];
                 let assetKeysData = result.map((item: any, index: any) => {
                     return {
                         label: item.groupItemTitle,
@@ -257,37 +253,18 @@ const Chart: React.FC<ChartProps> = ({
                     const sortedMarkets = [...market].sort((a, b) => {
                         const aOdd = selectedYes ? a.odd : 100 - a.odd;
                         const bOdd = selectedYes ? b.odd : 100 - b.odd;
-                        return bOdd - aOdd; // Sort descending (highest first)
+return bOdd - aOdd;
                     });
                     
                     // Take only the top 4 markets with highest odds
                     const top4Markets = sortedMarkets.slice(0, 4);
                     
-                    console.log('Market sorting debug:', {
-                        selectedYes,
-                        originalMarkets: market.map(m => ({ 
-                            label: m.groupItemTitle, 
-                            originalOdd: m.odd, 
-                            calculatedOdd: selectedYes ? m.odd : 100 - m.odd 
-                        })),
-                        sortedMarkets: sortedMarkets.map(m => ({ 
-                            label: m.groupItemTitle, 
-                            originalOdd: m.odd, 
-                            calculatedOdd: selectedYes ? m.odd : 100 - m.odd 
-                        })),
-                        top4Markets: top4Markets.map(m => ({ 
-                            label: m.groupItemTitle, 
-                            originalOdd: m.odd, 
-                            calculatedOdd: selectedYes ? m.odd : 100 - m.odd 
-                        })),
-                        resultLabels: result.map(r => r.groupItemTitle)
-                    });
                     
                     // Update assetKeysData to match the top 4 markets
                     const top4AssetKeys = top4Markets.map((marketItem: any, index: any) => {
                         return {
                             label: marketItem.groupItemTitle,
-                            color: ChartColors[index], // Use sequential colors for top 4
+color: ChartColors[index],
                             asset: `asset${index + 1}`,
                             odd: selectedYes ? marketItem.odd : 100 - marketItem.odd,
                             fullLabel: `${marketItem.groupItemTitle} ${selectedYes ? 'Yes' : 'No'}` // Add full label with Yes/No
@@ -305,29 +282,22 @@ const Chart: React.FC<ChartProps> = ({
                         if (matchingResult) {
                             orderedResultData.push(matchingResult);
                         } else {
-                            console.warn(`No data found for market: ${marketItem.groupItemTitle}`);
+
                             // Push null to maintain array structure
                             orderedResultData.push(null);
                         }
+                    console.warn(`No data found for market: ${marketItem.groupItemTitle}`)
                     }
-                    
-                    console.log('Data matching debug:', {
-                        orderedResultDataCount: orderedResultData.length,
-                        hasNulls: orderedResultData.some(item => item === null),
-                        dataLengths: orderedResultData.map(item => item ? item.data?.length : 0)
-                    });
                     
                     let t = orderedResultData.map((item) => item ? item.data : []);
                     let formattedData = t.map((innerArray) => {
                         if (!innerArray || innerArray.length === 0) return [];
                         return innerArray.map((item) => {
                             let formattedTime = Math.floor(new Date(item.t).getTime() / 1000);
-                            // Divide by 100 to get proper percentage (0-1 range)
                             return { t: formattedTime, p: item.p / 100 }; 
                         });
                     });
                     
-                    // Store all data for current selection
                     if (selectedYes) {
                         setAllChartDataYes(formattedData);
                     } else {
@@ -359,7 +329,7 @@ const Chart: React.FC<ChartProps> = ({
                             asset: "asset1",
                         },
                     ]);
-                    const t = result[0]?.data;
+                    const t = (result as any)[0]?.data;
                     let formattedData = t.map((item: any) => {
                         let formattedTime: any = Math.floor(new Date(item.t).getTime() / 1000);
                         return {
@@ -368,7 +338,6 @@ const Chart: React.FC<ChartProps> = ({
                         };
                     });
                     
-                    // Store all data for current selection
                     if (selectedYes) {
                         setAllChartDataYes(formattedData);
                     } else {
@@ -385,7 +354,10 @@ const Chart: React.FC<ChartProps> = ({
                 }
             }
         } catch (error) {
-            console.log(error);
+          console.log('error', error)
+          console.log(error)
+      console.log(error, "err");
+
         }
     }, [id, market, selectedYes, interval, ChartColors]);
     
@@ -393,7 +365,6 @@ const Chart: React.FC<ChartProps> = ({
         fetchData();
     }, [fetchData]); // Remove interval from dependencies
 
-    // Add separate effect to handle interval changes using stored data (like MonthlyListenersChart2)
     useEffect(() => {
         if (selectedYes && allChartDataYes.length > 0) {
             if (market.length > 1 && Array.isArray(allChartDataYes[0])) {
@@ -439,8 +410,6 @@ const Chart: React.FC<ChartProps> = ({
         };
         
         socket.on("chart-update", chartUpdate);
-        // return () => {
-        //   socket.off("chart-update");
         // };
 
     }, [socketContext, fetchData]); // Remove interval from dependencies here too
@@ -448,12 +417,13 @@ const Chart: React.FC<ChartProps> = ({
     const getSeriesData = async(id:any)=>{
         try{
 
-            let { success,result } = await getSeriesByEvent(id)
-            if(success){
-                setSeriesData(result)
+            const response = await getSeriesByEvent(id)
+            if(checkApiSuccess(response)){
+                setSeriesData(getResponseResult(response))
             }
         }catch(err){
-            console.log('error',err)
+      console.log(err, "err");
+
         }
     }
     useEffect(()=>{
@@ -470,7 +440,7 @@ const Chart: React.FC<ChartProps> = ({
             ? hoveredChance // Data is already in 0-100 range
             : selectedYes
                 ? chance
-                : chance == 0
+                : chance === 0
                     ? 0
                     : chance !== undefined
                         ? 100 - chance
@@ -481,11 +451,10 @@ const Chart: React.FC<ChartProps> = ({
     const [multiDisplayChance, setMultiDisplayChance] = useState<any>([]);
     useEffect(() => {
         if (market?.length > 1) {
-            // Sort markets by odds to get the top 4 with highest odds (matching chart logic)
             const sortedMarkets = [...market].sort((a, b) => {
                 const aOdd = selectedYes ? a.odd : 100 - a.odd;
                 const bOdd = selectedYes ? b.odd : 100 - b.odd;
-                return bOdd - aOdd; // Sort descending (highest first)
+return bOdd - aOdd;
             });
             const top4Markets = sortedMarkets.slice(0, 4);
             
@@ -624,7 +593,7 @@ const Chart: React.FC<ChartProps> = ({
                                     })}
                                 </p>
                             )}
-                            {/* Toggle switch - hide on mobile when multiple markets */}
+                            {}
                             {market?.length <= 1 && (
                                 <Button
                                     variant="ghost"
@@ -635,7 +604,7 @@ const Chart: React.FC<ChartProps> = ({
                                     <ArrowRightLeft />
                                 </Button>
                             )}
-                            {/* Toggle switch - show on desktop for all markets */}
+                            {}
                             {market?.length > 1 && (
                                 <Button
                                     variant="ghost"
@@ -662,7 +631,7 @@ const Chart: React.FC<ChartProps> = ({
                                                 .filter((series) => series.status !== "active")
                                                 .map((event) => (
                                                     <li key={event?.slug} onClick={()=>route.push(`/event-page/${event.slug}`)}>
-                                                        {/* <Link href={`/event-page/${event.slug}`}> */}
+                                                        {}
                                                             {momentFormat(event.endDate,"D MMM YYYY, h:mm A")}
                                                         {/* </Link> */}
                                                     </li>
@@ -679,7 +648,6 @@ const Chart: React.FC<ChartProps> = ({
                                     .map((event) => (
                                     <div
                                         key={event.slug} 
-                                        // href={`/event-page/${event.slug}`}
                                         onClick={()=>route.push(`/event-page/${event.slug}`)}
                                         className="w-[90px] rounded-full bg-transparent border border-[#262626] text-white hover:bg-[#262626] hover:text-white active:bg-[#262626] active:text-white text-center px-2 py-1 block text-sm"
                                     >
@@ -688,19 +656,7 @@ const Chart: React.FC<ChartProps> = ({
                                 ))
                             )}
 
-                            {/* <Button
-                                // className="w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] active:bg-[#262626] active:text-[#fff]"
-                                className={`w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] ${activeDate === "Jun 18"
-                                        ? "bg-[#fff] text-[#262626] border-[#262626]"
-                                        : ""
-                                    }`}
-                                onClick={() => setActiveDate("Jun 18")}
-                            >
-                                Jun 18
-                            </Button>
-                            <Button className="w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] active:bg-[#262626] active:text-[#fff]">
-                                Jul 30
-                            </Button> */}
+                            {}
                         </div>
                     </CardDescription>
                     {/* Single market chance display - inside CardHeader like MonthlyListenersChart2 */}
@@ -737,20 +693,7 @@ const Chart: React.FC<ChartProps> = ({
                                     
                                 </div>
                             )}
-                            {/* {multiDisplayChance.length > 0 && (
-                                <div className="flex justify-start mb-4">
-                                    {market?.length > 1 && multiDisplayChance.map((item: any, i: number) => (
-                                        <CardTitle
-                                            key={i}
-                                            className="text-4xl"
-                                            style={{ color: item.color }}
-                                        >
-                                            <span>{(item.last)?.toFixed(1)}%</span>
-                                            <span className="text-2xl font-light"> chance</span>
-                                        </CardTitle>
-                                    ))}
-                                </div>
-                            )} */}
+                            {}
                         </CardHeader>
                         <CardContent className="p-0">
                             <ChartContainer

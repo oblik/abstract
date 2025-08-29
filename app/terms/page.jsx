@@ -9,7 +9,7 @@ import "../globals.css"; // Ensure global styles are correctly imported
 import { MacbookScroll } from "@/app/components/ui/macbook-scroll";
 
 // Ensure correct handling of static assets
-import SONOTRADE from "@/app/sonotrade.png"; // Next.js requires import for local static assets
+import SONOTRADE from "@/app/sonotrade.png";
 import { Footer } from "../components/customComponents/Footer";
 import Header from "../Header";
 import { NavigationBar } from "@/app/components/ui/navigation-menu";
@@ -118,7 +118,6 @@ export default function Home() {
   const [selectedSubcategory, setSelectedSubcategory] = useState("all");
   const [subcategoryList, setSubcategoryList] = useState([]);
   const [selectCategory, setSelectedCategory] = useState("all");
-  // console.log("About page");
   useEffect(() => {
     let index = 1;
     let timeoutId;

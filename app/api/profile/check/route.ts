@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     // 返回用户资料数据（包括 is_new 标志，指示是否是新创建的资料）
     return NextResponse.json(data[0] as ProfileData);
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Server error:', error);
     return NextResponse.json(
       { error: 'Internal server error' }, 

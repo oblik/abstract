@@ -45,7 +45,7 @@ export async function GET(request) {
     }
 
     // Fetch top artists from Spotify
-    const userTopArtistsResponse = await fetch('https://api.spotify.com/v1/me/top/artists?limit=10', {
+    const userTopArtistsResponse = await fetch('https://api.spotify.com/v1/me/top-artists', {
       headers: { Authorization: `Bearer ${tokenData.access_token}` },
     });
 
@@ -75,7 +75,6 @@ export async function GET(request) {
       return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL}/register?status=error`);
     }
 
-    console.log("Successfully inserted user with Spotify data for email:", email);
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL}/register/success`);
   } catch (err) {
     console.error("Unexpected error:", err);

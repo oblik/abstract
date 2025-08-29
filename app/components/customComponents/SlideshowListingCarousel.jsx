@@ -173,7 +173,7 @@ export default function SlideshowListingCarousel() {
                               </div>
                             </Link>
                           ))}
-                        {/* Black fadeout at the bottom (lower opacity, more distance) */}
+                        {}
                       <SelectSeparator className="z-40 my-1" />            
 
                       </div>
@@ -197,7 +197,9 @@ export default function SlideshowListingCarousel() {
                       )}
                       <div className="text-xs mt-1 mb-1 text-gray-400 flex items-center gap-1">
                         {/* Volume icon */}
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="white"><path d="M4 20h2v-6H4zM8 20h2v-10H8zM12 20h2v-14h-2zM16 20h2v-8h-2z"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
                         <span className="text-white">Volume </span>
                         <span> ${((event.marketId?.reduce((acc, mark) => acc + (mark.volume || 0), 0) || 0)/100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                       </div>

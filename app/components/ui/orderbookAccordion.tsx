@@ -153,11 +153,7 @@ const OrderbookAccordionContent = React.forwardRef<
     ref
   ) => {
     const onClickOrderBook = () => {
-      // if (setSelectedOrderBookData) {
-      //   setSelectedOrderBookData(orderBook);
       // }
-      // if (setSelectedIndex && typeof index === 'number') {
-      //   setSelectedIndex(index);
       // }
     };
     const param = useParams();
@@ -169,7 +165,7 @@ const OrderbookAccordionContent = React.forwardRef<
     const [selectedOpenOrder, setSelectedOpenOrder] = useState<any>(null);
     const [askBookHighest, setAskBookHighest] = useState<number>(0);
     const [bidBookHighest, setBidBookHighest] = useState<number>(0);
-    const [markets, setMarkets] = useState([]);
+    const [markets, setMarkets] = useState<any[]>([]);
     
     // Add proper interval state management
     const [chartInterval, setChartInterval] = useState<string>(interval || "1d");
@@ -209,7 +205,6 @@ const OrderbookAccordionContent = React.forwardRef<
     useEffect(() => {
       const descending = (a: any, b: any) => Number(b[0]) - Number(a[0]);
       const ascending = (a: any, b: any) => Number(a[0]) - Number(b[0]);
-      // console.log(orderBook, "orderBook");
 
       if (activeView === "Yes") {
         const sortedBids = (orderBook?.bids?.[0] || []).sort(descending);
@@ -265,7 +260,9 @@ const OrderbookAccordionContent = React.forwardRef<
           setOpenOrders([]);
         }
       } catch (error) {
-        console.log(error, "error");
+        console.log(error, "error")
+        console.log(error, "error")
+
       }
     }, [selectedMarket?._id, setOpenOrders]);
 
@@ -278,10 +275,10 @@ const OrderbookAccordionContent = React.forwardRef<
     
       for (let [price, qty] of data) {
         let p = Number(price);
-        if (side == "ask" && p <= targetPrice) {
+        if (side === "ask" && p <= targetPrice) {
           totalQty += qty;
         }
-        if (side == "bid" && p >= targetPrice) {
+        if (side === "bid" && p >= targetPrice) {
           totalQty += qty;
         }
       }
@@ -291,12 +288,11 @@ const OrderbookAccordionContent = React.forwardRef<
     const onOrderCancel = async (orderId: any,success: any) => {
       try {
         if(success) {
-          let orderIndex = openOrders.findIndex((order: any) => order._id == orderId);
-          if(orderIndex != -1) {
+          let orderIndex = openOrders.findIndex((order: any) => order._id === orderId);
+          if(orderIndex !== -1) {
             let newOpenOrders = [...openOrders];
             newOpenOrders.splice(orderIndex, 1);
-            // setOpenOrders(newOpenOrders);
-            let selOpenOrderData = selectedOpenOrder.filter((order: any) => order._id != orderId);
+            let selOpenOrderData = selectedOpenOrder.filter((order: any) => order._id !== orderId);
             if(selOpenOrderData.length > 0) {
               setSelectedOpenOrder(selOpenOrderData)
             } else {
@@ -306,7 +302,7 @@ const OrderbookAccordionContent = React.forwardRef<
           }
         } 
       } catch (error) {
-        console.log(error, "error");
+
       }
     }
     useEffect(() => {
@@ -317,7 +313,6 @@ const OrderbookAccordionContent = React.forwardRef<
         const resData = JSON.parse(result);
         // price quantity side eventid marketid groupItemTitle userSide action price execQty timeInForce createdAt _id
         if (resData.marketId._id !== selectedMarket?._id) return;
-        // if(resData.userId !== user?._id) return;
         setOpenOrders((prev: any) => {
               const findOrder = prev.find(order => order._id === resData._id)
               if(findOrder){ 
@@ -376,11 +371,11 @@ const OrderbookAccordionContent = React.forwardRef<
   
       const fetchEvents = async () => {
         try {
-          let { success, result } = await getEventById({ id: id });
+          let { success, result } = await getEventById({ id: Array.isArray(id) ? id[0] : id });
           if (success) {
             if (result?.marketId && result?.marketId.length > 0) {
               setMarkets(
-                result.marketId.filter((market) =>
+                result.marketId.filter((market: any) =>
                   ["active", "closed", "resolved"].includes(market.status)
                 )
               );
@@ -409,7 +404,6 @@ const OrderbookAccordionContent = React.forwardRef<
                 setActiveView(val);
               }
             }}
-            // className="mt-4"
           >
             <TabsList className="flex justify-start w-1/4 min-w-[150px]">
               <TabsTrigger
@@ -470,7 +464,7 @@ const OrderbookAccordionContent = React.forwardRef<
                               {asks.length > 0 &&
                                 asks.map((row: any, index: any) => {
                                   const orderBookLength = asks.length || 0;
-                                  const openOrder = openOrders?.filter((order: any) => (100 - Number(order.price)) == row[0] );
+                                  const openOrder = openOrders?.filter((order: any) => (100 - Number(order.price)) === row[0] );
                                   return (
                                     <div
                                       key={index}
@@ -537,7 +531,7 @@ const OrderbookAccordionContent = React.forwardRef<
                             <div className="flex text-[12px] sm:text-base items-center h-[35px] w-full p-3">
                               <div className="w-[30%]">Last: 
                                 {selectedMarket?.last ? (
-                                  activeView == "Yes" ? selectedMarket?.last || 0 : 100 - (selectedMarket?.last || 0)
+                                  activeView === "Yes" ? selectedMarket?.last || 0 : 100 - (selectedMarket?.last || 0)
                                 ) : "--"}
                               ¢</div>
                               <div className="text-[12px] sm:text-base w-[30%] text-center">
@@ -563,7 +557,7 @@ const OrderbookAccordionContent = React.forwardRef<
                               {bids.length > 0 &&
                                 bids.map((row, index) => {
                                   const orderBookLength = bids.length || 0;
-                                  const openOrder = openOrders?.filter((order: any) => (order.price == row[0] && order.side == activeView?.toLowerCase()));
+                                  const openOrder = openOrders?.filter((order: any) => (order.price === row[0] && order.side === activeView?.toLowerCase()));
                                   return (
                                     <div
                                       key={index}

@@ -9,7 +9,7 @@ import "../globals.css"; // Ensure global styles are correctly imported
 import { MacbookScroll } from "@/app/components/ui/macbook-scroll";
 
 // Ensure correct handling of static assets
-import SONOTRADE from "@/app/sonotrade.png"; // Next.js requires import for local static assets
+import SONOTRADE from "@/app/sonotrade.png";
 import { Footer } from "../components/customComponents/Footer";
 import Header from "../Header";
 import { NavigationBar } from "@/app/components/ui/navigation-menu";
@@ -118,7 +118,6 @@ export default function Home() {
   const [selectedSubcategory, setSelectedSubcategory] = useState("all");
   const [subcategoryList, setSubcategoryList] = useState([]);
   const [selectCategory, setSelectedCategory] = useState("all");
-  // console.log("About page");
   useEffect(() => {
     let index = 1;
     let timeoutId;
@@ -185,11 +184,7 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-black text-white h-auto items-center justify-items-center p-0 m-0">
       {/* Header */}
-      {/* <Link href="/">
-      <header className="mbp-header pl-4 pt-4 pb-8">
-        <Image src={SONOTRADE} alt="SONOTRADE Logo" width={220} priority />
-      </header>
-      </Link> */}
+      {}
       <div  className="sticky top-0 z-50 w-[100%] bg-black lg:bg-transparent backdrop-blur-0 lg:backdrop-blur-md border-b border-[#222] lg:mb-4 mb-0 pb-2" style={{ borderBottomWidth: '1px' }}>
         <Header />
         <NavigationBar

@@ -70,7 +70,6 @@ export function Comment({
     .replace(/(\d+)\s*months?/g, (_, num) => `${parseInt(num, 10) * 30}d`)
     .replace(/(\d+)\s*years?/g, "$1y");
 
-  // Check if the current user is the author of this comment
   const isAuthor =
     currentUserWallet && comment.wallet_address === currentUserWallet;
 
@@ -127,13 +126,13 @@ export function Comment({
             </Link>
           </span>
           {
-            comment.positions && comment.positions.length == 1 ? (
+            comment.positions && comment.positions.length === 1 ? (
               <button
                 className="flex items-center gap-1 px-1 py-0 text-[12px] font-normal rounded"
                 aria-label="Customise options"
                 style={{ 
-                  background: comment.positions?.[0].side == "yes" ? "#152632": "#210d1a", 
-                  color: comment.positions?.[0].side == "yes" ? "#7DFDFE": "#ec4899" 
+                  background: comment.positions?.[0].side === "yes" ? "#152632": "#210d1a", 
+                  color: comment.positions?.[0].side === "yes" ? "#7DFDFE": "#ec4899" 
                 }}
               >
                 <span>{longNumbersNoDecimals(comment.positions?.[0].quantity)} | {comment.positions?.[0].label}</span>
@@ -146,8 +145,8 @@ export function Comment({
                       className="flex items-center gap-1 px-2 py-0.5 text-[12px] font-normal rounded"
                       aria-label="Customise options"
                       style={{ 
-                        background: comment.positions?.[0].side == "yes" ? "#152632": "#210d1a", 
-                        color: comment.positions?.[0].side == "yes" ? "#7DFDFE": "#ec4899" 
+                        background: comment.positions?.[0].side === "yes" ? "#152632": "#210d1a", 
+                        color: comment.positions?.[0].side === "yes" ? "#7DFDFE": "#ec4899" 
                       }}
                     >
                       <span>{longNumbersNoDecimals(comment.positions?.[0].quantity)} | {comment.positions?.[0].label}</span>
@@ -165,8 +164,8 @@ export function Comment({
                           <DropdownMenu.Item key={index} className="px-2 py-0.5 cursor-pointer hover:bg-[#100f0f] text-[12px] font-normal flex gap-2 items-center justify-between">
                             <span 
                               style={{ 
-                                background: item.side == "yes" ? "#152632": "#210d1a", 
-                                color: item.side == "yes" ? "#7DFDFE": "#ec4899" 
+                                background: item.side === "yes" ? "#152632": "#210d1a", 
+                                color: item.side === "yes" ? "#7DFDFE": "#ec4899" 
                               }}
                             >
                               {longNumbersNoDecimals(item.quantity)}
@@ -209,7 +208,7 @@ export function Comment({
               Delete
             </button>
           )}
-          {/* {getTimeAgo(comment.createdAt)} */}
+          {}
         </div>
       </div>
     </div>
@@ -275,14 +274,11 @@ export function ReplyForm({
         toastAlert("error",message || "Failed to post comment. Please try again later.");
         return;
       }
-      // toastAlert("success", "Comment posted successfully!");
-      // onReplyAdded(comment);
 
       setReply("");
       onCancel();
     } catch (error) {
       console.error("Reply submission error:", error);
-      // alert("Failed to post reply. Please try again later.");
     } finally {
       setIsSubmitting(false);
     }
@@ -320,15 +316,14 @@ export function ReplyForm({
       const reqData = {
         userName: username,
       };
-      const { status, message, result } = await addUserName(reqData);
+      const { success, message, result } = await addUserName(reqData);
 
-      if (!status) {
+      if (!success) {
         if (message) {
           toastAlert("error", message);
         }
         return false;
       }
-      console.log("result: ", result);
 
       setModelError("");
       dispatch(setUser(result));
@@ -429,11 +424,11 @@ export function CommentSection({ eventId }: CommentSectionProps) {
         return;
       }
   
-      const { comments, positions, count } = response;
-      setTotal(count);
+      const { comments, positions, count } = (response.result as any) || {};
+      setTotal(count || 0);
 
       const positionsMap = new Map();
-        positions.forEach(item => {
+        (positions || []).forEach(item => {
           const userId = item.userId.toString();
           if (!positionsMap.has(userId)) {
             positionsMap.set(userId, []);
@@ -456,7 +451,7 @@ export function CommentSection({ eventId }: CommentSectionProps) {
           };
         };
 
-        const flatComments = comments.reduce((acc, comment) => {
+        const flatComments = (comments || []).reduce((acc, comment) => {
           const { replies, ...parentComment } = comment;
           acc.push(addPositionsToComment(parentComment));
           
@@ -477,7 +472,7 @@ export function CommentSection({ eventId }: CommentSectionProps) {
       });
   
       setPage(pageToFetch);
-      setHasMore(comments.length === limit);
+      setHasMore((comments || []).length === limit);
   
     } catch (error) {
       console.error("Error loading comments:", error);

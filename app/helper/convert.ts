@@ -1,4 +1,3 @@
-//convert function
 export function convert(n: number): number | string {
     var sign = +n < 0 ? "-" : "",
       toStr = n.toString();

@@ -7,14 +7,11 @@ import { getWalletSettings, setWalletSettings } from "@/services/user";
 
 export default function WalletSettings() {
     const [priority, setPriority] = useState("");
-    // const [customRPC, setCustomRPC] = useState(false);
 
     const handleGasChange = (value) => {
       setPriority(value);
     }
 
-    // const handleCustomRPCChange = (value) => {
-    //     setCustomRPC(value);
     // }
 
     const getWalletSettingsData = async () => {
@@ -22,7 +19,6 @@ export default function WalletSettings() {
             let respData = await getWalletSettings();
             if(respData.success){
                 setPriority(respData.result.priority);
-                // setCustomRPC(respData.result.customRPC);
             }
         } catch (error) {
             console.error("Error getting wallet settings:", error);
@@ -43,10 +39,11 @@ export default function WalletSettings() {
             console.error("Error saving changes:", error);
         }
     }
-    console.log(priority,"prioritypriority");
+
   return (
     <>
         <h1 className="sm:text-2xl text-xl font-bold sm:mb-8 sm:mt-0 mt-3 mb-4">Wallet Settings</h1>
+        {console.log(priority,"prioritypriority")}
         <div className="sm:space-y-6 space-y-5 rounded-lg border bg-[#131212] sm:p-8 p-3">
             <div className="flex items-center space-x-3">
                 <Image

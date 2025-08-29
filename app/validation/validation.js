@@ -3,9 +3,7 @@ import { isAddress } from "../helper/custommath"
 
 export const regValidate = async (params) => {
     let errors = {}
-    // let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,6}))$/;
     let emailRegex = /^[a-zA-Z][a-zA-Z0-9._-]*[a-zA-Z0-9]@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/
-    // let emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 
     if (isEmpty(params.email)) {
         errors.email = "Email is required";
@@ -46,9 +44,9 @@ export const otpValidate = async (params) => {
 export const otpInputValidate = (params, name) => {
     let errors = {}
 
-    if (isEmpty(params.otp) && name == 'otp') {
+    if (isEmpty(params.otp) && name === 'otp') {
         errors.otp = "OTP is required";
-    } else if (isNaN(params.otp) && name == 'otp') {
+    } else if (isNaN(params.otp) && name === 'otp') {
         errors.otp = "invalid OTP";
     }
 
@@ -78,15 +76,15 @@ export const withdrawValidate = async (params) => {
 export const withdrawInputValidate = (params, name) => {
     let errors = {}
 
-    if (isEmpty(params.userAddress) && name == 'userAddress') {
+    if (isEmpty(params.userAddress) && name === 'userAddress') {
         errors.userAddress = "Address is required";
-    } else if(!isAddress(params.userAddress) && name == 'userAddress' ){
+    } else if(!isAddress(params.userAddress) && name === 'userAddress' ){
         errors.userAddress = "Invalid Address";
     }
 
-    if (isEmpty(params.amount) && name == 'amount') {
+    if (isEmpty(params.amount) && name === 'amount') {
         errors.amount = "Amount is required";
-    } else if (isNaN(params.amount) && name == 'amount') {
+    } else if (isNaN(params.amount) && name === 'amount') {
         errors.amount = "Invalid amount";
     }
 

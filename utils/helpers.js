@@ -3,7 +3,6 @@ export function decimalToPercentage(decimal) {
   const percentage = decimal * 100;
   // Round to the nearest whole number
   const roundedPercentage = Math.round(percentage);
-  // return the percentage 
   return roundedPercentage;
 }
 
@@ -29,7 +28,7 @@ export function sellFunction(data, sharesToSell) {
     const size = parseFloat(order.size);
 
     if (remainingShares <= 0) {
-      break; // Stop if no more shares are left to sell
+break;
     }
 
     // Calculate the maximum number of shares we can sell at this price
@@ -73,7 +72,7 @@ export function buyFunction(data, amountInUSD) {
     const size = parseFloat(order.size);
 
     if (remainingAmount <= 0) {
-      break; // Stop if no more amount is left
+break;
     }
 
     // Calculate the maximum number of shares we can buy with the remaining amount

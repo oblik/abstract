@@ -9,7 +9,6 @@ const supabase = createClient(
     process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// Get comments for a specific event
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const eventId = searchParams.get('eventId');

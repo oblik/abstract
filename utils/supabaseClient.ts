@@ -9,7 +9,6 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // 为每个组件提供一个获取新客户端实例的函数
-// provide a function to get a new client instance for each component
 export function getSupabaseClient(): SupabaseClient {
   return supabase;
 }

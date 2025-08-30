@@ -1,7 +1,7 @@
 "use client";
 import Header from "@/app/Header";
 import HeaderFixed from "@/app/HeaderFixed";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/app/components/ui/button";
 import config from "../../config/config";
 import {
@@ -81,7 +81,7 @@ let initialValue = {
 
 export default function PortfolioPage({ categories }) {
   const programID = new PublicKey(config?.programID);
-  const connection = new Connection(config?.rpcUrl, "confirmed");
+  const connection = useMemo(() => new Connection(config?.rpcUrl, "confirmed"), []);
   const PYTH_PRICE_ACCOUNT = new PublicKey(config?.PYTH_PRICE_ACCOUNT);
 
   const { isConnected, address } = useSelector(
@@ -197,7 +197,7 @@ export default function PortfolioPage({ categories }) {
     } catch (err) {
       console.error("Error fetching POL balance:", err);
     }
-  }, [address, connection, config?.tokenMint]);
+  }, [address, connection]);
 
   async function disconnectWallet() {
     if (window.solana && window.solana.isPhantom) {

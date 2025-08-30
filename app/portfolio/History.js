@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { getClosedPnL } from "@/services/portfolio";
 import { toFixedDown } from "../helper/roundOf";
@@ -27,7 +27,7 @@ const History = () => {
   const [loading, setLoading] = useState(false)
 
 
-  const formatClosedPnL = (data) => {
+  const formatClosedPnL = useCallback((data) => {
     const groupedByEvent = {};
 
     for (const item of data) {
@@ -85,9 +85,9 @@ const History = () => {
     }
 
     return groupedByEvent;
-  };
+  }, [fromDate]);
 
-  const getUserClosedPnL = async () => {
+  const getUserClosedPnL = useCallback(async () => {
     try {
       setLoading(true)
       const res = await getClosedPnL({});
@@ -102,7 +102,7 @@ const History = () => {
     } finally {
       setLoading(false)
     }
-  };
+  }, [formatClosedPnL]);
 
   useEffect(() => {
     getUserClosedPnL();
@@ -152,8 +152,8 @@ const History = () => {
                 let total = { entry: 0, exit: 0, pnl: 0 };
 
                 return (
-              <React.Fragment>                 
-                <React.Fragment key={eventId}>
+              <React.Fragment key={eventId}>                 
+                <React.Fragment>
                     <tr>
                       <td className="pt-1" colSpan={8}>
                          <Link  href={`/event-page/${event?.eventInfo?.slug}`}>

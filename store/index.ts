@@ -22,7 +22,7 @@ const persistConfig = {
 	version: 1,
 	storage,
 	stateReconciler: autoMergeLevel1,
-        whitelist: ["wallet","walletconnect"],
+        whitelist: ["wallet", "walletconnect", "auth"],
 	debug: false, // Set to false to reduce console noise
 	// transforms: [
 	// 	encryptTransform({

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Ye from "/public/images/Ye.png";
 import Image from "next/image";
 import { Button } from "@/app/components/ui/button";
@@ -93,6 +93,29 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
     return null;
 };
 
+const ChartColors = [
+    "hsl(var(--chart-1))",
+    "hsl(var(--chart-2))",
+    "hsl(var(--chart-3))",
+    "hsl(var(--chart-4))",
+    "hsl(var(--chart-5))",
+    "hsl(var(--chart-1))",
+    "hsl(var(--chart-2))",
+    "hsl(var(--chart-3))",
+    "hsl(var(--chart-4))",
+    "hsl(var(--chart-5))",
+    "hsl(var(--chart-1))",
+    "hsl(var(--chart-2))",
+    "hsl(var(--chart-3))",
+    "hsl(var(--chart-4))",
+    "hsl(var(--chart-5))",
+    "hsl(var(--chart-1))",
+    "hsl(var(--chart-2))",
+    "hsl(var(--chart-3))",
+    "hsl(var(--chart-4))",
+    "hsl(var(--chart-5))",
+];
+
 const ChartWidget: React.FC<ChartProps> = ({
     id,
     endDate,
@@ -162,28 +185,6 @@ const ChartWidget: React.FC<ChartProps> = ({
     const [screenWidth, setScreenWidth] = useState<number>(
         typeof window !== "undefined" ? window.innerWidth : 1024
     );
-    const ChartColors = [
-        "hsl(var(--chart-1))",
-        "hsl(var(--chart-2))",
-        "hsl(var(--chart-3))",
-        "hsl(var(--chart-4))",
-        "hsl(var(--chart-5))",
-        "hsl(var(--chart-1))",
-        "hsl(var(--chart-2))",
-        "hsl(var(--chart-3))",
-        "hsl(var(--chart-4))",
-        "hsl(var(--chart-5))",
-        "hsl(var(--chart-1))",
-        "hsl(var(--chart-2))",
-        "hsl(var(--chart-3))",
-        "hsl(var(--chart-4))",
-        "hsl(var(--chart-5))",
-        "hsl(var(--chart-1))",
-        "hsl(var(--chart-2))",
-        "hsl(var(--chart-3))",
-        "hsl(var(--chart-4))",
-        "hsl(var(--chart-5))",
-    ]
     
     // Update screen width on resize
     useEffect(() => {
@@ -239,7 +240,7 @@ const ChartWidget: React.FC<ChartProps> = ({
         }
     };
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             console.log('ChartWidget fetchData called with:', { selectedYes, interval });
             const data = {
@@ -371,11 +372,11 @@ color: ChartColors[index],
       console.log(error, "err");
 
         }
-    };
+    }, [id, market, selectedYes, interval]);
     
     useEffect(() => {
         fetchData();
-    }, [id, market, selectedYes]); // Remove interval from dependencies
+    }, [fetchData]); // Remove interval from dependencies
 
     useEffect(() => {
         if (selectedYes && allChartDataYes.length > 0) {

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState, useCallback } from "react";
 import SearchBar from "../components/ui/SearchBar";
 import Image from "next/image";
 import Link from "next/link";
@@ -34,7 +34,7 @@ const Positions = (props) => {
   const socketContext = useContext(SocketContext);
   const cardRef = useRef();
 
-  const getUserPositionHistory = async () => {
+  const getUserPositionHistory = useCallback(async () => {
     try {
       setLoading(true)
       const res = await getPositionsById(props.uniqueId);
@@ -47,7 +47,7 @@ const Positions = (props) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [props.uniqueId]);
 
   const waitForImageLoad = (imgElement) => {
     return new Promise((resolve) => {

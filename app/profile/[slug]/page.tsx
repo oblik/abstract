@@ -15,7 +15,7 @@ export default async function Page(props: { params: Promise<{ slug: string; }> }
   ]);
 
   return (
-    <ProfilePage user={userResult.user || null} categories={categories} />
+    <ProfilePage user={userResult.user && Object.keys(userResult.user).length > 0 ? userResult.user as any : null} categories={categories} />
   );
 }
 

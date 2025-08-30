@@ -79,7 +79,7 @@ export default function PortfolioPage() {
 
   //   };
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const response = await getUserData(dispatch);
       if (checkApiSuccess(response)) {
@@ -88,17 +88,17 @@ export default function PortfolioPage() {
     } catch (error) {
       console.error("Error fetching profile:", error);
     }
-  };
+  }, [dispatch]);
 
   //get positions
-  const fetchPositions = async () => {
+  const fetchPositions = useCallback(async () => {
     const response = await getPositions();
     if (checkApiSuccess(response)) {
       setPositions(getResponseResult(response) || []);
     }
-  };
+  }, []);
 
-  const fetchTradeOverview = async () => {
+  const fetchTradeOverview = useCallback(async () => {
     setTradeOverviewLoading(true);
     try {
       const response = await getTradeOverview();
@@ -117,7 +117,7 @@ export default function PortfolioPage() {
     } finally {
       setTradeOverviewLoading(false);
     }
-  };
+  }, []);
 
 
   useEffect(() => {

@@ -455,7 +455,7 @@ const disconnectWalletRef = useRef(null);
     }, 1000);
   
     return () => clearInterval(interval);
-  }, [data?.walletAddress, isConnected, signedIn]);
+  }, [data?.walletAddress, isConnected, signedIn, dispatch]);
 
   return (
     <>

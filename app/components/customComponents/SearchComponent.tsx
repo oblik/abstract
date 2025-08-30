@@ -80,7 +80,7 @@ export default function SearchComponent() {
       if (checkApiSuccess(response)) {
         const result = getResponseResult(response);
         setIsRecentActivity(false);
-        setFilterEvent(result?.data || []);
+        setFilterEvent((result as any)?.data || []);
       }
     } catch (error) {
       console.error("Error fetching filter events:", error);

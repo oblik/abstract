@@ -8,37 +8,23 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "upload.wikimedia.org",
+        hostname: "upload.wikimedia.org",  // Add this line
       },
       {
         protocol: "https",
-        hostname: "i.ibb.co",
+        hostname: "i.ibb.co",  // Add this line
       },
       {
         protocol: "http",
-        hostname: "localhost",
+        hostname: "localhost",  // Add this line
         port: "3001",
       },
       {
-        protocol: "https",
+        protocol:"https",
         hostname: "sonotradesdemo.wearedev.team",
-      },
+      }
     ],
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'https://sonotradesdemo.wearedev.team/api/:path*',
-      },
-      {
-        source: '/freeipapi/:path*',
-        destination: 'https://freeipapi.com/:path*',
-      },
-    ];
-  },
-  // <<< ADD THIS
-
 };
 
 export default nextConfig;

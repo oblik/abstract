@@ -57,7 +57,6 @@ import History from "./History";
 import { Footer } from "../components/customComponents/Footer";
 import { setWalletConnect } from "@/store/slices/walletconnect/walletSlice";
 import { PnLFormatted } from "@/utils/helpers";
-import pythClient from "@/lib/pyth-client";
 import { getWalletSettings, getCoinList } from "@/services/user";
 import depositIDL from "../../components/IDL/DEPOSITIDL.json";
 import Withdraw from "./withdraw";

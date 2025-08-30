@@ -1,17 +1,28 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { jwtVerify } from "jose";
-import { protectedRoutes } from "./app/components/Router/routes";
+import { authRoutes, protectedRoutes } from "./app/components/Router/routes";
 
 const PUBLIC_FILE = /\.(.*)$/;
 
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
-    const token = request.cookies.get("user-token")?.value;
+    const currentUser = request.cookies.get("user-token");
+    console.log("current user test console/.......")
+    console.log("currentUser",currentUser)
+    if(currentUser){
+        console.log("currentUser is true.......")
+    }
 
     if (pathname.startsWith("/_next") || pathname.includes("/api/") || PUBLIC_FILE.test(pathname)) {
         return;
     }
+
+    // const authPathnameRegex = new RegExp(
+    //     `^(${authRoutes
+    //         .map((route) => (route.includes("[") ? route.replace(/\[.*?\]/g, "[^/]+") : route))
+    //         .join("|")})/?$`,
+    //     "i"
+    // );
 
     const protectedPathnameRegex = new RegExp(
         `^(${protectedRoutes
@@ -20,38 +31,19 @@ export async function middleware(request: NextRequest) {
         "i"
     );
 
-    let tokenValid = false;
-    if (token) {
-        try {
-            const { payload } = await jwtVerify(
-                token,
-                new TextEncoder().encode(process.env.JWT_SECRET as string)
-            );
-            if (!payload.exp) {
-                throw new Error("Missing exp");
-            }
-            if (payload.exp * 1000 > Date.now()) {
-                tokenValid = true;
-            } else {
-                throw new Error("Token expired");
-            }
-        } catch {
-            request.cookies.delete("user-token");
-            return NextResponse.redirect(new URL("/", request.url));
-        }
-    }
+    //   const authPathnameRegex = new RegExp(`^(/(${i18n.locales.join("|")}))?(${authRoutes.map((route) => (route.includes("[") ? route.replace(/\[.*?\]/g, "[^/]+") : route)).join("|")})/?$`, "i");
 
-    //     `^(${authRoutes
-    //     "i"
-    // );
+    //   const protectedPathnameRegex = new RegExp(`^(/(${i18n.locales.join("|")}))?(${protectedRoutes.map((route) => (route.includes("[") ? route.replace(/\[.*?\]/g, "[^/]+") : route)).join("|")})/?$`, "i");
+    //   const locale = getLocale(request);
 
-
-
-    if (protectedPathnameRegex.test(pathname) && !tokenValid) {
+    if (protectedPathnameRegex.test(pathname) && !currentUser?.value) {
         request.cookies.delete("user-token");
-        return NextResponse.redirect(new URL("/", request.url));
+        const response = NextResponse.redirect(new URL("/", request.url));
+        return response;
     }
 
+    // if (authPathnameRegex.test(pathname) && currentUser) {
+    //     return NextResponse.redirect(new URL("/",request.url));
     // }
 
 }

@@ -3,61 +3,30 @@ import browser from "browser-detect";
 import isEmpty from "@/app/helper/isEmpty";
 
 import config from "@/config/config";
-
-// Helper to get freeipapi base URL (use proxy in dev, full URL in prod)
-function getFreeIpApiBaseUrl() {
-  if (process.env.NODE_ENV === "production") {
-    return config.getLoginInfo;
-  }
-  return "/freeipapi"; // Use Next.js proxy in development
-}
-
-// Helper to get API base URL (use proxy in dev, full URL in prod)
-function getApiBaseUrl() {
-  if (process.env.NODE_ENV === "production") {
-    return config.backendURL;
-  }
-  return ""; // Use Next.js proxy in development
-}
 import { handleResp, setAuthorization } from "@/config/axios";
 import { signIn } from "@/store/slices/auth/sessionSlice";
 import { setUser } from "@/store/slices/auth/userSlice";
 import { setWallet } from "@/store/slices/wallet/dataSlice";
+import { setAuthToken } from "@/lib/cookies";
 import { subscribe } from "@/config/socketConnectivity";
-import {
-  UserRegistrationData,
-  GoogleLoginData,
-  WalletLoginData,
-  EmailVerificationData,
-  ResendOTPData,
-  ApiResponse,
-  User,
-  Wallet,
-  LoginHistory,
-  AppDispatch,
-  ApiError
-} from "@/types";
 
-export const register = async (data: UserRegistrationData): Promise<ApiResponse> => {
+export const register = async (data: any) => {
   try {
     let respData = await axios({
-      url: `${getApiBaseUrl()}/api/v1/user/register`,
+      url: `${config.backendURL}/api/v1/user/register`,
       method: "post",
       data,
     });
     return handleResp(respData, "success");
-  } catch (error: unknown) {
-    console.log(error, "error")
-    console.log(error, "error")
-    console.log(error, "error")
+  } catch (error: any) {
     return handleResp(error, "error");
   }
 };
 
-export const googleLogin = async (reqBody: GoogleLoginData, dispatch: AppDispatch): Promise<ApiResponse> => {
+export const googleLogin = async (reqBody: any, dispatch: any) => {
   try {
     let respData = await axios({
-      url: `${getApiBaseUrl()}/api/v1/user/google-sign`,
+      url: `${config.backendURL}/api/v1/user/google-sign`,
       method: "post",
       data: reqBody,
     });
@@ -66,65 +35,57 @@ export const googleLogin = async (reqBody: GoogleLoginData, dispatch: AppDispatc
     dispatch(signIn(result.token));
     dispatch(setUser(result.user));
     dispatch(setWallet(result.wallet));
-    await fetch("/api/auth/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: result.token }),
-    });
+    setAuthorization(result.token);
+    setAuthToken(result.token);
     return {
       success: true,
       message,
     };
-  } catch (error: unknown) {
-    const apiError = error as ApiError;
-
+  } catch (error: any) {
+    console.log(error, "error");
     return {
       success: false,
-      message: apiError?.response?.data?.message || 'An error occurred',
-      errors: apiError?.response?.data?.errors,
+      message: error?.response?.data?.message,
+      errors: error?.response?.data?.errors,
     };
   }
 };
 
-export const walletLogin = async (reqBody: WalletLoginData, dispatch: AppDispatch): Promise<ApiResponse> => {
+export const walletLogin = async (reqBody: any, dispatch: any) => {
   try {
     let respData = await axios({
-      url: `${getApiBaseUrl()}/api/v1/user/wallet-sign`,
+      url: `${config.backendURL}/api/v1/user/wallet-sign`,
       method: "post",
       data: reqBody,
     });
     const { message, result } = respData.data;
-    if(!isEmpty(result?.user?.email) && result?.user?.status === "verified" ){
+    if(!isEmpty(result?.user?.email) && result?.user?.status == "verified" ){
       subscribe(result.user._id);
       dispatch(signIn(result?.token));
       dispatch(setUser(result?.user));
       dispatch(setWallet(result?.wallet));
-      await fetch("/api/auth/token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: result?.token }),
-      });
+      setAuthorization(result?.token);
+      setAuthToken(result?.token);
     }
     return {
       success: true,
       message,
       result
     };
-  } catch (error: unknown) {
-    const apiError = error as ApiError;
-
+  } catch (error: any) {
+    console.log(error, "error");
     return {
       success: false,
-      message: apiError?.response?.data?.message || 'An error occurred',
-      errors: apiError?.response?.data?.errors,
+      message: error?.response?.data?.message,
+      errors: error?.response?.data?.errors,
     };
   }
 };
 
-export const verifyEmail = async (data: EmailVerificationData, dispatch: AppDispatch): Promise<ApiResponse> => {
+export const verifyEmail = async (data: any, dispatch: any) => {
   try {
     let respData = await axios({
-      url: `${getApiBaseUrl()}/api/v1/user/email-verify`,
+      url: `${config.backendURL}/api/v1/user/email-verify`,
       method: "post",
       data,
     });
@@ -133,50 +94,45 @@ export const verifyEmail = async (data: EmailVerificationData, dispatch: AppDisp
     dispatch(signIn(result.token));
     dispatch(setUser(result.user));
     dispatch(setWallet(result.wallet));
-    await fetch("/api/auth/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: result.token }),
-    });
+    setAuthorization(result.token);
+    setAuthToken(result.token);
     return {
       success: true,
       message,
     };
-  } catch (error: unknown) {
-    const apiError = error as ApiError;
-
+  } catch (error: any) {
+    console.log(error, "error");
     return {
       success: false,
-      message: apiError?.response?.data?.message || 'An error occurred',
-      errors: apiError?.response?.data?.errors,
+      message: error?.response?.data?.message,
+      errors: error?.response?.data?.errors,
     };
   }
 };
 
-export const getLocation = async (): Promise<LoginHistory | false> => {
+export const getLocation = async () => {
   try {
     let loginHistory: any = {};
     let respData: any = await axios({
-      url: `${getFreeIpApiBaseUrl()}/api/json`,
+      url: config.getLoginInfo,
       method: "get",
     });
     if (respData) {
       const browserRes = browser();
       respData = respData?.data;
-      const data = respData as any;
-      loginHistory.countryName = data.countryName;
-      loginHistory.countryCode = data.countryCode;
-      loginHistory.ipaddress = data.ipAddress;
-      loginHistory.region = data.regionName;
-      loginHistory.country_code = data.country_code;
-      loginHistory.timezone = data.timeZones;
-      loginHistory.country_capital = data.country_capital;
-      loginHistory.city = data.cityName;
-      loginHistory.country = data.countryName;
+      loginHistory.countryName = respData.countryName;
+      loginHistory.countryCode = respData.countryCode;
+      loginHistory.ipaddress = respData.ipAddress;
+      loginHistory.region = respData.regionName;
+      loginHistory.country_code = respData.country_code;
+      loginHistory.timezone = respData.timeZones;
+      loginHistory.country_capital = respData.country_capital;
+      loginHistory.city = respData.cityName;
+      loginHistory.country = respData.countryName;
       loginHistory.browsername = browserRes.name;
       loginHistory.ismobile = browserRes.mobile;
       loginHistory.os = browserRes.os;
-      return loginHistory as LoginHistory;
+      return loginHistory;
     }
     return false;
   } catch (err) {
@@ -184,27 +140,27 @@ export const getLocation = async (): Promise<LoginHistory | false> => {
   }
 };
 
-export const resendOTP = async (data: ResendOTPData): Promise<ApiResponse> => {
+export const resendOTP = async (data: any) => {
   try {
     let respData = await axios({
-      url: `${getApiBaseUrl()}/api/v1/user/resend-otp`,
+      url: `${config.backendURL}/api/v1/user/resend-otp`,
       method: "post",
       data,
     });
     return handleResp(respData, "success");
-  } catch (error: unknown) {
+  } catch (error) {
     return handleResp(error, "error");
   }
 };
 
-export const getUser = async (): Promise<ApiResponse<User>> => {
+export const getUser = async () => {
   try {
     let respData = await axios({
       method: "get",
-      url: `${getApiBaseUrl()}/api/v1/user/get-user`,
+      url: `${config.backendURL}/api/v1/user/get-user`,
     });
     return handleResp(respData, "success");
-  } catch (error: unknown) {
+  } catch (error) {
     return handleResp(error, "error");
   }
 };

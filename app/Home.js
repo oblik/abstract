@@ -17,7 +17,7 @@ import {
 } from "@/app/components/ui/carousel";
 import EventLinting from "@/app/components/customComponents/EventLinting";
 import SlideshowLinting from "@/app/components/customComponents/SlideshowLinting";
-// import { infoCards } from "@/app/components/constants";
+import { infoCards } from "@/app/components/constants";
 import { getCategories, getTagsByCategory } from "@/services/market";
 import { getInfoCards } from "@/services/user";
 import { Footer } from "./components/customComponents/Footer";
@@ -149,7 +149,7 @@ export default function Home({ infoCardCms, categories, tags }) {
 
   return (
     <>
-      <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
+      <div className="px-0 sm:px-2 text-white bg-black h-auto items-center justify-items-center p-0 m-0">
       {/* Fixed header/navbar */}
       <div className="fixed top-0 left-0 z-50 w-full backdrop-blur-md bg-black/80 border-b border-[#222]" style={{ borderBottomWidth: '1px' }}>
         <Header />
@@ -159,6 +159,7 @@ export default function Home({ infoCardCms, categories, tags }) {
           setSelectedCategory={setSelectedCategory}
           selectedCategory={selectCategory}
         />
+        
       </div>
       {/* Spacer to prevent content from being hidden behind the fixed header/navbar */}
       <div
@@ -170,13 +171,14 @@ export default function Home({ infoCardCms, categories, tags }) {
         }}
       />
 
-        <div className="container mx-auto pt-0 px-0 sm:px-2 max-w-full overflow-hidden">
-          <div className="px-1 sm:px-0">
+        <div className="container mx-auto pt-0 max-w-full overflow-hidden">
+          <div className="px-1.5 sm:px-0">
             <SubcategoryBar
               subcategories={subcategoryList}
               selectedSubcategory={selectedSubcategory}
               setSelectedSubcategory={setSelectedSubcategory}
             />
+            <div className="hidden sm:block">
             {
               isEmpty(categoryParam) && (
                 <>
@@ -186,6 +188,7 @@ export default function Home({ infoCardCms, categories, tags }) {
                 </>
               )
             }
+            </div>
 
             {/* Event Cards Section */}
             <div className={"flex pb-6 justify-center w-full mt-0"}>
@@ -224,7 +227,7 @@ export default function Home({ infoCardCms, categories, tags }) {
         <Footer />
       </div>
       {/* Add extra bottom space for mobile so HeaderFixed does not overlay content */}
-      <div className="block sm:hidden" style={{ height: '75px' }} />
+      <div className="block bg-black sm:hidden" style={{ height: '75px' }} />
       <HeaderFixed />
     </>
   );

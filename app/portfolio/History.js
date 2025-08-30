@@ -8,6 +8,7 @@ import { capitalize } from "@/lib/stringCase";
 import { HistoryIcon, Loader } from "lucide-react";
 import { getUserTradeHistory } from "@/services/user";
 import { Dialog } from "radix-ui";
+import Link from "next/link";
 import {
   Cross2Icon,
   CopyIcon,
@@ -133,32 +134,7 @@ const History = () => {
   }
   return (
     <>
-      {/* <div className="flex space-x-4 mb-3">
-        <SearchBar placeholder="Search" />
-        <DatePicker
-          placeholderText="Select date"
-          selectsRange={true}
-          startDate={startDate}
-          endDate={endDate}
-          onChange={(update) => {
-            setDateRange(update);
-          }}
-          className="custom_datepicker"
-        />
-        <select className="border border-[#262626] bg-black rounded p-1 text-sm">
-          <option>All</option>
-          <option>All Trades</option>
-          <option>Buy</option>
-          <option>Sell</option>
-          <option>Reward</option>
-        </select>
-        <select className="border bg-[#131212] border-[#262626] bg-black rounded p-1 text-sm">
-          <option>Newest</option>
-          <option>Oldest</option>
-          <option>Value</option>
-          <option>Shares</option>
-        </select>
-      </div> */}
+
       <div className="overflow-x-auto">
         <table className="w-full text-left custom_table table table-responsive">
           <thead>
@@ -166,13 +142,14 @@ const History = () => {
               <th>Market</th>
               <th>Final Position</th>
               <th>Settlement Payout</th>
-              <th>Total Cost</th>
+              <th>Total Spent</th>
               <th>Total Payout</th>
               <th>Total Return</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
+                <>
             {!isEmpty(ClosedPnL) && !loading && Object.entries(ClosedPnL).map(
               ([eventId, event]) => {
                 const markets = event?.markets;
@@ -182,24 +159,37 @@ const History = () => {
                 let total = { entry: 0, exit: 0, pnl: 0 };
 
                 return (
-                  <React.Fragment key={eventId}>
+              <React.Fragment>                 
+                <React.Fragment key={eventId}>
                     <tr>
-                      <td colSpan={8}>
-                        <div className="flex items-center space-x-2 cursor-pointer">
-                          <span className="text-2xl">
+                      <td className="pt-1" colSpan={8}>
+                                                <Link  href={`/event-page/${event?.eventInfo?.slug}`}>
+
+                        <div className="flex items-center gap-3 ">
+
+                          <span>
+
+
                             <img
                               src={event?.eventInfo?.image}
                               alt="Icon"
-                              width={42}
-                              height={42}
+                              width={45}
+                             height={45}
+                             className="cursor-pointer rounded-[6px] object-cover aspect-square"
                             />
                           </span>
-                          <span className="text-sm font-normal">
+                          
+                          <span className="text-base font-semibold leading-tight cursor-pointe">
                             {event?.eventInfo?.title}
                           </span>
+
                         </div>
+                                                  </Link>
+
                       </td>
                     </tr>
+                    <tr>
+                     </tr>
 
                     {marketIds.map((marketId, idx) => {
                       const m = markets[marketId];
@@ -208,31 +198,34 @@ const History = () => {
                       total.exit += m.exit;
                       total.pnl += m.pnl;
 
-                      return (
+                      return ( 
                         <tr key={marketId}>
                           <td>{ m.groupItemTitle || ""}</td>
-                          <td className={`${m.shares > 0 ? "" : "text-gray-500"}`}>{m.shares > 0 ? `${m.shares} ${capitalize(m.closedSide == "yes" ? (m.outcome?.[0]?.title || "yes") : (m.outcome?.[1]?.title || "no"))}` : "None"}</td>
-                          <td className={`${(m.resolution && m.isResolved) ? "text-green-500" : (!m.isResolved && m.resolution) ? "text-red-500" :"text-gray-500"}`}>${m.isResolved ? m.shares : "0"   }</td>
-                          <td>${toFixedDown(m.entry, 2)}</td>
-                          <td>${toFixedDown(m.exit, 2)}</td>
+                          <td className={`${m.shares > 0 ? "" : "text-gray-500"}`}>{m.shares > 0 ? `${m.shares} ${capitalize(m.closedSide == "yes" ? (m.outcome?.[0]?.title || "yes") : (m.outcome?.[1]?.title || "no"))}` : "--"}</td>
+                          <td className={`${m.shares > 0 ? "" : "text-gray-500"}`}>{m.shares > 0 ? `$${Number(m.shares).toFixed(2)}` : "--"}</td>
+                          <td>${Number(m.entry).toFixed(2)}</td>
+                          <td>${Number(m.exit).toFixed(2)}</td>
                           <td
                             className={
-                              m.pnl >= 0 ? "text-green-500" : "text-red-500"
+                              (m.exit - m.entry) >= 0 ? "text-green-500" : "text-red-500"
                             }
                           >
-                            ${toFixedDown(m.pnl, 2)}{" "}({toFixedDown((m.pnl/m.entry)*100, 2)}%)
+                            {`${(m.exit - m.entry) < 0 ? '-' : ''}$${Number(Math.abs(m.exit - m.entry)).toFixed(2)}`} ({toFixedDown(((m.exit-m.entry)/m.entry)*100, 1)}%)
                           </td>
                           <td>
-                            <button className="text-blue-500" onClick={()=>handleTradeOpen(marketId, m.outcome)}>
+                            <button className="text-gray-500 w-5 h-5" onClick={()=>handleTradeOpen(marketId, m.outcome)}>
                               <HistoryIcon />
                             </button>
                           </td>
+                          
+                          
                         </tr>
+                        
                       );
                     })}
 
                     {isMultiMarket && (
-                      <tr className="font-bold">
+                      <tr >
                         <td>Total</td>
                         <td></td>
                         <td></td>
@@ -240,22 +233,37 @@ const History = () => {
                         <td>${toFixedDown(total.exit, 2)}</td>
                         <td
                           className={
-                            total.pnl >= 0 ? "text-green-700" : "text-red-700"
+                            total.pnl >= 0 ? "text-green-500" : "text-red-700"
                           }
                         >
-                          ${toFixedDown(total.pnl, 2)}
+                          {(total.exit - total.entry) < 0 ? '-' : ''}${Number(Math.abs(total.exit - total.entry)).toFixed(2)}
                         </td>
                         <td></td>
                       </tr>
                     )}
                   </React.Fragment>
+                                  <tr>
+                  <td colSpan={9} className="border-b border-[#262626]"></td>
+                </tr>
+                  
+                  
+            </React.Fragment>
+                  
+                  
+                                                  
                 );
+                
               }
+              
             )}
+            
+            
+           </>
+
           </tbody>
         </table>
         {Object.entries(ClosedPnL)?.length === 0 && !loading && (
-            <div  className="flex justify-center my-5 text-gray-500">
+            <div  className="flex text-[13px] justify-center text my-5 text-gray-500">
                 No history found
             </div>
         )}

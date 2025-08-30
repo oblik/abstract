@@ -49,43 +49,69 @@ const Notification = () => {
         )
 
     return (
-        <div className="flex flex-col gap-2 min-h-[200px]">
-            {
-                data?.length > 0 && data.map((item, index) =>
-                    <Link
-                        href="/notifications"
-                        className="flex items-start gap-3 p-4 hover:bg-[#333333] rounded"
-                        key={index}
-                    >
-                        <Image
-                            src="/images/tradecheck.png"
-                            alt="Profile Icon"
-                            width={48}
-                            height={48}
-                            className="rounded"
-                        />
-                        <div classname="pt-0">
-                            <h5 className="text-[16px] font-semibold text-gray-100">
-                                {item.type == "trade" && "Trade confirmed"}
-                                {item.type == "reply" && "Someone replied to your comment"}
-                                {item.type == "deposit" && "Deposit confirmed"}
-                                {item.type == "withdraw" && "Withdraw approved"}
-                            </h5>
-                            <p className="text-sm text-gray-300">
-                                {item.type == "trade" && (item?.content?.marketTitle)}
-                                {item.type == "reply" && (item?.content?.eventName ?? "--")}
-                                {item.type == "deposit" && (item?.content?.message ?? "--")}
-                                {item.type == "withdraw" && (item?.content?.message ?? "--")}
+        <div className="flex flex-col gap-0 pt-2 min-h-[200px]">
+            {data?.length > 0 &&
+                data.map((item, index) => (
+                <div
+                    className="grid grid-cols-[1fr_auto] gap-2 p-4 pl-2 pr-2 pt-2 hover:bg-[#111111] rounded min-h-[64px]"
+                    style={{ minHeight: 95 }}
+                    key={index}
+                >
+                    {/* Left column */}
+                    <div className="flex items-start gap-4">
+                    <Image
+                        src={
+                        item.type === "trade"
+                            ? "/images/checktrade.png"
+                            : item.type === "reply"
+                            ? "/images/notreply.png"
+                            : item.type === "deposit" || item.type === "withdraw"
+                            ? "/images/walletwithdraw.png"
+                            : "/images/tradecheck.png"
+                        }
+                        alt="Profile Icon"
+                        width={48}
+                        height={48}
+                        className="rounded"
+                    />
+                    <div className="flex flex-col items-start justify-start p-0 m-0 h-full">
+                        <h5 className="sm:text-[15px] text-[14px] font-semibold text-white leading-none">
+                        <Link href={`/event-page/${item.content?.slug}`}>
+                            {item.type == "trade" && "Trade confirmed"}
+                        </Link>
+                        {item.type == "reply" && "Trader replied"}
+                        {item.type == "deposit" && "Deposit confirmed"}
+                        {item.type == "withdraw" && "Withdraw approved"}
+                        </h5>
+                        <p className="sm:text-s pt-1 text-[12px] text-gray-400">
+                        <Link href={`/event-page/${item.content?.slug}`}>
+                            {item.type == "trade" && item?.content?.marketTitle}
+                        </Link>
+                        {item.type == "reply" && (item?.content?.content ?? "--")}
+                        {item.type == "deposit" && (item?.content?.message ?? "--")}
+                        {item.type == "withdraw" && (item?.content?.message ?? "--")}
+                        </p>
+                        <p className="sm:text-[11px] text-[10px] text-gray-500 mb-0">
+                        {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
+                        </p>
+                    </div>
+                    </div>
 
-                            </p>
-                            <p className="text-[12px] text-gray-400 mb-0">
-                                {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
-                            </p>
+                    {/* Right column */}
+                        <div className="flex flex-col items-center justify-center text-center w-20">
+                        <h5 className="sm:text-[16px] text-[14px] font-semibold text-white leading-none">
+                            {item.type == "trade" && (item?.content?.orderAction ?? "").toUpperCase()}
+                        </h5>
+                        <p className="sm:text-sm text-[12px] text-gray-400">
+                            {item.type == "trade" && (item?.content?.price ? `${item?.content?.tradeCnt}/${item?.content?.price}¢` : "")}
+                        </p>
                         </div>
-                    </Link>
-                )
-            }
-        </div>
+                </div>
+                ))}
+            </div>
+
+   
+
     )
 }
 

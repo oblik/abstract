@@ -98,8 +98,8 @@ export default function ProfilePage(props: ProfilePageProps) {
   };
 
   return (
-    <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
-      <div className="sticky top-0 z-50 w-[100%] bg-black lg:bg-transparent backdrop-blur-0 lg:backdrop-blur-md border-b border-[#222] lg:mb-4 mb-0 pb-2" style={{ borderBottomWidth: '1px' }}>
+    <div className="px-0 pb-20 sm:px-0 text-white bg-black h-auto items-center justify-items-center p-0 m-0">
+        <div className="fixed top-0 left-0 z-50 w-[100%] backdrop-blur-md bg-black/80 border-b border-[#222] lg:mb-4 mb-0" style={{ borderBottomWidth: '1px' }}>
         <Header />
         <NavigationBar
           menuItems={props.categories}
@@ -108,7 +108,17 @@ export default function ProfilePage(props: ProfilePageProps) {
           selectedCategory={selectCategory}
         />
       </div>
-      <div className="container mx-auto py-5 px-4 container-sm">
+      {/* Spacer to prevent content from being hidden behind the fixed header/navbar */}
+      <div
+        className="lg:mb-4 mb-0"
+        style={{
+          height: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
+          minHeight: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
+          width: '100%'
+        }}
+      />
+      
+      <div className="px-1.5 sm:px-0 container mx-auto px-0 py-5 container-sm">
         {/* 1. User information area */}
         <div className="flex items-center justify-between space-x-4 mb-6 profile_top">
           <div className="flex items-center space-x-4">
@@ -282,9 +292,12 @@ export default function ProfilePage(props: ProfilePageProps) {
             }
           </TabsContent>
         </Tabs>
-        <Footer />
-        <HeaderFixed />
+
+
       </div>
+            <HeaderFixed />
+
+      
     </div>
   );
 }

@@ -446,10 +446,10 @@ console.log(data?.walletAddress,isConnected,"data");
       )} */}
       {signedIn && (
         <button
-          className="px-3 py-2 hover:bg-gray-800 rounded-md transition-colors hidden lg:block"
+          className="px-3 py-2 rounded-md transition-colors hidden lg:block"
           onClick={() => navigateToPortfolioPage()}
         >
-          <div className="text-l text-[#33ff4c]">{PnLFormatted(formatNumber(walletData?.balance + walletData?.position, 2))}</div>
+          <div className="text-l text-[#33ff4c]">${Number(walletData?.balance + walletData?.position).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
           <div className="text-xs text-grey">Portfolio</div>
         </button>
       )}
@@ -502,16 +502,6 @@ console.log(data?.walletAddress,isConnected,"data");
                 />
               </div>
             </GoogleOAuthProvider>
-            {/* <Button className="mt-4 w-full google_btn">
-                <Image
-                  src="/images/google_icon.png"
-                  alt="Profile Icon"
-                  width={24}
-                  height={27}
-                  className="rounded-full"
-                />
-                <span>Continue with Google</span>
-              </Button> */}
             <div className="custom_seperator">
               <Separator.Root
                 className="SeparatorRoot"
@@ -548,40 +538,16 @@ console.log(data?.walletAddress,isConnected,"data");
             <div className="flex gap-3 justify-between mt-4 sm:flex-nowrap flex-wrap">
               <Button
                 onClick={() => ConnectPhantomWallet()}
-                className="w-full h-13 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]"
+                className="rounded-[6px] w-full sm:h-13 h-10 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]"
               >
                 <Image
                   src={"/images/wallet_icon_02.png"}
                   alt="Icon"
-                  width={40}
-                  height={40}
+                  width={30}
+                  height={30}
                 />
               </Button>
-              {/* <Button className="w-full h-13 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]">
-                  <Image
-                    src="/images/wallet_icon_02.png"
-                    alt="Icon"
-                    width={40}
-                    height={40}
-                  />
-                </Button>
-                <Button className="w-full h-13 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]">
-                  <Image
-                    src="/images/wallet_icon_03.png"
-                    alt="Icon"
-                    width={40}
-                    height={40}
-                  />
-                </Button>
-                <Button className="w-full h-13 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]">
-                  <Image
-                    src="/images/wallet_icon_04.png"
-                    alt="Icon"
-                    width={40}
-                    height={40}
-                  />
 
-                </Button> */}
             </div>
             <Dialog.Close asChild>
               <button className="modal_close_brn" aria-label="Close">
@@ -708,7 +674,7 @@ console.log(data?.walletAddress,isConnected,"data");
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
               <button
-                className="rounded p-2 hover:bg-[#333333] relative"
+                className="rounded p-2 hover:bg-[#202020] relative"
                 aria-label="Customise options"
               >
                 <BellIcon className="sm:w-6 sm:h-6 w-5 h-5" />
@@ -719,9 +685,8 @@ console.log(data?.walletAddress,isConnected,"data");
               <div className="notification_dropdown_portal">
                 <DropdownMenu.Content
                   className="notification_menu"
-                  sideOffset={5}
                 >
-                  <DropdownMenu.Label className="text-[18px] font-medium text-gray-100 px-4 py-3 border-b border-gray-700">
+                  <DropdownMenu.Label className="text-[18px] font-medium text-gray-100 px-2 py-3 pt-2 border-b border-[#222]">
                     Notifications
                   </DropdownMenu.Label>
                   <Notifications />
@@ -732,8 +697,8 @@ console.log(data?.walletAddress,isConnected,"data");
 
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
-              <button className="profile_button" aria-label="Customise options">
-                <Avatar className="w-6 h-6">
+              <button className="pr-0 mr-0 profile_button" aria-label="Customise options">
+                <Avatar className="w-6 pr-0 mr-0 h-6">
                     {data?.profileImg ? (
                     <AvatarImage
                         src={data?.profileImg}
@@ -753,14 +718,8 @@ console.log(data?.walletAddress,isConnected,"data");
             <DropdownMenu.Portal>
               <div className="custom_dropdown_portal">
                 <DropdownMenu.Content className="profile_menu" sideOffset={5}>
-                  <div className="flex items-center space-x-3">
-                    {/* <img
-                      src={data?.profileImg ? data?.profileImg : "/images/default_user.png"}
-                      alt="Profile Icon"
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    /> */}
+                  <div className="flex items-center pl-2 space-x-3">
+
                     <Avatar className="w-10 h-10">
                     {data?.profileImg ? (
                     <AvatarImage
@@ -777,15 +736,10 @@ console.log(data?.walletAddress,isConnected,"data");
                 </Avatar>
                     <div>
                       <span className="text-sm text-gray-100">
-                        {data?.name ? data?.name : "--"}
+                        @{data?.userName ? data?.userName : "--"}
                       </span>
                       <div className="text-sm text-gray-100 flex items-center space-x-2">
-                        <button className="IconButton bg-[#131212] px-2 py-1 rounded" 
-                              // onClick={() => {
-                              //   navigator.clipboard.writeText(address ? address : data?.email);
-                              //   toastAlert("success", "Address copied to clipboard");
-                              // }}
-                              >
+                        <button className="IconButton bg-[#131212] px-2 py-1 rounded">
                                 <span className="text-[12px]">
                                   {address ? shortText(address) : data?.email}
                                 </span>
@@ -813,9 +767,7 @@ console.log(data?.walletAddress,isConnected,"data");
                             </Tooltip.Portal>
                           </Tooltip.Root>
                         </Tooltip.Provider>
-                        {/* <Link href="#" target="_blank">
-                          <OpenInNewWindowIcon className="h-[16px] w-[16px]" />
-                        </Link> */}
+
                       </div>
                     </div>
                   </div>
@@ -826,18 +778,7 @@ console.log(data?.walletAddress,isConnected,"data");
                   <DropdownMenu.Item className="DropdownMenuItem">
                     <Link href="/settings">Settings</Link>
                   </DropdownMenu.Item>
-                  {/* <DropdownMenu.Item className="DropdownMenuItem" disabled>
-                    <Link href="/">Watchlist</Link>
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item className="DropdownMenuItem" disabled>
-                    <Link href="/">Rewards</Link>
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item className="DropdownMenuItem" disabled>
-                    <Link href="/">Learn</Link>
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item className="DropdownMenuItem" disabled>
-                    <Link href="/">Documentation</Link>
-                  </DropdownMenu.Item> */}
+
                   <DropdownMenu.Item className="DropdownMenuItem" disabled>
                     <Link href="/">Terms of Use</Link>
                   </DropdownMenu.Item>

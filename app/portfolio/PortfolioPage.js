@@ -844,17 +844,26 @@ export default function PortfolioPage({ categories }) {
   const todayRealPercent = trunc((todayReal / profitAmount) * 100, 2)
   return (
     <>
-      <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
-        <div className="sticky top-0 z-50 w-[100%] backdrop-blur-md bg-black/90 border-b border-[#222] lg:mb-4 mb-0" style={{ borderBottomWidth: '1px' }}>
-          <Header />
-          <NavigationBar
-            menuItems={categories}
-            showLiveTag={true}
-            setSelectedCategory={setSelectedCategory}
-            selectedCategory={selectCategory}
-          />
-        </div>
-        <div className="container mx-auto px-4 pb-0 sm:pb-4 container-sm">
+      <div className="px-0 pb-20 sm:px-0 text-white bg-black h-auto items-center justify-items-center p-0 m-0">
+      <div className="fixed top-0 left-0 z-50 w-full backdrop-blur-md bg-black/80 border-b border-[#222]" style={{ borderBottomWidth: '1px' }}>
+        <Header />
+        <NavigationBar
+          menuItems={categories}
+          showLiveTag={true}
+          setSelectedCategory={setSelectedCategory}
+          selectedCategory={selectCategory}
+        />
+      </div>
+      {/* Spacer to prevent content from being hidden behind the fixed header/navbar */}
+      <div
+        className="lg:mb-4 mb-0"
+        style={{
+          height: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
+          minHeight: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
+          width: '100%'
+        }}
+      />
+        <div className="px-1.5 sm:px-0 container mx-auto pb-0 sm:pb-4 container-sm">
           <div className="flex justify-end sm:mb-2 mb-0 sm:mt-2 mt-4">
             {isConnected ? (
               <>
@@ -1542,13 +1551,13 @@ export default function PortfolioPage({ categories }) {
               <div className="flex gap-3 justify-between mt-4 sm:flex-nowrap flex-wrap">
                 <Button
                   onClick={() => ConnectPhantomWallet()}
-                  className="w-full h-13 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]"
+                className="rounded-[6px] w-full sm:h-13 h-10 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]"
                 >
                   <Image
                     src={"/images/wallet_icon_02.png"}
                     alt="Icon"
-                    width={40}
-                    height={40}
+                    width={30}
+                    height={30}
                   />
                 </Button>
               </div>
@@ -1561,7 +1570,9 @@ export default function PortfolioPage({ categories }) {
           </Dialog.Portal>
         </Dialog.Root>
       </div>
-      <Footer />
+            <div className="hidden sm:block">
+              <Footer />
+            </div>
       <HeaderFixed />
     </>
   );

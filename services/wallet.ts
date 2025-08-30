@@ -1,4 +1,12 @@
 import config from "@/config/config";
+
+// Helper to get API base URL (use proxy in dev, full URL in prod)
+function getApiBaseUrl() {
+  if (process.env.NODE_ENV === "production") {
+    return config.backendURL;
+  }
+  return ""; // Use Next.js proxy in development
+}
 import axios, { handleResp } from "@/config/axios";
 import { setWallet } from "@/store/slices/wallet/dataSlice";
 import { setUser } from "@/store/slices/auth/userSlice";
@@ -6,7 +14,7 @@ import { setUser } from "@/store/slices/auth/userSlice";
 export const userDeposit = async (data: any, dispatch: any) => {
     try {
       let respData = await axios({
-        url: `${config.backendURL}/api/v1/user/user-deposit`,
+        url: `${getApiBaseUrl()}/api/v1/user/user-deposit`,
         method: "post",
         data,
       });
@@ -23,7 +31,7 @@ export const userDeposit = async (data: any, dispatch: any) => {
 export const addressCheck = async (data: any) => {
     try {
       let respData = await axios({
-        url: `${config.backendURL}/api/v1/user/address-check`,
+        url: `${getApiBaseUrl()}/api/v1/user/address-check`,
         method: "post",
         data,
       });
@@ -37,7 +45,7 @@ export const saveWalletEmail = async (data: any) => {
   try {
     let respData = await axios({
       method: "post",
-      url: `${config.backendURL}/api/v1/user/save-wallet-email`,
+      url: `${getApiBaseUrl()}/api/v1/user/save-wallet-email`,
       data,
     });
     return handleResp(respData, "success");
@@ -50,7 +58,7 @@ export const saveWalletEmail = async (data: any) => {
 export const withdrawRequest = async (data: any,dispatch: any) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/withdraw-request`,
+      url: `${getApiBaseUrl()}/api/v1/user/withdraw-request`,
       method: "post",
       data,
     });

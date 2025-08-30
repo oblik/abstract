@@ -177,9 +177,9 @@ export default function ProfileSettings() {
             ) : (
             <form
                 onSubmit={handleSubmit}
-                className="sm:space-y-6 space-y-5 rounded-lg border bg-[#131212] sm:p-8 p-3"
+                className="sm:space-y-6 space-y-4 rounded-lg pt-4 border bg-[#131212] sm:p-8 p-3"
             >
-                <div className="relative w-24 h-24 mb-6 mx-auto">
+                <div className="relative sm:w-24 sm:h-24 w-20 h-20 sm:mb-6 mb-4 mx-auto">
                 <input
                     ref={inputFileRef}
                     type="file"
@@ -219,14 +219,15 @@ export default function ProfileSettings() {
 
                 <div className="sm:space-y-2 space-y-1">
                 <Label htmlFor="username">Username</Label>
-                <Input
-                    id="username"
-                    value={username}
-                    onChange={handleUsernameChange}
-                    className="bg-black border-[#252525] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
-                    placeholder="Set a unique username (letters, numbers, underscore only)"
-                    disabled={isDisable}
-                />
+                  <Input
+                      id="username"
+                      value={username}
+                      onChange={handleUsernameChange}
+                      className="bg-black border-[#252525] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none 
+                                text-sm sm:text-base  placeholder:text-[#404040] placeholder:text-sm sm:placeholder:text-base"
+                      placeholder="Set a unique username (letters, numbers, underscore only)"
+                      disabled={isDisable}
+                  />
                 {usernameError && (
                     <p className="text-red-500 text-sm mt-1">
                     {usernameError}
@@ -240,7 +241,8 @@ export default function ProfileSettings() {
                     id="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="bg-black border-[#252525] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none "
+                    className="bg-black border-[#252525]  placeholder:text-[#404040]  focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none 
+                                text-sm text-white sm:text-base placeholder:text-sm sm:placeholder:text-base"                    
                     placeholder="Your name (optional)"
                 />
                 </div>
@@ -251,7 +253,7 @@ export default function ProfileSettings() {
                     id="bio"
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
-                    className="w-full bg-black border border-[#252525] rounded-md p-2 text-white"
+                    className="w-full placeholder:text-sm text-white placeholder:text-[#404040] sm:placeholder:text-base bg-black border border-[#252525] rounded-md p-2 text-white"
                     placeholder="Tell us about yourself... (optional)"
                     rows={3}
                 />
@@ -261,7 +263,7 @@ export default function ProfileSettings() {
                 <Button
                     type="submit"
                     disabled={saving || !!usernameError || saved}
-                    className="border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300"
+                    className="border border-white bg-transparent text-[12px] sm:text-[14px] text-white hover:bg-white hover:text-black transition-colors duration-300"
                 >
                     {saving ? (
                     "Saving..."

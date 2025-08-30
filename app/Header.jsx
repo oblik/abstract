@@ -21,9 +21,9 @@ export default function Header() {
   const navigateToPortfolioPage = () => router.push("/portfolio");
 
   return (
-    <header className="flex flex-col md:flex-row items-center w-full bg-transparent sm:h-12 h-10 md:h-16 pt-1 md:pt-2 container mx-auto px-2 md:px-4 lg:px-0">
+    <header className="px-1.5 sm:px-0 flex flex-col md:flex-row items-center w-full bg-transparent sm:h-12 h-11 md:h-16 pt-1 md:pt-2 container mx-auto">
       {/* Logo and Mobile Auth */}
-      <div className="flex items-center justify-between lg:ml-4 w-full lg:w-auto">
+      <div className="flex items-center justify-between ml-0 w-full lg:w-auto">
         <div className="flex items-center">
           <Link href="/">
             <Image
@@ -53,10 +53,10 @@ export default function Header() {
       </div>
 
       {/* Desktop Auth Buttons */}
-      <div className="hidden lg:flex items-center gap-2 ml-auto pr-4">
+      <div className="hidden lg:flex items-center gap-2 ml-auto pr-0 mr-0">
         {signedIn && (
           <button
-            className="px-3 py-2 hover:bg-gray-800 rounded-md transition-colors"
+            className="px-3 py-2 rounded-md transition-colors"
             onClick={navigateToPortfolioPage}
           >
             <div className="text-l text-[#33ff4c]">

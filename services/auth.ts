@@ -3,6 +3,22 @@ import browser from "browser-detect";
 import isEmpty from "@/app/helper/isEmpty";
 
 import config from "@/config/config";
+
+// Helper to get freeipapi base URL (use proxy in dev, full URL in prod)
+function getFreeIpApiBaseUrl() {
+  if (process.env.NODE_ENV === "production") {
+    return config.getLoginInfo;
+  }
+  return "/freeipapi"; // Use Next.js proxy in development
+}
+
+// Helper to get API base URL (use proxy in dev, full URL in prod)
+function getApiBaseUrl() {
+  if (process.env.NODE_ENV === "production") {
+    return config.backendURL;
+  }
+  return ""; // Use Next.js proxy in development
+}
 import { handleResp, setAuthorization } from "@/config/axios";
 import { signIn } from "@/store/slices/auth/sessionSlice";
 import { setUser } from "@/store/slices/auth/userSlice";
@@ -13,7 +29,7 @@ import { subscribe } from "@/config/socketConnectivity";
 export const register = async (data: any) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/register`,
+      url: `${getApiBaseUrl()}/api/v1/user/register`,
       method: "post",
       data,
     });
@@ -26,7 +42,7 @@ export const register = async (data: any) => {
 export const googleLogin = async (reqBody: any, dispatch: any) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/google-sign`,
+      url: `${getApiBaseUrl()}/api/v1/user/google-sign`,
       method: "post",
       data: reqBody,
     });
@@ -54,7 +70,7 @@ export const googleLogin = async (reqBody: any, dispatch: any) => {
 export const walletLogin = async (reqBody: any, dispatch: any) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/wallet-sign`,
+      url: `${getApiBaseUrl()}/api/v1/user/wallet-sign`,
       method: "post",
       data: reqBody,
     });
@@ -85,7 +101,7 @@ export const walletLogin = async (reqBody: any, dispatch: any) => {
 export const verifyEmail = async (data: any, dispatch: any) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/email-verify`,
+      url: `${getApiBaseUrl()}/api/v1/user/email-verify`,
       method: "post",
       data,
     });
@@ -114,7 +130,7 @@ export const getLocation = async () => {
   try {
     let loginHistory: any = {};
     let respData: any = await axios({
-      url: config.getLoginInfo,
+      url: `${getFreeIpApiBaseUrl()}/api/json`,
       method: "get",
     });
     if (respData) {
@@ -143,7 +159,7 @@ export const getLocation = async () => {
 export const resendOTP = async (data: any) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/resend-otp`,
+      url: `${getApiBaseUrl()}/api/v1/user/resend-otp`,
       method: "post",
       data,
     });
@@ -157,7 +173,7 @@ export const getUser = async () => {
   try {
     let respData = await axios({
       method: "get",
-      url: `${config.backendURL}/api/v1/user/get-user`,
+      url: `${getApiBaseUrl()}/api/v1/user/get-user`,
     });
     return handleResp(respData, "success");
   } catch (error) {

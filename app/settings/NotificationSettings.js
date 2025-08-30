@@ -59,17 +59,17 @@ export default function NotificationSettings() {
     return (
         <>
             <h1 className="sm:text-2xl text-xl font-bold sm:mb-8 sm:mt-0 mt-3 mb-4">Notification Settings</h1>
-            <div className="sm:space-y-6 space-y-5 rounded-lg border bg-[#131212] sm:p-8 p-3">
+            <div className="sm:space-y-6 space-y-3 pt-6 pb-6 rounded-lg border bg-[#131212] sm:p-8 p-3">
             <div className="flex items-center space-x-3">
                 <Image
                 src="/images/email_icon.png"
                 alt="Icon"
-                width={40}
-                height={40}
+                width={30}
+                height={30}
                 />
-                <span className="text-lg font-semibold">Email</span>
+                <span className="sm:text-lg text-[15px] font-semibold">Email</span>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center sm:text-[15px] text-[14px] justify-between">
                 <label
                     className="Label"
                     htmlFor="airplane-mode"
@@ -94,12 +94,12 @@ export default function NotificationSettings() {
                 <Image
                 src="/images/bell_icon.png"
                 alt="Icon"
-                width={40}
-                height={40}
+                width={30}
+                height={30}
                 />
-                <span className="text-lg font-semibold">In App</span>
+                <span className="sm:text-lg text-[15px] font-semibold">In App</span>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center sm:text-[15px] text-[14px] justify-between">
                 <label
                 className="Label"
                 htmlFor="airplane-mode"
@@ -126,7 +126,7 @@ export default function NotificationSettings() {
                     <CheckIcon className="h-[20px] w-[20px]" />
                 </Checkbox.Indicator>
                 </Checkbox.Root>
-                <label className="Label" htmlFor="c1">
+                <label className="Label sm:text-[15px] text-[14px]" htmlFor="c1">
                 Hide small fills (Less than 1 share)
                 </label>
             </div>

@@ -95,9 +95,11 @@ export default function EventLinting({
 
   return (
     <>
-        {loading && (
-          <Loader className="w-26 h-26 animate-spin" />
-        )}
+            {loading && (
+              <div className="flex justify-center items-center py-8">
+                <Loader className="w-26 h-26 animate-spin" />
+              </div>
+            )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[10px] w-full">
           {events &&

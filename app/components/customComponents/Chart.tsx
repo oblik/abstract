@@ -578,10 +578,10 @@ const Chart: React.FC<ChartProps> = ({
                         <div style={{ display: "flex", alignItems: "center" }}>
                             <div
                                 style={{
-                                    width: screenWidth < 640 ? "40px" : "65px",
-                                    height: screenWidth < 640 ? "40px" : "65px",
+                                    width: screenWidth < 640 ? "45px" : "65px",
+                                    height: screenWidth < 640 ? "45px" : "65px",
                                     overflow: "hidden",
-                                    borderRadius: "10px",
+                                    borderRadius: screenWidth < 640 ? "7px" : "8px",
                                     flexShrink: 0,
                                 }}
                             >
@@ -599,7 +599,7 @@ const Chart: React.FC<ChartProps> = ({
                                 />
                             </div>
                             <div
-                                className="text-[19px] lg:text-[26px] sm:text-[20px]"
+                                className="text-[18px] lg:text-[26px] sm:text-[20px]"
                                 style={{ paddingLeft: "15px" }}
                             >
                                 {title || ""}
@@ -608,10 +608,10 @@ const Chart: React.FC<ChartProps> = ({
                     </CardTitle>
 
                     {/* 显示 Vol 和时间等信息 */}
-                    <CardDescription className="py-0 flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2">
+                    <CardDescription className="py-0 sm:pb-0 pb-1 flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2">
                         {/* First line - Volume, Date, and Toggle */}
                         <div className="flex flex-wrap gap-3 items-center">
-                            <p className="text-[12px] sm:text-[14px]">Vol ${(volume && toTwoDecimal(volume/100)?.toLocaleString()) || "0.00"}</p>
+                            <p className="text-[12px] sm:text-[14px]">Vol ${volume?.toLocaleString() || ""}</p>
                             {endDate && (
                                 <p className="flex items-center gap-1 text-[12px] sm:text-[14px]">
                                     <Clock size={12} className="sm:w-[14px] sm:h-[14px] w-[12px] h-[12px]" />{" "}
@@ -647,61 +647,51 @@ const Chart: React.FC<ChartProps> = ({
                                 </Button>
                             )}
                         </div>
-                        <div className="flex items-center gap-2 mt-2">
-                            {seriesData?.length > 0 && (
-                                <Popover.Root>
-                                    <Popover.Trigger asChild>
-                                        <Button className="...">
-                                            <CountdownTimerIcon />
-                                        </Button>
-                                    </Popover.Trigger>
-                                    <Popover.Content className="history_card" sideOffset={5}>
-                                        <ul className="history_card_list">
+                            <div className="flex items-center gap-2 pl-2 mt-0">
+                                        {seriesData?.length > 0 && (
+                                            <Popover.Root>
+                                                <Popover.Trigger asChild>
+                                                    <Button className="px-4 sm:h-7 h-6 rounded-full">
+                                                        <CountdownTimerIcon />
+                                                    </Button>
+                                                </Popover.Trigger>
+                                                <Popover.Content className="history_card" sideOffset={5}>
+                                                    <ul className="history_card_list">
+                                                    {seriesData?.length > 0 && (
+                                                        seriesData
+                                                            .filter((series) => series.status !== "active")
+                                                            ?.sort((a: any, b: any) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())
+                                                            ?.map((event) => (
+                                                                <li key={event?.slug} 
+                                                                onClick={()=>route.push(`/event-page/${event.slug}`)}
+                                                                >
+                                                                    {/* <Link href={`/event-page/${event.slug}`}> */}
+                                                                        {momentFormat(event.endDate,"D MMM YYYY, h:mm A")}
+                                                                    {/* </Link> */}
+                                                                </li>
+                                                            ))
+                                                        )}
+                                                    </ul>
+                                                    <Popover.Arrow className="HoverCardArrow" />
+                                                </Popover.Content>
+                                            </Popover.Root>
+                                        )}
                                         {seriesData?.length > 0 && (
                                             seriesData
-                                                .filter((series) => series.status !== "active")
-                                                .map((event) => (
-                                                    <li key={event?.slug} onClick={()=>route.push(`/event-page/${event.slug}`)}>
-                                                        {/* <Link href={`/event-page/${event.slug}`}> */}
-                                                            {momentFormat(event.endDate,"D MMM YYYY, h:mm A")}
-                                                        {/* </Link> */}
-                                                    </li>
-                                                ))
-                                            )}
-                                        </ul>
-                                        <Popover.Arrow className="HoverCardArrow" />
-                                    </Popover.Content>
-                                </Popover.Root>
-                            )}
-                            {seriesData?.length > 0 && (
-                                seriesData
-                                    .filter((series) => series.status === "active")
-                                    .map((event) => (
-                                    <div
-                                        key={event.slug} 
-                                        // href={`/event-page/${event.slug}`}
-                                        onClick={()=>route.push(`/event-page/${event.slug}`)}
-                                        className="w-[90px] rounded-full bg-transparent border border-[#262626] text-white hover:bg-[#262626] hover:text-white active:bg-[#262626] active:text-white text-center px-2 py-1 block text-sm"
-                                    >
-                                        {momentFormat(event?.endDate,"D MMM")}
-                                    </div>
-                                ))
-                            )}
-
-                            {/* <Button
-                                // className="w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] active:bg-[#262626] active:text-[#fff]"
-                                className={`w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] ${activeDate === "Jun 18"
-                                        ? "bg-[#fff] text-[#262626] border-[#262626]"
-                                        : ""
-                                    }`}
-                                onClick={() => setActiveDate("Jun 18")}
-                            >
-                                Jun 18
-                            </Button>
-                            <Button className="w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] active:bg-[#262626] active:text-[#fff]">
-                                Jul 30
-                            </Button> */}
-                        </div>
+                                                .filter((series) => series.status === "active")
+                                                ?.sort((a: any, b: any) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime())
+                                                ?.map((event) => (
+                                                    <div
+                                                        key={event.slug}
+                                                        // href={`/event-page/${event.slug}`}
+                                                        onClick={() => route.push(`/event-page/${event.slug}`)}
+                                                      className="sm:w-[90px] w-[80px] h-6 sm:h-8 flex items-center justify-center rounded-full bg-transparent border border-[#262626] text-white hover:bg-[#262626] hover:text-white active:bg-[#262626] active:text-white py-0 sm:py-2 px-2 text-[12px] sm:text-sm"
+                                                    >
+                                                        {momentFormat(event?.endDate, "D MMM")}
+                                                    </div>
+                                            ))
+                                        )}
+                                      </div>
                     </CardDescription>
                     {/* Single market chance display - inside CardHeader like MonthlyListenersChart2 */}
                     {market?.length <= 1 && displayChance !== undefined && (

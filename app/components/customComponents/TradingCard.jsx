@@ -159,16 +159,7 @@ export function TradingCard({
               </div>
             </div>
           </CardTitle>
-          {/* <CardDescription>
-            {" "}
-            $
-            {market?.volume
-              ? (market.volume / 100).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })
-              : "0.00"}
-          </CardDescription> */}
+
         </CardHeader>
 
         <CardContent className="sm:p-4 pt-0 sm:pt-0 p-3">

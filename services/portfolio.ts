@@ -1,10 +1,18 @@
 import config from "@/config/config";
+
+// Helper to get API base URL (use proxy in dev, full URL in prod)
+function getApiBaseUrl() {
+  if (process.env.NODE_ENV === "production") {
+    return config.backendURL;
+  }
+  return ""; // Use Next.js proxy in development
+}
 import axios, { handleResp } from "@/config/axios";
 
 export const getPositionHistory = async (data: any) => {
     try {
       let respData = await axios({
-        url: `${config.backendURL}/api/v1/user/position-history`,
+        url: `${getApiBaseUrl()}/api/v1/user/position-history`,
         method: "post",
         data,
       });
@@ -17,7 +25,7 @@ export const getPositionHistory = async (data: any) => {
 export const getPositionsById = async (id: string) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/position-history/user/${id}`,
+      url: `${getApiBaseUrl()}/api/v1/user/position-history/user/${id}`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -29,7 +37,7 @@ export const getPositionsById = async (id: string) => {
 export const getOpenOrders = async (data: any) => {
     try {
       let respData = await axios({
-        url: `${config.backendURL}/api/v1/user/open-position`,
+        url: `${getApiBaseUrl()}/api/v1/user/open-position`,
         method: "get",
         data,
       });
@@ -42,7 +50,7 @@ export const getOpenOrders = async (data: any) => {
 export const getClosedPnL = async (data: any) => {
     try {
       let respData = await axios({
-        url: `${config.backendURL}/api/v1/user/closedPnL`,
+        url: `${getApiBaseUrl()}/api/v1/user/closedPnL`,
         method: "get",
         data,
       });
@@ -55,7 +63,7 @@ export const getClosedPnL = async (data: any) => {
 export const getUserPnL = async (data: any) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/position-value?timeframe=${data}`,
+      url: `${getApiBaseUrl()}/api/v1/user/position-value?timeframe=${data}`,
       method: "get",
       data,
     });

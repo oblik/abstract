@@ -220,7 +220,7 @@ const OpenOrders = () => {
                     </tbody>
                 </table>
                 {openOrders.length === 0 && !loading && (
-                    <div className="flex justify-center my-5 text-gray-500">
+                    <div className="flex text-[13px] justify-center text my-5 text-gray-500">
                         No orders found
                     </div>
                 )}

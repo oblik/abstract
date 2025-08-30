@@ -320,8 +320,7 @@ export default function EventPage({ categories }) {
 
   return (
     <>
-      {/* <div className="overflow-hidden text-white bg-black sm:pr-10 sm:pl-10 pr-0 pl-0 justify-center h-auto items-center justify-items-center m-0"> */}
-      <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
+      <div className="px-0 sm:px-0 text-white bg-black h-auto items-center justify-items-center p-0 m-0">
         <div className="fixed top-0 left-0 z-50 w-[100%] backdrop-blur-md bg-black/80 border-b border-[#222] lg:mb-4 mb-0" style={{ borderBottomWidth: '1px' }}>
           <Header />
           <div className="hidden lg:block">
@@ -336,16 +335,15 @@ export default function EventPage({ categories }) {
         </div>
         {/* Remove spacer and use padding-top on main content to offset header */}
         <div
-          className="container mx-auto px-0 sm:px-4 max-w-full overflow-hidden"
+          className=" container mx-auto px-0 max-w-full overflow-hidden"
           style={{ paddingTop: typeof window !== 'undefined' && window.innerWidth < 640 ? '40px' : '112px', paddingLeft: window?.innerWidth < 640 ? 0 : undefined, paddingRight: window?.innerWidth < 640 ? 0 : undefined }}
         >
           {eventsLoading ? (
-            <div className="flex justify-center items-center h-[80vh] w-[80vw]">
+            <div className="flex justify-center items-center h-[80vh] w-full">
               <Loader className="w-26 h-26 animate-spin bg-blend-overlay" />
-              Loading...
             </div>
           ) : (
-            <div className="sm:mx-auto mx-0 sm:pt-4 pt-0 px-1 sm:px-0">
+            <div className="px-1.5 sm:px-0 sm:mx-auto mx-0 sm:pt-4 pt-0">
               {/* Preview Card Section */}
               <div className="flex justify-center items-center">
                 <div className="flex justify-center sm:max-w-8xl mb-0 w-full gap-5">
@@ -354,12 +352,11 @@ export default function EventPage({ categories }) {
                     {events?.forecast ? (
                       <MonthlyListenersChart2
                         title={events?.title}
-                        volume={
-                          markets?.reduce(
-                            (acc, market) => acc + (market.volume || 0),
-                            0
-                          ) || 0
-                        }
+                      volume={
+                        Number(
+                          ((markets?.reduce((acc, market) => acc + (market.volume || 0), 0) || 0) / 100)
+                        ).toFixed(2)
+                      }
                         image={events?.image}
                         endDate={events.endDate}
                         eventId={events?._id}
@@ -375,10 +372,9 @@ export default function EventPage({ categories }) {
                         id={id}
                         title={events?.title}
                         volume={
-                          markets?.reduce(
-                            (acc, market) => acc + (market.volume || 0),
-                            0
-                          ) || 0
+                          Number(
+                            ((markets?.reduce((acc, market) => acc + (market.volume || 0), 0) || 0) / 100)
+                          ).toFixed(2)
                         }
                         image={events?.image || "/images/logo.png"}
                         endDate={events?.endDate}
@@ -388,39 +384,7 @@ export default function EventPage({ categories }) {
                         series={events?.seriesId}
                       />
                     )}
-                    {/* {markets.length < 2 ? (
-                      <SingleLineChart
-                        title={events.title}
-                        volume={events.volume}
-                        image={events.image || "/images/logo.png"}
-                        endDate={events.endDate}
-                        market={markets}
-                        interval={interval}
-                        chance={markets[0]?.bestAsk} // 添加 chance 属性，使用市场的 bestAsk 值
-                      />
-                    ) : (
-                      <MultiLineChart
-                        title={events.title}
-                        volume={events.volume}
-                        image={events.image || "/images/logo.png"}
-                        markets={markets.filter(
-                          (market) => market.status === "active"
-                        )}
-                        endDate={events.endDate}
-                        interval={interval}
-                      />
-                    )}
-                    Check */}
-                    {/* <MultiLineChart
-                        title={events.title}
-                        volume={events.volume}
-                        image={events.image || "/images/logo.png"}
-                        markets={markets.filter(
-                          (market) => market.status === "active"
-                        )}
-                        endDate={events.endDate}
-                        interval={interval}
-                      /> */}
+
                     <div className="flex justify-center items-center mt-2 sm:mt-0 mb-4 sm:mb-8 md:mb-8 text-xs sm:text-base" style={{ marginTop: '0.5rem', marginBottom: '1rem', transform: 'scale(0.85)', transformOrigin: 'center', maxWidth: '90vw' }}>
                       <ChartIntervals
                         interval={interval}
@@ -492,13 +456,13 @@ export default function EventPage({ categories }) {
                                 ?.map((market, index) => {
                                   if (market.status == "resolved") {
                                     return (
-                                      <div key={index} className="flex justify-between items-center px-4 py-3 border-b border-[#2a2a2a] hover:bg-[#1d1d1d] cursor-pointer">
+                                      <div key={index} className="flex justify-between items-center px-4 py-3 border-t border-[#2a2a2a] hover:bg-[#0a0a0a] duration-300 cursor-pointer">
                                         <div>
                                           <h3 className="text-[15px] sm:text-[16px] font-bold text-white flex items-center gap-2">
                                             {market.groupItemTitle}
                                           </h3>
                                           <p className="text-gray-400 text-sm">
-                                            ${Number(market.volume).toLocaleString()} Vol.
+                                            ${Number((market.volume || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Vol.
                                           </p>
                                         </div>
                                         <div className="flex items-center gap-1">
@@ -758,7 +722,7 @@ export default function EventPage({ categories }) {
                             </div>
                           </div>
                         </DrawerTrigger>
-                        <DrawerContent className="h-[90vh] overflow-auto">
+                        <DrawerContent className="pb-0 border border-grey-500 bg-black h-auto">
                           {/* Hidden DrawerTitle to satisfy component requirements */}
                           <div hidden>
                             <DrawerHeader>
@@ -767,8 +731,10 @@ export default function EventPage({ categories }) {
                           </div>
 
                           {/* Main Content */}
-                          <div className="p-0">
+                          <div className="no-shadow p-0">
                             <TradingCard
+
+                            className="border-none box-shadow-none no-shadow !shadow-none shadow-none"
                               activeView={activeView}
                               setActiveView={setActiveView}
                               selectedOrderBookData={
@@ -794,7 +760,7 @@ export default function EventPage({ categories }) {
                     {/* Drawer for multiple markets - controlled by accordion buttons */}
                     {markets?.length > 1 && (
                       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-                        <DrawerContent className="h-[80vh]">
+                        <DrawerContent className="pb-0 border border-grey-500 bg-black h-auto">
                           {/* Hidden DrawerTitle to satisfy component requirements */}
                           <div hidden>
                             <DrawerHeader>
@@ -803,7 +769,7 @@ export default function EventPage({ categories }) {
                           </div>
 
                           {/* Main Content */}
-                          <div className="p-0">
+                          <div className="no-shadow p-0">
                             <TradingCard
                               activeView={activeView}
                               setActiveView={setActiveView}

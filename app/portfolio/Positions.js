@@ -246,7 +246,7 @@ const Positions = (props) => {
     <>
       <div className="overflow-x-auto">
         <table className="w-full text-left custom_table">
-          <thead className="sm:text-sm h-0 py-0 text-[13px]">
+          <thead >
             <tr>
               <th className="max-h-2">Market</th>
               <th>Contracts</th>
@@ -271,7 +271,7 @@ const Positions = (props) => {
                             alt="Icon"
                             width={45}
                             height={45}
-                            className="rounded-[6px] object-cover aspect-square"
+                            className="cursor-pointer rounded-[6px] object-cover aspect-square"
                             onClick={() =>
                               router.push(`/event-page/${item?.eventSlug}`)
                             }

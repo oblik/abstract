@@ -3,26 +3,34 @@ import axios, { handleResp } from "@/config/axios";
 import { setUser } from "@/store/slices/auth/userSlice";
 
 
-export const getUserData = async (dispatch:any) => {
+function getApiBaseUrl() {
+  if (process.env.NODE_ENV === "production") {
+    return config.backendURL;
+  }
+  return ""; // Use Next.js proxy in development
+}
 
-    try {
-      let respData = await axios({
-        url: `${config.backendURL}/api/v1/user/get-user`,
-        method: "get",
-      });
-      const { result } = respData.data;
-      console.log("result>>>>>>>>>>.",result)
-      dispatch(setUser(result));
-      return handleResp(respData, "success");
-    } catch (error: any) {
-      return handleResp(error, "error");
-    }
+
+export const getUserData = async (dispatch: any) => {
+
+  try {
+    let respData = await axios({
+      url: `${getApiBaseUrl()}/api/v1/user/get-user`,
+      method: "get",
+    });
+    const { result } = respData.data;
+    console.log("result>>>>>>>>>>.", result)
+    dispatch(setUser(result));
+    return handleResp(respData, "success");
+  } catch (error: any) {
+    return handleResp(error, "error");
+  }
 };
 
 export const getUserById = async (id: string) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/get-user/id/${id.replace("@", "")}`,
+      url: `${getApiBaseUrl()}/api/v1/user/get-user/id/${id.replace("@", "")}`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -35,7 +43,7 @@ export const getTradeOverviewById = async (id: string) => {
 
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/user-trade-overview/id/${id}`,
+      url: `${getApiBaseUrl()}/api/v1/user/user-trade-overview/id/${id}`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -48,7 +56,7 @@ export const getTradeOverview = async () => {
 
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/user-trade-overview`,
+      url: `${getApiBaseUrl()}/api/v1/user/user-trade-overview`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -57,23 +65,23 @@ export const getTradeOverview = async () => {
   }
 };
 
-export const updateUserData = async (data:object) => {
-    try {
-      let respData = await axios({
-        url: `${config.backendURL}/api/v1/user/update-user`,
-        method: "post",
-        data: data
-      });
-      return handleResp(respData, "success");
-    } catch (error: any) {
-      return handleResp(error, "error");
-    }
+export const updateUserData = async (data: object) => {
+  try {
+    let respData = await axios({
+      url: `${getApiBaseUrl()}/api/v1/user/update-user`,
+      method: "post",
+      data: data
+    });
+    return handleResp(respData, "success");
+  } catch (error: any) {
+    return handleResp(error, "error");
+  }
 };
 
 export const getPositions = async () => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/position-history`,
+      url: `${getApiBaseUrl()}/api/v1/user/position-history`,
       method: "post",
     });
     return handleResp(respData, "success");
@@ -82,10 +90,10 @@ export const getPositions = async () => {
   }
 };
 
-export const getTradeHistory = async (data:any) => {
+export const getTradeHistory = async (data: any) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/trade-history/user/${data?.id}?page=${data.page}&limit=${data.limit}`,
+      url: `${getApiBaseUrl()}/api/v1/user/trade-history/user/${data?.id}?page=${data.page}&limit=${data.limit}`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -94,10 +102,10 @@ export const getTradeHistory = async (data:any) => {
   }
 };
 
-export const getUserTradeHistory = async (data:any) => {
+export const getUserTradeHistory = async (data: any) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/trade-history/${data?.id}`,
+      url: `${getApiBaseUrl()}/api/v1/user/trade-history/${data?.id}`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -109,7 +117,7 @@ export const getUserTradeHistory = async (data:any) => {
 export const getInfoCards = async () => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/info-cards`,
+      url: `${getApiBaseUrl()}/api/v1/user/info-cards`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -118,10 +126,10 @@ export const getInfoCards = async () => {
   }
 };
 
-export const setUserEmailNotification = async (data:any) => {
+export const setUserEmailNotification = async (data: any) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/set-user-email-notification`,
+      url: `$${getApiBaseUrl()}/api/v1/user/set-user-email-notification`,
       method: "post",
       data: data
     });
@@ -131,10 +139,10 @@ export const setUserEmailNotification = async (data:any) => {
   }
 };
 
-export const setInAppNotification = async (data:any) => {
+export const setInAppNotification = async (data: any) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/set-in-app-notification`,
+      url: `${getApiBaseUrl()}/api/v1/user/set-in-app-notification`,
       method: "post",
       data: data
     });
@@ -144,10 +152,10 @@ export const setInAppNotification = async (data:any) => {
   }
 };
 
-export const setWalletSettings = async (data:any) => {
+export const setWalletSettings = async (data: any) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/set-wallet-settings`,
+      url: `${getApiBaseUrl()}/api/v1/user/set-wallet-settings`,
       method: "post",
       data: data
     });
@@ -160,7 +168,7 @@ export const setWalletSettings = async (data:any) => {
 export const getWalletSettings = async () => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/get-wallet-settings`,
+      url: `${getApiBaseUrl()}/api/v1/user/get-wallet-settings`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -169,22 +177,10 @@ export const getWalletSettings = async () => {
   }
 };
 
-export const getPositionsByEvtId = async (data:any) => {
+export const getPositionsByEvtId = async (data: any) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/positions/event/${data?.id}`,
-      method: "get",
-    });
-    return handleResp(respData, "success");
-  } catch (error: any) {
-    return handleResp(error, "positionerror");
-  }
-};
-
-export const getOpenOrdersByEvtId = async (data:any) => {
-  try {
-    let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/open-orders/event/${data?.id}`,
+      url: `${getApiBaseUrl()}/api/v1/user/positions/event/${data?.id}`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -193,10 +189,22 @@ export const getOpenOrdersByEvtId = async (data:any) => {
   }
 };
 
-export const addUserName = async (data:any) => {
+export const getOpenOrdersByEvtId = async (data: any) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/add-user-name`,
+      url: `${getApiBaseUrl()}/api/v1/user/open-orders/event/${data?.id}`,
+      method: "get",
+    });
+    return handleResp(respData, "success");
+  } catch (error: any) {
+    return handleResp(error, "error");
+  }
+};
+
+export const addUserName = async (data: any) => {
+  try {
+    let respData = await axios({
+      url: `${getApiBaseUrl()}/api/v1/user/add-user-name`,
       method: "post",
       data: data
     });
@@ -206,10 +214,10 @@ export const addUserName = async (data:any) => {
   }
 };
 
-export const deleteComment = async (data:any) => {
+export const deleteComment = async (data: any) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/comments/${data?.id}`,
+      url: `${getApiBaseUrl()}/api/v1/user/comments/${data?.id}`,
       method: "delete",
     });
     return handleResp(respData, "success");
@@ -221,7 +229,7 @@ export const deleteComment = async (data:any) => {
 export const getCurrentValue = async () => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/current-value`,
+      url: `${getApiBaseUrl()}/api/v1/user/current-value`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -231,10 +239,10 @@ export const getCurrentValue = async () => {
 };
 
 
-export const transactionHistory = async (data:any) => {
+export const transactionHistory = async (data: any) => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/transaction-history`,
+      url: `${getApiBaseUrl()}/api/v1/user/transaction-history`,
       method: "get",
       params: data,
     });
@@ -250,7 +258,7 @@ export const transactionHistory = async (data:any) => {
 export const getCoinList = async () => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/get-coin-list`,
+      url: `${getApiBaseUrl()}/api/v1/user/get-coin-list`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -262,7 +270,7 @@ export const getCoinList = async () => {
 export const getNotifications = async () => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/notifications`,
+      url: `${getApiBaseUrl()}/api/v1/user/notifications`,
       method: "get",
     });
     return handleResp(respData, "success");

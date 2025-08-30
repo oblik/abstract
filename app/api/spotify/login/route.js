@@ -14,7 +14,7 @@ export async function GET(request) {
   const scopes = ['user-top-read'];
   const redirectUri = `${process.env.NEXT_PUBLIC_SITE_URL}/api/spotify/callback`;
 
-const authUrl = `https:
+  const authUrl = `https://accounts.spotify.com/authorize?response_type=code&client_id=${process.env.SPOTIFY_CLIENT_ID}&scope=${encodeURIComponent(
     scopes.join(' ')
   )}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${encodeURIComponent(`${email},${name}`)}`;
 

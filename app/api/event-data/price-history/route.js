@@ -8,7 +8,7 @@ export async function GET(req) {
 
   try {
     const response = await fetch(
-      `https://api-dev.orderly.network/v1/public/futures/${market}/price-history?fidelity=${fidelity}&interval=${interval}`,
+      `https://clob.polymarket.com/prices-history?interval=${interval}&market=${market}&fidelity=${fidelity}`,
       {
         method: "GET",
         headers: {

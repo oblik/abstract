@@ -13,12 +13,11 @@ export async function GET(req: Request) {
     if (!apiKey) {
       throw new Error('POLYGONSCAN_API_KEY not configured');
     }
-const apiUrl = `https://api.polygonscan.com/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=asc&apikey=${apiKey}`;
+    const apiUrl = `https://api.polygonscan.com/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=desc&apikey=${apiKey}`;
     const response = await fetch(apiUrl);
     const data = await response.json();
     return NextResponse.json(data);
-  } catch (err: unknown) {
-    const error = err as Error;
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

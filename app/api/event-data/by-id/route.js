@@ -1,10 +1,12 @@
-export async function GET(request) {
-  const { searchParams } = new URL(request.url);
+export const runtime = 'edge';
+
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
 
   try {
     const response = await fetch(
-      `https://api-dev.orderly.network/v1/client/events/${id}`,
+      `https://gamma-api.polymarket.com/events/${id}`,
       {
         method: "GET",
         headers: {

@@ -37,7 +37,7 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Divider Line */}
-        <div className="mt-10 border-t border-gray-800"></div>
+        <div className="mt-10 border-t border-[#202020]"></div>
 
         {/* Bottom Section */}
         <div className="mt-6 pt-6 flex flex-col md:flex-row items-center justify-between text-sm text-white/75">

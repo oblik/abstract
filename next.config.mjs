@@ -8,49 +8,37 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "upload.wikimedia.org",  // Add this line
+        hostname: "upload.wikimedia.org",
       },
       {
         protocol: "https",
-        hostname: "i.ibb.co",  // Add this line
+        hostname: "i.ibb.co",
       },
       {
         protocol: "http",
-        hostname: "localhost",  // Add this line
+        hostname: "localhost",
         port: "3001",
       },
       {
-        protocol:"https",
+        protocol: "https",
         hostname: "sonotradesdemo.wearedev.team",
-      }
+      },
     ],
   },
-  // Fix for camelcase module resolution in @pythnetwork/client
-  transpilePackages: ['@pythnetwork/client', '@coral-xyz/anchor'],
-  webpack: (config, { isServer }) => {
-    // Add alias for camelcase to help webpack resolve it
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      'camelcase': 'camelcase',
-    };
-    
-    // Handle Node.js modules in browser environment
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        "crypto": false,
-        "stream": false,
-        "assert": false,
-        "http": false,
-        "https": false,
-        "os": false,
-        "url": false,
-        "zlib": false,
-      };
-    }
-    
-    return config;
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'https://sonotradesdemo.wearedev.team/api/:path*',
+      },
+      {
+        source: '/freeipapi/:path*',
+        destination: 'https://freeipapi.com/:path*',
+      },
+    ];
   },
+  // <<< ADD THIS
+
 };
 
 export default nextConfig;

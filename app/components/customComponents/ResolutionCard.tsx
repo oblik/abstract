@@ -24,10 +24,8 @@ export default function ResolutionCard({
         <div className="bg-[#00AEEF] p-3 rounded-full">
           <Check className="text-white w-6 h-6" />
         </div>
-        <h4 className="text-[#00AEEF] font-semibold text-lg">Outcome: {displayOutcome}</h4>
-        {eventType === "Multiple Choice" && (
-          <p className="text-gray-400 text-sm">{market?.groupItemTitle}</p>
-        )}
+        <h4 className="text-[#00AEEF] font-semibold text-lg">Market Resolved</h4>
+
       </CardContent>
     </Card>
   );

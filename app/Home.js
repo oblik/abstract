@@ -29,7 +29,7 @@ const InfoCards = ({ infoCardCms }) => {
 
   const sanitizeHTML = (html) => {
     if (typeof html !== 'string') return '';
-    
+
     // Remove only dangerous tags and attributes, preserve safe formatting tags
     let sanitized = html
       // Remove script tags and their content
@@ -43,7 +43,7 @@ const InfoCards = ({ infoCardCms }) => {
       // Remove potentially dangerous attributes
       .replace(/data-\w+="[^"]*"/g, '')
       .replace(/data-\w+='[^']*'/g, '');
-    
+
     return sanitized;
   };
 
@@ -165,7 +165,7 @@ export default function Home({ infoCardCms, categories, tags }) {
         console.error("Error fetching tags:", error);
       }
     };
-    
+
     fetchTags();
   }, [selectCategory]);
 
@@ -186,43 +186,46 @@ export default function Home({ infoCardCms, categories, tags }) {
 
   return (
     <>
-      <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
-      {/* Fixed header/navbar */}
-      <div className="fixed top-0 left-0 z-50 w-full backdrop-blur-md bg-black/80 border-b border-[#222]" style={{ borderBottomWidth: '1px' }}>
-        <Header />
-        <NavigationBar
-          menuItems={categories}
-          showLiveTag={true}
-          setSelectedCategory={setSelectedCategory}
-          selectedCategory={selectCategory}
-        />
-      </div>
-      {/* Spacer to prevent content from being hidden behind the fixed header/navbar */}
-      <div
-        className="lg:mb-4 mb-0"
-        style={{
-          height: windowSize.width < 1024 ? '95px' : '112px',
-          minHeight: windowSize.width < 1024 ? '95px' : '112px',
-          width: '100%'
-        }}
-      />
+      <div className="px-0 sm:px-2 text-white bg-black h-auto items-center justify-items-center p-0 m-0">
+        {/* Fixed header/navbar */}
+        <div className="fixed top-0 left-0 z-50 w-full backdrop-blur-md bg-black/80 border-b border-[#222]" style={{ borderBottomWidth: '1px' }}>
+          <Header />
+          <NavigationBar
+            menuItems={categories}
+            showLiveTag={true}
+            setSelectedCategory={setSelectedCategory}
+            selectedCategory={selectCategory}
+          />
 
-        <div className="container mx-auto pt-0 px-0 sm:px-2 max-w-full overflow-hidden">
-          <div className="px-1 sm:px-0">
+        </div>
+        {/* Spacer to prevent content from being hidden behind the fixed header/navbar */}
+        <div
+          className="lg:mb-4 mb-0"
+          style={{
+            height: windowSize.width < 1024 ? '95px' : '112px',
+            minHeight: windowSize.width < 1024 ? '95px' : '112px',
+            width: '100%'
+          }}
+        />
+
+        <div className="container mx-auto pt-0 max-w-full overflow-hidden">
+          <div className="px-1.5 sm:px-0">
             <SubcategoryBar
               subcategories={subcategoryList}
               selectedSubcategory={selectedSubcategory}
               setSelectedSubcategory={setSelectedSubcategory}
             />
-            {
-              isEmpty(categoryParam) && (
-                <>
-                  <SlideshowListing />
-                  {/* Info Cards Section */}
-                  <InfoCards infoCardCms={infoCardCms} />
-                </>
-              )
-            }
+            <div className="hidden sm:block">
+              {
+                isEmpty(categoryParam) && (
+                  <>
+                    <SlideshowListing />
+                    {/* Info Cards Section */}
+                    <InfoCards infoCardCms={infoCardCms} />
+                  </>
+                )
+              }
+            </div>
 
             {/* Event Cards Section */}
             <div className={"flex pb-6 justify-center w-full mt-0"}>
@@ -260,8 +263,8 @@ export default function Home({ infoCardCms, categories, tags }) {
       <div className="hidden sm:block">
         <Footer />
       </div>
-      {}
-      <div className="block sm:hidden" style={{ height: '75px' }} />
+      {/* Add extra bottom space for mobile so HeaderFixed does not overlay content */}
+      <div className="block bg-black sm:hidden" style={{ height: '75px' }} />
       <HeaderFixed />
     </>
   );

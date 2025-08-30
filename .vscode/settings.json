@@ -1,4 +1,39 @@
 {
-    "files.participants.timeout": 600000,
-    "diffEditor.maxComputationTime": 0
+  // Increase timeout for file participants (e.g. rename, refactor) but not infinite
+  "files.participants.timeout": 30000, // 30 seconds instead of 10 minutes
+
+  // Allow diff computation on larger files but cap at 15s
+  "diffEditor.maxComputationTime": 15000,
+
+  // Exclude heavy folders from indexing/watching to cut CPU
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/dist": true,
+    "**/coverage": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.next/**": true,
+    "**/dist/**": true,
+    "**/coverage/**": true,
+    "**/.turbo/**": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/dist": true,
+    "**/coverage": true
+  },
+    // Disable auto linting on type
+  "eslint.run": "onSave",
+
+  // Optional: prevent auto format on type (Prettier or VS Code built-in)
+  "editor.formatOnType": false,
+
+  // Keep format on save if you want
+  "editor.formatOnSave": true
+  
+  
 }
+

@@ -3,7 +3,23 @@ import browser from "browser-detect";
 import isEmpty from "@/app/helper/isEmpty";
 
 import config from "@/config/config";
-import { handleResp } from "@/config/axios";
+
+// Helper to get freeipapi base URL (use proxy in dev, full URL in prod)
+function getFreeIpApiBaseUrl() {
+  if (process.env.NODE_ENV === "production") {
+    return config.getLoginInfo;
+  }
+  return "/freeipapi"; // Use Next.js proxy in development
+}
+
+// Helper to get API base URL (use proxy in dev, full URL in prod)
+function getApiBaseUrl() {
+  if (process.env.NODE_ENV === "production") {
+    return config.backendURL;
+  }
+  return ""; // Use Next.js proxy in development
+}
+import { handleResp, setAuthorization } from "@/config/axios";
 import { signIn } from "@/store/slices/auth/sessionSlice";
 import { setUser } from "@/store/slices/auth/userSlice";
 import { setWallet } from "@/store/slices/wallet/dataSlice";
@@ -25,7 +41,7 @@ import {
 export const register = async (data: UserRegistrationData): Promise<ApiResponse> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/register`,
+      url: `${getApiBaseUrl()}/api/v1/user/register`,
       method: "post",
       data,
     });
@@ -41,7 +57,7 @@ export const register = async (data: UserRegistrationData): Promise<ApiResponse>
 export const googleLogin = async (reqBody: GoogleLoginData, dispatch: AppDispatch): Promise<ApiResponse> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/google-sign`,
+      url: `${getApiBaseUrl()}/api/v1/user/google-sign`,
       method: "post",
       data: reqBody,
     });
@@ -73,7 +89,7 @@ export const googleLogin = async (reqBody: GoogleLoginData, dispatch: AppDispatc
 export const walletLogin = async (reqBody: WalletLoginData, dispatch: AppDispatch): Promise<ApiResponse> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/wallet-sign`,
+      url: `${getApiBaseUrl()}/api/v1/user/wallet-sign`,
       method: "post",
       data: reqBody,
     });
@@ -108,7 +124,7 @@ export const walletLogin = async (reqBody: WalletLoginData, dispatch: AppDispatc
 export const verifyEmail = async (data: EmailVerificationData, dispatch: AppDispatch): Promise<ApiResponse> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/email-verify`,
+      url: `${getApiBaseUrl()}/api/v1/user/email-verify`,
       method: "post",
       data,
     });
@@ -139,9 +155,9 @@ export const verifyEmail = async (data: EmailVerificationData, dispatch: AppDisp
 
 export const getLocation = async (): Promise<LoginHistory | false> => {
   try {
-    let loginHistory: Partial<LoginHistory> = {};
-    let respData = await axios({
-      url: config.getLoginInfo,
+    let loginHistory: any = {};
+    let respData: any = await axios({
+      url: `${getFreeIpApiBaseUrl()}/api/json`,
       method: "get",
     });
     if (respData) {
@@ -171,7 +187,7 @@ export const getLocation = async (): Promise<LoginHistory | false> => {
 export const resendOTP = async (data: ResendOTPData): Promise<ApiResponse> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/resend-otp`,
+      url: `${getApiBaseUrl()}/api/v1/user/resend-otp`,
       method: "post",
       data,
     });
@@ -185,7 +201,7 @@ export const getUser = async (): Promise<ApiResponse<User>> => {
   try {
     let respData = await axios({
       method: "get",
-      url: `${config.backendURL}/api/v1/user/get-user`,
+      url: `${getApiBaseUrl()}/api/v1/user/get-user`,
     });
     return handleResp(respData, "success");
   } catch (error: unknown) {

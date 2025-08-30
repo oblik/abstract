@@ -295,7 +295,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
       <span className="text-red-500 text-sm">{errors?.price}</span>
 
 
-      <div className="flex items-center justify-between mt-3">
+    <div className="hidden sm:flex items-center justify-between mt-3">
         <label className="Label" htmlFor="expiry" style={{ paddingRight: 15 }}>
           Set Expiration
         </label>

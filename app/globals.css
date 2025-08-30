@@ -1,3 +1,11 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import "@radix-ui/colors/black-alpha.css";
+@import "@radix-ui/colors/mauve.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Dynamic viewport height for iOS Safari compatibility */
 
 @media (max-width: 640px) {
@@ -8,18 +16,12 @@
   }
 }
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
-@import "@radix-ui/colors/black-alpha.css";
-@import "@radix-ui/colors/mauve.css";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @media (prefers-color-scheme: dark) {
   :root {
     /* --background: #0a0a0a; */
   }
 }
+
 html ::-webkit-scrollbar {
   display: none;
   height: 0;
@@ -66,6 +68,7 @@ body {
   padding: 0;
   overflow-x: hidden;
 }
+
 @supports (-webkit-touch-callout: none) {
   .safari-fix {
     display: flex;
@@ -76,6 +79,7 @@ body {
     box-sizing: border-box; /* Consistent box model */
   }
 }
+
 
 @layer base {
   :root {
@@ -359,10 +363,13 @@ body {
   left: -50px !important;
 }
 .profile_menu {
-  min-width: 250px;
-  background-color: #262626;
-  border-radius: 6px;
-  padding: 5px;
+  width: 300px;
+  max-height: 500px;
+  overflow-y: auto;
+  background-color: #0a0a0a;
+  border-radius: 9px;
+  border: 1px solid #2c2c2c;
+  padding: 10px;
   box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
     0px 10px 20px -15px rgba(22, 23, 24, 0.2);
   animation: fadeIn 150ms ease-in-out;
@@ -385,11 +392,11 @@ body {
   gap: 0.5rem;
   cursor: pointer;
   border-radius: 100px;
-  padding: 5px 8px;
+  padding: 5px 0 5px 8px;
   transition: background-color 0.3s ease;
 }
 .profile_button:hover {
-  background-color: #333333;
+  background-color: #202020;
 }
 .profile_button:focus {
   box-shadow: 0 0 0 2px #000;
@@ -544,8 +551,8 @@ body {
 }
 
 .DialogContent {
-  background-color: #111;
-  border-radius: 6px;
+  background-color: #0a0a0a;
+  border-radius: 8px;
   box-shadow: 0 0 0 1px color-mix(in oklab, #ffffff2c, #3a3a3a 25%),
     0 12px 60px #0003, 0 16px 64px #0006, 0 16px 36px -20px #000000e6;
   position: fixed;
@@ -560,8 +567,20 @@ body {
   z-index: 100;
   overflow-y: auto;
 }
+
+@media (max-width: 600px) {
+  .DialogContent {
+    padding: 12px;
+    padding-top: 18px;
+  }
+}
 .DialogContent:focus {
   outline: none;
+}
+
+.google_login {
+  border-radius: 6px;
+  overflow: hidden;
 }
 
 .DialogTitle {
@@ -575,7 +594,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  border-radius: 4px;
+  border-radius: 6px;
   padding: 0 15px;
   font-size: 16px;
   line-height: 1;
@@ -613,6 +632,11 @@ body {
   right: 5px;
   background-color: #2e2e2e;
 }
+.no-shadow .trading_card {
+  box-shadow: none !important;
+  border: none !important; /* if you also want border gone */
+}
+
 .modal_close_brn:hover {
   background-color: #535353;
 }
@@ -621,20 +645,30 @@ body {
 }
 .custom_grpinp button {
   position: absolute;
-  right: 5px;
-  height: 36px;
-  top: 5px;
-  border-radius: 3px;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 32px;
+  border-radius: 6px;
+  padding: 0 16px;
+  z-index: 2;
 }
 .custom_grpinp input {
   width: 100%;
-  border-radius: 5px;
-  height: 46px;
-  padding: 12px;
+  border-radius: 6px;
+  height: 42px;
+  padding: 12px 90px 12px 12px;
   background: #000000;
   border: 1px solid #323232;
   color: #fff;
-  font-size: 16px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .custom_grpinp input {
+    font-size: 13px;
+  }
 }
 @keyframes overlayShow {
   from {
@@ -783,16 +817,35 @@ input[type="number"]::-webkit-outer-spin-button {
   left: -10px !important;
   
 }
+
+@media (max-width: 600px) {
+  .notification_dropdown_portal > div {
+    left: 2 !important;
+    right: 0 !important;
+  
+  }
+  }
 .notification_menu {
   width: 440px;
   max-height: 500px;
   overflow-y: auto;
-  background-color: #262626;
-  border-radius: 6px;
+  background-color: #0a0a0a;
+  border-radius: 9px;
+  border: 1px solid #2c2c2c;
   padding: 10px;
   box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
     0px 10px 20px -15px rgba(22, 23, 24, 0.2);
   animation: fadeIn 150ms ease-in-out;
+}
+
+@media (max-width: 600px) {
+  .notification_menu {
+    width: 98vw;
+    min-width: 0;
+    max-width: 99vw;
+    left: 1vw;
+    right: 1vw;
+  }
 }
 .h-[fit-content] {
   height: fit-content !important;
@@ -859,7 +912,7 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 .comment-dropdown-content {
   min-width: 200px;
-  background-color: #262626;
+  background-color: #000000;
   border-radius: 6px;
   padding: 5px;
   box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),

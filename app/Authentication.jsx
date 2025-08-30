@@ -462,10 +462,10 @@ const disconnectWalletRef = useRef(null);
       {}
       {signedIn && (
         <button
-          className="px-3 py-2 hover:bg-gray-800 rounded-md transition-colors hidden lg:block"
+          className="px-3 py-2 rounded-md transition-colors hidden lg:block"
           onClick={() => navigateToPortfolioPage()}
         >
-          <div className="text-l text-[#33ff4c]">{PnLFormatted(formatNumber(walletData?.balance + walletData?.position, 2))}</div>
+          <div className="text-l text-[#33ff4c]">${Number(walletData?.balance + walletData?.position).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
           <div className="text-xs text-grey">Portfolio</div>
         </button>
       )}
@@ -518,8 +518,7 @@ const disconnectWalletRef = useRef(null);
                 />
               </div>
             </GoogleOAuthProvider>
-            {}
-            <div className="custom_separator">
+            <div className="custom_seperator">
               <Separator.Root
                 className="SeparatorRoot"
                 style={{ margin: "15px 0" }}
@@ -555,16 +554,15 @@ const disconnectWalletRef = useRef(null);
             <div className="flex gap-3 justify-between mt-4 sm:flex-nowrap flex-wrap">
               <Button
                 onClick={() => ConnectPhantomWallet()}
-                className="w-full h-13 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]"
+                className="rounded-[6px] w-full sm:h-13 h-10 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]"
               >
                 <Image
                   src={"/images/wallet_icon_02.png"}
                   alt="Icon"
-                  width={40}
-                  height={40}
+                  width={30}
+                  height={30}
                 />
               </Button>
-              {}
             </div>
             <Dialog.Close asChild>
               <button className="modal_close_brn" aria-label="Close">
@@ -691,7 +689,7 @@ const disconnectWalletRef = useRef(null);
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
               <button
-                className="rounded p-2 hover:bg-[#333333] relative"
+                className="rounded p-2 hover:bg-[#202020] relative"
                 aria-label="Customise options"
               >
                 <BellIcon className="sm:w-6 sm:h-6 w-5 h-5" />
@@ -702,9 +700,8 @@ const disconnectWalletRef = useRef(null);
               <div className="notification_dropdown_portal">
                 <DropdownMenu.Content
                   className="notification_menu"
-                  sideOffset={5}
                 >
-                  <DropdownMenu.Label className="text-[18px] font-medium text-gray-100 px-4 py-3 border-b border-gray-700">
+                  <DropdownMenu.Label className="text-[18px] font-medium text-gray-100 px-2 py-3 pt-2 border-b border-[#222]">
                     Notifications
                   </DropdownMenu.Label>
                   <Notifications />
@@ -715,8 +712,8 @@ const disconnectWalletRef = useRef(null);
 
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
-              <button className="profile_button" aria-label="Customise options">
-                <Avatar className="w-6 h-6">
+              <button className="pr-0 mr-0 profile_button" aria-label="Customise options">
+                <Avatar className="w-6 pr-0 mr-0 h-6">
                     {data?.profileImg ? (
                     <AvatarImage
                         src={data?.profileImg}
@@ -736,8 +733,8 @@ const disconnectWalletRef = useRef(null);
             <DropdownMenu.Portal>
               <div className="custom_dropdown_portal">
                 <DropdownMenu.Content className="profile_menu" sideOffset={5}>
-                  <div className="flex items-center space-x-3">
-                    {}
+                  <div className="flex items-center pl-2 space-x-3">
+
                     <Avatar className="w-10 h-10">
                     {data?.profileImg ? (
                     <AvatarImage
@@ -754,12 +751,10 @@ const disconnectWalletRef = useRef(null);
                 </Avatar>
                     <div>
                       <span className="text-sm text-gray-100">
-                        {data?.name ? data?.name : "--"}
+                        @{data?.userName ? data?.userName : "--"}
                       </span>
                       <div className="text-sm text-gray-100 flex items-center space-x-2">
-                        <button className="IconButton bg-[#131212] px-2 py-1 rounded" 
-                              // }}
-                              >
+                        <button className="IconButton bg-[#131212] px-2 py-1 rounded">
                                 <span className="text-[12px]">
                                   {address ? shortText(address) : data?.email}
                                 </span>
@@ -787,7 +782,6 @@ const disconnectWalletRef = useRef(null);
                             </Tooltip.Portal>
                           </Tooltip.Root>
                         </Tooltip.Provider>
-                        {}
                       </div>
                     </div>
                   </div>
@@ -798,7 +792,6 @@ const disconnectWalletRef = useRef(null);
                   <DropdownMenu.Item className="DropdownMenuItem">
                     <Link href="/settings">Settings</Link>
                   </DropdownMenu.Item>
-                  {}
                   <DropdownMenu.Item className="DropdownMenuItem" disabled>
                     <Link href="/">Terms of Use</Link>
                   </DropdownMenu.Item>

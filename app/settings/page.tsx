@@ -93,12 +93,12 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
-      <div  className="sticky top-0 z-50 w-[100%] bg-black lg:bg-transparent backdrop-blur-0 lg:backdrop-blur-md border-b border-[#222] lg:mb-4 mb-0 pb-2" style={{ borderBottomWidth: '1px' }}>
+    <div className="text-white pb-20 bg-black h-auto items-center justify-items-center p-0 m-0">
+      <div  className="px-0 sticky top-0 z-50 w-[100%] bg-black lg:bg-transparent backdrop-blur-0 lg:backdrop-blur-md border-b border-[#222] lg:mb-4 mb-0 sm:pb-2 pb-0" style={{ borderBottomWidth: '1px' }}>
         <Header />
       </div>
 
-      <div className="container mx-auto sm:py-10 py-4 px-4 container-sm">
+      <div className="container mx-auto sm:py-10 py-4 px-1.5 sm:px-4 container-sm">
         <Tabs.Root defaultValue="tab1" orientation="vertical">
           <div className="flex justify-center mb-0 w-full lg:flex-row flex-col">
             <div className="w-full pl-0 pr-0 lg:w-[20%] relative">
@@ -126,7 +126,7 @@ export default function ProfilePage() {
           </div>
         </Tabs.Root>
       </div>
-      <Footer/>
+
       <HeaderFixed />
     </div>
   );

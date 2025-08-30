@@ -158,7 +158,7 @@ export function TradingCard({
               </div>
             </div>
           </CardTitle>
-          {}
+          
         </CardHeader>
 
         <CardContent className="sm:p-4 pt-0 sm:pt-0 p-3">

@@ -238,7 +238,11 @@ const AccordionTrigger = React.forwardRef<
                   {Array.isArray(children) ? children[1] : children}
                 </span>
                 <span className="sm:text-xs text-[12px] text-gray-400 mt-0.5 text-left">
-                  Vol ${typeof volume === "number" ? volume.toLocaleString() : "--"}
+                  Vol ${
+                    typeof volume === "number"
+                      ? Number(volume / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                      : "--"
+                  }
                 </span>
               </span>
             </div>
@@ -262,8 +266,12 @@ const AccordionTrigger = React.forwardRef<
                 <span className="text-[16px] lg:text-sm text-left">
                   {Array.isArray(children) ? children[1] : children}
                 </span>
-                <span className="text-[12px] sm:text-xs text-gray-400 mt-0.5 text-left">
-                  Vol ${typeof volume === "number" ? volume.toLocaleString() : "--"}
+                <span className="sm:text-xs text-[12px] text-gray-400 mt-0.5 text-left">
+                  Vol ${
+                    typeof volume === "number"
+                      ? Number(volume / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                      : "--"
+                  }
                 </span>
               </span>
             </div>

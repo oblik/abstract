@@ -342,10 +342,10 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
               <div style={{ display: "flex", alignItems: "center" }}>
                 <div
                   style={{
-                   width: screenWidth < 640 ? "40px" : "65px",
-                   height: screenWidth < 640 ? "40px" : "65px",
+                   width: screenWidth < 640 ? "45px" : "65px",
+                   height: screenWidth < 640 ? "45px" : "65px",
                    overflow: "hidden",
-                   borderRadius: "10px",
+                   borderRadius: screenWidth < 640 ? "7px" : "8px",
                    flexShrink: 0,
                   }}
                 >
@@ -363,7 +363,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                />
                 </div>
                 <div
-                  className="text-[19px] lg:text-[26px] sm:text-[20px]"
+                  className="text-[18px] lg:text-[26px] sm:text-[20px]"
                   style={{ paddingLeft: "15px" }}
                 >
                   {title || ""}
@@ -372,10 +372,10 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
             </CardTitle>
             <CardDescription className="py-0 pt-0 sm:pt-2 flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2">
               <div className="flex flex-wrap gap-3 items-center">
-                <p className="text-[12px] sm:text-[14px]">Vol ${toTwoDecimal(volume)?.toLocaleString() || ""}</p>
+                <p className="text-[12px] sm:text-[14px]">Vol ${volume?.toLocaleString() || ""}</p>
                 {endDate && (
                   <p className="flex items-center gap-1 text-[12px] sm:text-[14px]">
-                   <Clock size={12} className="sm:w-[14px] sm:h-[14px] w-[12px] h-[12px]" />{" "}
+                  <Clock size={12} className="sm:w-[14px] sm:h-[14px] w-[12px] h-[12px]" />{" "}
                     {new Date(endDate)?.toLocaleString("en-US", {
                       day: "numeric",
                       month: "short",
@@ -385,12 +385,11 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                     })}
                   </p>
                 )}
-              </div>
-              <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-2 pl-2 mt-0">
                 {seriesData?.length > 0 && (
                     <Popover.Root>
                         <Popover.Trigger asChild>
-                            <Button className="...">
+                            <Button className="px-4 sm:h-7 h-5 rounded-full">
                                 <CountdownTimerIcon />
                             </Button>
                         </Popover.Trigger>
@@ -421,16 +420,18 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                         ?.sort((a: any, b: any) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime())
                         ?.map((event) => (
                         <div
-                            key={event.slug} 
-                            onClick={()=>route.push(`/event-page/${event.slug}`)}
-                            className="w-[90px] rounded-full bg-transparent border border-[#262626] text-white hover:bg-[#262626] hover:text-white active:bg-[#262626] active:text-white text-center px-2 py-1 block text-sm"
+                            key={event.slug}
+                            // href={`/event-page/${event.slug}`}
+                            onClick={() => route.push(`/event-page/${event.slug}`)}
+                            className="sm:w-[90px] w-[80px] h-6 sm:h-8 flex items-center justify-center rounded-full bg-transparent border border-[#262626] text-white hover:bg-[#262626] hover:text-white active:bg-[#262626] active:text-white py-0 sm:py-2 px-2 text-[12px] sm:text-sm"
                         >
-                            {momentFormat(event?.endDate,"D MMM")}
+                            {momentFormat(event?.endDate, "D MMM")}
                         </div>
                     ))
                 )}
                 {}
               </div>
+            </div>
             </CardDescription>
             {displayChance !== undefined && (
               <div className="flex pt-2 sm:pt-3 pb-2 flex-wrap gap-3 items-center w-full">

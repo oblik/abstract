@@ -192,7 +192,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
   }, [categoryParam, setSelectedCategory]);
 
   return (
-    <div className="container mx-auto px-4 max-w-full overflow-hidden relative">
+    <div className="px-1.5 sm:px-0 container mx-auto px-0 max-w-full overflow-hidden relative">
       <div className="w-full flex justify-start mt-0">
         {}
         {showLiveTag && (
@@ -207,25 +207,25 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
                 LIVE
               </span>
             </h1>
-            <div className="sm:text-4xl text-3xl pb-[6%]">
-              <span className="live-dot">•</span>
+            <div className="sm:text-4xl text-3xl sm:pb-[16%] pb-[6%] sm:pt-[0%] pt-[0%]">
+              <span className="text-3xl live-dot">•</span>
             </div>
           </div>
         )}
 
         {/* Horizontal category list with arrows */}
-        <div className="flex items-center w-full mx-4">
+        <div className="pb-0 sm:pb-1 flex items-center w-full mx-4">
 
 
           <div
             ref={categoryListRef}
-            className="flex flex-nowrap gap-2 sm:py-3 py-0 overflow-x-auto snap-x scroll-px-3 snap-mandatory min-w-0 no-scrollbar"              
+            className="flex flex-nowrap gap-2 sm:py-2 py-0 overflow-x-auto snap-x scroll-px-3 snap-mandatory min-w-0 no-scrollbar"              
             style={{ scrollBehavior: "smooth" }}
             onScroll={handleCategoryScroll}
           >
             <div
               className={cn(
-                "px-3 sm:py-1 py-0 rounded-md transition-colors text-xs sm:text-sm font-medium whitespace-nowrap text-left pl-0 cursor-pointer",
+                "px-3 sm:py-1 pb-1 py-0 rounded-md transition-colors text-xs sm:text-sm font-medium whitespace-nowrap text-left pl-0 cursor-pointer",
                 "text-[#666] hover:text-gray-400",
                 selectedCategory === "all" && "text-white"
               )}

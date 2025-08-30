@@ -102,9 +102,7 @@ export default function HeaderFixed() {
             >
               <div className="text-xs text-gray">Portfolio</div>
               <div className="text-lg text-[#33ff4c]">
-                {PnLFormatted(
-                  Number(walletData?.balance + walletData?.position).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                )}
+                ${Number(walletData?.balance + walletData?.position).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
             </button>
           </div>
@@ -154,7 +152,7 @@ export default function HeaderFixed() {
 
       {/* Search Bar */}      
       <Drawer open={isSearchOpen} onOpenChange={setIsSearchOpen}>
-        <DrawerContent className="h-[80vh] z-50 rounded-t-2xl bg-[#181818] lg:hidden">
+      <DrawerContent className="h-[80vh] z-[9999999] rounded-t-2xl bg-black border border-grey-500 lg:hidden">
           {/* Hidden DrawerTitle to satisfy component requirements */}
           <div hidden>
             <DrawerHeader>
@@ -163,7 +161,7 @@ export default function HeaderFixed() {
           </div>
 
           {/* Main Content */}
-          <div className="flex justify-between items-center px-4 py-3 border-b border-[#232b3a]">
+          <div className="flex z-[9999999] justify-between items-center px-4 py-3 border-b border-[#232b3a]">
             <span className="text-lg font-semibold text-white">Search</span>
             <button
               className="text-gray-400 hover:text-white text-2xl"

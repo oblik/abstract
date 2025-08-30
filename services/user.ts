@@ -18,10 +18,16 @@ import {
   ApiError
 } from "@/types";
 
+function getApiBaseUrl() {
+  if (process.env.NODE_ENV === "production") {
+    return config.backendURL;
+  }
+  return ""; // Use Next.js proxy in development
+}
 export const getUserData = async (dispatch: AppDispatch): Promise<ApiResponse<User>> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/get-user`,
+      url: `${getApiBaseUrl()}/api/v1/user/get-user`,
       method: "get",
     });
     const { result } = respData.data;
@@ -37,7 +43,7 @@ export const getUserData = async (dispatch: AppDispatch): Promise<ApiResponse<Us
 export const getUserById = async (id: string): Promise<ApiResponse<User>> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/get-user/id/${id.replace("@", "")}`,
+      url: `${getApiBaseUrl()}/api/v1/user/get-user/id/${id.replace("@", "")}`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -50,7 +56,7 @@ export const getUserById = async (id: string): Promise<ApiResponse<User>> => {
 export const getTradeOverviewById = async (id: string): Promise<ApiResponse<TradeOverview>> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/user-trade-overview/id/${id}`,
+      url: `${getApiBaseUrl()}/api/v1/user/user-trade-overview/id/${id}`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -62,7 +68,7 @@ export const getTradeOverviewById = async (id: string): Promise<ApiResponse<Trad
 export const getTradeOverview = async (): Promise<ApiResponse<TradeOverview>> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/user-trade-overview`,
+      url: `${getApiBaseUrl()}/api/v1/user/user-trade-overview`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -74,7 +80,7 @@ export const getTradeOverview = async (): Promise<ApiResponse<TradeOverview>> =>
 export const updateUserData = async (data: UpdateUserData): Promise<ApiResponse> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/update-user`,
+      url: `${getApiBaseUrl()}/api/v1/user/update-user`,
       method: "post",
       data: data
     });
@@ -87,7 +93,7 @@ export const updateUserData = async (data: UpdateUserData): Promise<ApiResponse>
 export const getPositions = async (): Promise<ApiResponse<Position[]>> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/position-history`,
+      url: `${getApiBaseUrl()}/api/v1/user/position-history`,
       method: "post",
     });
     return handleResp(respData, "success");
@@ -99,7 +105,7 @@ export const getPositions = async (): Promise<ApiResponse<Position[]>> => {
 export const getTradeHistory = async (data: TradeHistoryParams): Promise<ApiResponse<TradeHistory[]>> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/trade-history/user/${data?.id}?page=${data.page}&limit=${data.limit}`,
+      url: `${getApiBaseUrl()}/api/v1/user/trade-history/user/${data?.id}?page=${data.page}&limit=${data.limit}`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -111,7 +117,7 @@ export const getTradeHistory = async (data: TradeHistoryParams): Promise<ApiResp
 export const getUserTradeHistory = async (data: { id: string }): Promise<ApiResponse<TradeHistory[]>> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/trade-history/${data?.id}`,
+      url: `${getApiBaseUrl()}/api/v1/user/trade-history/${data?.id}`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -123,7 +129,7 @@ export const getUserTradeHistory = async (data: { id: string }): Promise<ApiResp
 export const getInfoCards = async (): Promise<ApiResponse> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/info-cards`,
+      url: `${getApiBaseUrl()}/api/v1/user/info-cards`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -135,7 +141,7 @@ export const getInfoCards = async (): Promise<ApiResponse> => {
 export const setUserEmailNotification = async (data: UserNotificationSettings): Promise<ApiResponse> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/set-user-email-notification`,
+      url: `${getApiBaseUrl()}/api/v1/user/set-user-email-notification`,
       method: "post",
       data: data
     });
@@ -148,7 +154,7 @@ export const setUserEmailNotification = async (data: UserNotificationSettings): 
 export const setInAppNotification = async (data: UserNotificationSettings): Promise<ApiResponse> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/set-in-app-notification`,
+      url: `${getApiBaseUrl()}/api/v1/user/set-in-app-notification`,
       method: "post",
       data: data
     });
@@ -161,7 +167,7 @@ export const setInAppNotification = async (data: UserNotificationSettings): Prom
 export const setWalletSettings = async (data: WalletSettings): Promise<ApiResponse> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/set-wallet-settings`,
+      url: `${getApiBaseUrl()}/api/v1/user/set-wallet-settings`,
       method: "post",
       data: data
     });
@@ -174,7 +180,7 @@ export const setWalletSettings = async (data: WalletSettings): Promise<ApiRespon
 export const getWalletSettings = async (): Promise<ApiResponse<WalletSettings>> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/get-wallet-settings`,
+      url: `${getApiBaseUrl()}/api/v1/user/get-wallet-settings`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -186,11 +192,11 @@ export const getWalletSettings = async (): Promise<ApiResponse<WalletSettings>> 
 export const getPositionsByEvtId = async (data: { id: string }): Promise<ApiResponse<Position[]>> => {
   try {
     let respData = await axiosNoCredentials({
-      url: `${config.backendURL}/api/v1/user/positions/event/${data?.id}`,
+      url: `${getApiBaseUrl()}/api/v1/user/positions/event/${data?.id}`,
       method: "get",
     });
     return handleResp(respData, "success");
-  } catch (error: unknown) {
+  } catch (error: any) {
     return handleResp(error, "error");
   }
 };
@@ -198,11 +204,11 @@ export const getPositionsByEvtId = async (data: { id: string }): Promise<ApiResp
 export const getOpenOrdersByEvtId = async (data: { id: string }): Promise<ApiResponse> => {
   try {
     let respData = await axiosNoCredentials({
-      url: `${config.backendURL}/api/v1/user/open-orders/event/${data?.id}`,
+      url: `${getApiBaseUrl()}/api/v1/user/open-orders/event/${data?.id}`,
       method: "get",
     });
     return handleResp(respData, "success");
-  } catch (error: unknown) {
+  } catch (error: any) {
     return handleResp(error, "error");
   }
 };
@@ -210,7 +216,7 @@ export const getOpenOrdersByEvtId = async (data: { id: string }): Promise<ApiRes
 export const addUserName = async (data: { userName: string }): Promise<ApiResponse> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/add-user-name`,
+      url: `${getApiBaseUrl()}/api/v1/user/add-user-name`,
       method: "post",
       data: data
     });
@@ -223,7 +229,7 @@ export const addUserName = async (data: { userName: string }): Promise<ApiRespon
 export const deleteComment = async (data: { id: string }): Promise<ApiResponse> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/comments/${data?.id}`,
+      url: `${getApiBaseUrl()}/api/v1/user/comments/${data?.id}`,
       method: "delete",
     });
     return handleResp(respData, "success");
@@ -235,7 +241,7 @@ export const deleteComment = async (data: { id: string }): Promise<ApiResponse> 
 export const getCurrentValue = async (): Promise<ApiResponse> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/current-value`,
+      url: `${getApiBaseUrl()}/api/v1/user/current-value`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -247,7 +253,7 @@ export const getCurrentValue = async (): Promise<ApiResponse> => {
 export const transactionHistory = async (data: TransactionHistoryParams): Promise<ApiResponse<Transaction[]>> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/transaction-history`,
+      url: `${getApiBaseUrl()}/api/v1/user/transaction-history`,
       method: "get",
       params: data,
     });
@@ -263,7 +269,7 @@ export const transactionHistory = async (data: TransactionHistoryParams): Promis
 export const getCoinList = async (): Promise<ApiResponse> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/get-coin-list`,
+      url: `${getApiBaseUrl()}/api/v1/user/get-coin-list`,
       method: "get",
     });
     return handleResp(respData, "success");
@@ -275,7 +281,7 @@ export const getCoinList = async (): Promise<ApiResponse> => {
 export const getNotifications = async (): Promise<ApiResponse> => {
   try {
     let respData = await axios({
-      url: `${config.backendURL}/api/v1/user/notifications`,
+      url: `${getApiBaseUrl()}/api/v1/user/notifications`,
       method: "get",
     });
     return handleResp(respData, "success");

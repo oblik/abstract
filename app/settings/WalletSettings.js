@@ -49,10 +49,10 @@ export default function WalletSettings() {
                 <Image
                   src="/images/gas_icon.png"
                   alt="Icon"
-                  width={40}
-                  height={40}
+                  width={30}
+                  height={30}
                 />
-                <span className="text-lg font-semibold">
+                <span className="sm:text-lg sm:text-[15px] font-semibold">
                   Pay your own gas
                 </span>
               </div>
@@ -65,7 +65,7 @@ export default function WalletSettings() {
                 onValueChange={handleGasChange}
               >
                 <div className="flex items-center justify-between">
-                  <label className="Label" htmlFor="r1">
+                  <label className="Label sm:text-[15px] text-[14px]" htmlFor="r1">
                   Low priority fee    
                   {/* Low priority */}
                   </label>
@@ -79,7 +79,7 @@ export default function WalletSettings() {
                   </RadioGroup.Item>
                 </div>
                 <div className="flex items-center justify-between">
-                  <label className="Label" htmlFor="r2">
+                  <label className="Label sm:text-[15px] text-[14px]" htmlFor="r2">
                     Medium priority fee
                     {/* Medium priority */}
                   </label>
@@ -93,7 +93,7 @@ export default function WalletSettings() {
                   </RadioGroup.Item>
                 </div>
                 <div className="flex items-center justify-between">
-                  <label className="Label" htmlFor="r3">
+                  <label className="Label sm:text-[15px] text-[14px]" htmlFor="r3">
                     High priority
                     {/* High priority */}
                   </label>
@@ -110,7 +110,7 @@ export default function WalletSettings() {
               <div className="text-center">
                 <Button
                   type="submit"
-                  className="border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300"
+                  className="border border-white bg-transparent text-[12px] sm:text-[14px] text-white hover:bg-white hover:text-black transition-colors duration-300"
                   onClick={handleSaveChanges}
                 >
                   Save Changes

@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import { useSelector } from "@/store";
 import SONOTRADE from "@/public/images/logo.png";
-import React, { useState, useEffect ,useCallback,useRef} from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { DropdownMenu, Tooltip, Separator, Dialog } from "radix-ui";
 import {
@@ -68,8 +68,8 @@ export default function Authentication() {
   const router = useRouter();
   const dispatch = useDispatch();
   const previousWalletRef = useRef(null);
-const disconnectWalletRef = useRef(null);
-  
+  const disconnectWalletRef = useRef(null);
+
   const { signedIn } = useSelector((state) => state.auth?.session);
   const data = useSelector(state => state?.auth?.user);
   const walletData = useSelector((state) => state?.wallet?.data);
@@ -117,8 +117,8 @@ const disconnectWalletRef = useRef(null);
         }
         const response = await window.solana.connect();
 
-        const message = 
-        `Welcome to SonoTrade! - Sign to connect 
+        const message =
+          `Welcome to SonoTrade! - Sign to connect 
 
         URI : ${window.location.origin} 
         Network : ${config.networkType}
@@ -129,28 +129,28 @@ const disconnectWalletRef = useRef(null);
         const signedMessage = await window.solana.signMessage(encodedMessage, "utf8");
         console.log("Signature:", signedMessage);
 
-   if(signedMessage){
-        const connection = new Connection(config?.rpcUrl);
+        if (signedMessage) {
+          const connection = new Connection(config?.rpcUrl);
 
-        const publicKey = new PublicKey(response.publicKey.toString());
-        const balanceLamports = await connection.getBalance(publicKey);
-        console.log(balanceSOL, balanceLamports, 'balanceSOLbalanceSOL');
-        const balanceSOL = balanceLamports / 1e9;
+          const publicKey = new PublicKey(response.publicKey.toString());
+          const balanceLamports = await connection.getBalance(publicKey);
+          console.log(balanceSOL, balanceLamports, 'balanceSOLbalanceSOL');
+          const balanceSOL = balanceLamports / 1e9;
 
-        dispatch(
-          setWalletConnect({
-            isConnected: true,
-            address: response.publicKey.toString(),
-            network: config.network,
-            type: config.networkType,
-            rpc: config?.rpcUrl,
-            balance: balanceSOL
-          })
-        );
-        setIsConnect(true);
-        setOpen(false);
-        walletAdd();
-   }
+          dispatch(
+            setWalletConnect({
+              isConnected: true,
+              address: response.publicKey.toString(),
+              network: config.network,
+              type: config.networkType,
+              rpc: config?.rpcUrl,
+              balance: balanceSOL
+            })
+          );
+          setIsConnect(true);
+          setOpen(false);
+          walletAdd();
+        }
       } catch (err) {
         console.log(err, "errr")
         console.log(err, "err")
@@ -287,7 +287,7 @@ const disconnectWalletRef = useRef(null);
       if (success) {
         setOpen(false);
         toastAlert("success", message, "login");
-      console.log(message, success, "message")
+        console.log(message, success, "message")
       } else {
         toastAlert("error", message, "login");
       }
@@ -415,51 +415,51 @@ const disconnectWalletRef = useRef(null);
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-      if(signedIn){
-        const res = await window.solana.connect({ onlyIfTrusted: true });
-        const newPublicKey = res?.publicKey?.toString()?.toLowerCase();
-        const savedAddress = data?.walletAddress?.toLowerCase();
-  
-        if (!previousWalletRef.current) {
-          console.log("🔁 Wallet switched from", previousWalletRef.current, "to", newPublicKey);
+        if (signedIn) {
+          const res = await window.solana.connect({ onlyIfTrusted: true });
+          const newPublicKey = res?.publicKey?.toString()?.toLowerCase();
+          const savedAddress = data?.walletAddress?.toLowerCase();
+
+          if (!previousWalletRef.current) {
+            console.log("🔁 Wallet switched from", previousWalletRef.current, "to", newPublicKey);
+            previousWalletRef.current = newPublicKey;
+          }
+
+          if (
+            newPublicKey &&
+            savedAddress &&
+            newPublicKey !== previousWalletRef.current &&
+            newPublicKey !== savedAddress
+          ) {
+
+            if (isConnected) {
+              disconnectWalletRef.current?.();
+              removeAuthToken();
+              dispatch(reset());
+              dispatch(signOut());
+              toastAlert(
+                "error",
+                `Logged out: please reconnect with your wallet address ${data?.walletAddress}`,
+                "logout"
+              );
+              setTimeout(() => {
+                window.location.href = "/";
+              }, 1000);
+            }
+          }
+
           previousWalletRef.current = newPublicKey;
         }
-  
-        if (
-          newPublicKey &&
-          savedAddress &&
-          newPublicKey !== previousWalletRef.current &&
-          newPublicKey !== savedAddress
-        ) {
-
-          if (isConnected) {
-            disconnectWalletRef.current?.();
-            removeAuthToken();
-            dispatch(reset());
-            dispatch(signOut());
-            toastAlert(
-              "error",
-              `Logged out: please reconnect with your wallet address ${data?.walletAddress}`,
-              "logout"
-            );
-            setTimeout(() => {
-              window.location.href = "/";
-            }, 1000);
-          }
-        }
-  
-        previousWalletRef.current = newPublicKey;
-      }
       } catch (err) {
       }
     }, 1000);
-  
+
     return () => clearInterval(interval);
   }, [data?.walletAddress, isConnected, signedIn, dispatch]);
 
   return (
     <>
-      {}
+      { }
       {signedIn && (
         <button
           className="px-3 py-2 rounded-md transition-colors hidden lg:block"
@@ -537,6 +537,13 @@ const disconnectWalletRef = useRef(null);
                 value={email}
                 onChange={registerChange}
                 placeholder="Enter Email"
+                enterKeyHint="go"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault()
+                    handleClick()
+                  }
+                }}
               />
               <Button onClick={handleClick} disabled={loader}>
                 Continue{" "}
@@ -598,6 +605,13 @@ const disconnectWalletRef = useRef(null);
                   value={otp ? otp : ""}
                   onChange={handleOtpChange}
                   placeholder="Enter OTP"
+                  enterKeyHint="done"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault()
+                      handleOtpClick()
+                    }
+                  }}
                 />
                 {expireTime === 0 ? (
                   <Button onClick={resendCode}>Resend OTP</Button>
@@ -660,6 +674,13 @@ const disconnectWalletRef = useRef(null);
                   value={email ? email : ""}
                   onChange={registerChange}
                   placeholder="Enter Email"
+                  enterKeyHint="go"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault()
+                      walletEmailClick()
+                    }
+                  }}
                 />
                 <Button onClick={walletEmailClick} disabled={loader}>
                   Continue{" "}
@@ -693,7 +714,7 @@ const disconnectWalletRef = useRef(null);
                 aria-label="Customise options"
               >
                 <BellIcon className="sm:w-6 sm:h-6 w-5 h-5" />
-                {}
+                { }
               </button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
@@ -714,18 +735,18 @@ const disconnectWalletRef = useRef(null);
             <DropdownMenu.Trigger asChild>
               <button className="pr-0 mr-0 profile_button" aria-label="Customise options">
                 <Avatar className="w-6 pr-0 mr-0 h-6">
-                    {data?.profileImg ? (
+                  {data?.profileImg ? (
                     <AvatarImage
-                        src={data?.profileImg}
-                        alt={data?.username || "User Avatar"}
+                      src={data?.profileImg}
+                      alt={data?.username || "User Avatar"}
                     />
-                    ) : (
+                  ) : (
                     <AvatarFallback className="bg-blue-500 text-sm">
-                        {data?.username
+                      {data?.username
                         ? data?.username.charAt(0).toUpperCase()
                         : data?.email?.charAt(0).toUpperCase()}
                     </AvatarFallback>
-                    )}
+                  )}
                 </Avatar>
                 <ChevronDownIcon className="w-4 h-4" />
               </button>
@@ -736,29 +757,29 @@ const disconnectWalletRef = useRef(null);
                   <div className="flex items-center pl-2 space-x-3">
 
                     <Avatar className="w-10 h-10">
-                    {data?.profileImg ? (
-                    <AvatarImage
-                        src={data?.profileImg}
-                        alt={data?.username || "User Avatar"}
-                    />
-                    ) : (
-                    <AvatarFallback className="bg-blue-500 text-md">
-                        {data?.username
-                        ? data?.username.charAt(0).toUpperCase()
-                        : data?.email?.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                    )}
-                </Avatar>
+                      {data?.profileImg ? (
+                        <AvatarImage
+                          src={data?.profileImg}
+                          alt={data?.username || "User Avatar"}
+                        />
+                      ) : (
+                        <AvatarFallback className="bg-blue-500 text-md">
+                          {data?.username
+                            ? data?.username.charAt(0).toUpperCase()
+                            : data?.email?.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
                     <div>
                       <span className="text-sm text-gray-100">
                         @{data?.userName ? data?.userName : "--"}
                       </span>
                       <div className="text-sm text-gray-100 flex items-center space-x-2">
                         <button className="IconButton bg-[#131212] px-2 py-1 rounded">
-                                <span className="text-[12px]">
-                                  {address ? shortText(address) : data?.email}
-                                </span>
-                              </button>
+                          <span className="text-[12px]">
+                            {address ? shortText(address) : data?.email}
+                          </span>
+                        </button>
                         <Tooltip.Provider>
                           <Tooltip.Root>
                             <Tooltip.Trigger asChild>

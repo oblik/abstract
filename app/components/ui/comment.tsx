@@ -135,7 +135,7 @@ export function Comment({
                   color: comment.positions?.[0].side === "yes" ? "#7DFDFE": "#ec4899" 
                 }}
               >
-                <span>{longNumbersNoDecimals(comment.positions?.[0].quantity)} | {comment.positions?.[0].label}</span>
+                <span>{longNumbersNoDecimals(comment.positions?.[0].quantity, 2)} | {comment.positions?.[0].label}</span>
               </button>
               ) 
               : comment.positions.length > 1 ? (
@@ -149,7 +149,7 @@ export function Comment({
                         color: comment.positions?.[0].side === "yes" ? "#7DFDFE": "#ec4899" 
                       }}
                     >
-                      <span>{longNumbersNoDecimals(comment.positions?.[0].quantity)} | {comment.positions?.[0].label}</span>
+                      <span>{longNumbersNoDecimals(comment.positions?.[0].quantity, 2)} | {comment.positions?.[0].label}</span>
                       <ChevronDownIcon className="w-4 h-4" />
                     </button>
                   </DropdownMenu.Trigger>
@@ -168,7 +168,7 @@ export function Comment({
                                 color: item.side === "yes" ? "#7DFDFE": "#ec4899" 
                               }}
                             >
-                              {longNumbersNoDecimals(item.quantity)}
+                              {longNumbersNoDecimals(item.quantity, 2)}
                             </span>                  
                             <span>{item.label}</span>
                           </DropdownMenu.Item>

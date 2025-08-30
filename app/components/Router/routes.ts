@@ -4,7 +4,7 @@ export const authRoutes = [
     "/forgot-password",
     "/reset-password/[token]",
 ]
- 
+
 export const protectedRoutes: string[] = [
     "/settings",
     "/portfolio",

@@ -137,7 +137,7 @@ const Chart: React.FC<ChartProps> = ({
                 hour12: true
             });
         }
-        
+
         if (active && payload && payload.length) {
             return (
                 <div className="bg-transparent p-2 border border-transparent rounded shadow text-white">
@@ -182,7 +182,7 @@ const Chart: React.FC<ChartProps> = ({
         "hsl(var(--chart-4))",
         "hsl(var(--chart-5))",
     ]
-    
+
     // Update screen width on resize
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -209,7 +209,7 @@ const Chart: React.FC<ChartProps> = ({
         const now = new Date();
         const endOfToday = new Date(now);
         endOfToday.setHours(23, 59, 59, 999);
-        
+
         switch (interval) {
             case "1h":
                 return new Date(now.getTime() - 60 * 60 * 1000).getTime();
@@ -240,10 +240,10 @@ const Chart: React.FC<ChartProps> = ({
                 // Remove timestamp parameters to get all available data
             };
             console.log('Chart fetchData - Request data:', data);
-            
+
             const { success, result } = await getPriceHistory(id, data);
             console.log('Chart fetchData - API response:', { success, result });
-            
+
             if (success) {
                 let assetKeysData = result.map((item: any, index: any) => {
                     return {
@@ -259,30 +259,30 @@ const Chart: React.FC<ChartProps> = ({
                         const bOdd = selectedYes ? b.odd : 100 - b.odd;
                         return bOdd - aOdd; // Sort descending (highest first)
                     });
-                    
+
                     // Take only the top 4 markets with highest odds
                     const top4Markets = sortedMarkets.slice(0, 4);
-                    
+
                     console.log('Market sorting debug:', {
                         selectedYes,
-                        originalMarkets: market.map(m => ({ 
-                            label: m.groupItemTitle, 
-                            originalOdd: m.odd, 
-                            calculatedOdd: selectedYes ? m.odd : 100 - m.odd 
+                        originalMarkets: market.map(m => ({
+                            label: m.groupItemTitle,
+                            originalOdd: m.odd,
+                            calculatedOdd: selectedYes ? m.odd : 100 - m.odd
                         })),
-                        sortedMarkets: sortedMarkets.map(m => ({ 
-                            label: m.groupItemTitle, 
-                            originalOdd: m.odd, 
-                            calculatedOdd: selectedYes ? m.odd : 100 - m.odd 
+                        sortedMarkets: sortedMarkets.map(m => ({
+                            label: m.groupItemTitle,
+                            originalOdd: m.odd,
+                            calculatedOdd: selectedYes ? m.odd : 100 - m.odd
                         })),
-                        top4Markets: top4Markets.map(m => ({ 
-                            label: m.groupItemTitle, 
-                            originalOdd: m.odd, 
-                            calculatedOdd: selectedYes ? m.odd : 100 - m.odd 
+                        top4Markets: top4Markets.map(m => ({
+                            label: m.groupItemTitle,
+                            originalOdd: m.odd,
+                            calculatedOdd: selectedYes ? m.odd : 100 - m.odd
                         })),
                         resultLabels: result.map(r => r.groupItemTitle)
                     });
-                    
+
                     // Update assetKeysData to match the top 4 markets
                     const top4AssetKeys = top4Markets.map((marketItem: any, index: any) => {
                         return {
@@ -293,13 +293,13 @@ const Chart: React.FC<ChartProps> = ({
                             fullLabel: `${marketItem.groupItemTitle} ${selectedYes ? 'Yes' : 'No'}` // Add full label with Yes/No
                         };
                     });
-                    
+
                     setChartConfig(top4AssetKeys);
-                    
+
                     // Filter and reorder result data to match the top 4 markets
                     const orderedResultData: (any | null)[] = [];
                     for (const marketItem of top4Markets) {
-                        const matchingResult: any | undefined = result.find((resultItem: any) => 
+                        const matchingResult: any | undefined = result.find((resultItem: any) =>
                             resultItem.groupItemTitle === marketItem.groupItemTitle
                         );
                         if (matchingResult) {
@@ -310,30 +310,30 @@ const Chart: React.FC<ChartProps> = ({
                             orderedResultData.push(null);
                         }
                     }
-                    
+
                     console.log('Data matching debug:', {
                         orderedResultDataCount: orderedResultData.length,
                         hasNulls: orderedResultData.some(item => item === null),
                         dataLengths: orderedResultData.map(item => item ? item.data?.length : 0)
                     });
-                    
+
                     let t = orderedResultData.map((item) => item ? item.data : []);
                     let formattedData = t.map((innerArray) => {
                         if (!innerArray || innerArray.length === 0) return [];
                         return innerArray.map((item) => {
                             let formattedTime = Math.floor(new Date(item.t).getTime() / 1000);
                             // Divide by 100 to get proper percentage (0-1 range)
-                            return { t: formattedTime, p: item.p / 100 }; 
+                            return { t: formattedTime, p: item.p / 100 };
                         });
                     });
-                    
+
                     // Store all data for current selection
                     if (selectedYes) {
                         setAllChartDataYes(formattedData);
                     } else {
                         setAllChartDataNo(formattedData);
                     }
-                    
+
                     // Process data with current interval
                     let processedData = processMultiChartData(
                         formattedData[0] || [],
@@ -367,14 +367,14 @@ const Chart: React.FC<ChartProps> = ({
                             p: item.p / 100, // Divide by 100 to get proper percentage
                         };
                     });
-                    
+
                     // Store all data for current selection
                     if (selectedYes) {
                         setAllChartDataYes(formattedData);
                     } else {
                         setAllChartDataNo(formattedData);
                     }
-                    
+
                     // Process data with current interval
                     let processedData = processSingleChartData(formattedData, interval);
                     if (selectedYes) {
@@ -388,7 +388,7 @@ const Chart: React.FC<ChartProps> = ({
             console.log(error);
         }
     };
-    
+
     useEffect(() => {
         fetchData();
     }, [market, selectedYes]); // Remove interval from dependencies
@@ -433,11 +433,11 @@ const Chart: React.FC<ChartProps> = ({
     useEffect(() => {
         const socket = socketContext?.socket;
         if (!socket) return;
-    
+
         const chartUpdate = () => {
             fetchData();
         };
-        
+
         socket.on("chart-update", chartUpdate);
         // return () => {
         //   socket.off("chart-update");
@@ -445,24 +445,24 @@ const Chart: React.FC<ChartProps> = ({
 
     }, [market, selectedYes]); // Remove interval from dependencies here too
 
-    const getSeriesData = async(id:any)=>{
-        try{
+    const getSeriesData = async (id: any) => {
+        try {
 
-            let { success,result } = await getSeriesByEvent(id)
-            if(success){
+            let { success, result } = await getSeriesByEvent(id)
+            if (success) {
                 setSeriesData(result)
             }
-        }catch(err){
-            console.log('error',err)
+        } catch (err) {
+            console.log('error', err)
         }
     }
-    useEffect(()=>{
-        if(series?.slug){
+    useEffect(() => {
+        if (series?.slug) {
             getSeriesData(series?.slug)
-        }else{
+        } else {
             setSeriesData([])
         }
-    },[series,id])
+    }, [series, id])
 
     // Calculate the current displayed chance value and color
     const displayChance =
@@ -488,23 +488,23 @@ const Chart: React.FC<ChartProps> = ({
                 return bOdd - aOdd; // Sort descending (highest first)
             });
             const top4Markets = sortedMarkets.slice(0, 4);
-            
-            if(multiHoveredChance.length > 0){
-                setMultiDisplayChance(top4Markets.map((item: any,index: any) => {
+
+            if (multiHoveredChance.length > 0) {
+                setMultiDisplayChance(top4Markets.map((item: any, index: any) => {
                     return {
                         label: item.groupItemTitle,
                         color: ChartColors[index],
-                        asset: `asset${index+1}`,
+                        asset: `asset${index + 1}`,
                         fullLabel: `${item.groupItemTitle} ${selectedYes ? 'Yes' : 'No'}`, // Add full label with Yes/No
                         last: (multiHoveredChance[index] !== undefined ? multiHoveredChance[index] : (selectedYes ? item.odd : 100 - item.odd))
                     }
                 }));
             } else {
-                setMultiDisplayChance(top4Markets.map((item: any,index: any) => {
+                setMultiDisplayChance(top4Markets.map((item: any, index: any) => {
                     return {
                         label: item.groupItemTitle,
                         color: ChartColors[index],
-                        asset: `asset${index+1}`,
+                        asset: `asset${index + 1}`,
                         fullLabel: `${item.groupItemTitle} ${selectedYes ? 'Yes' : 'No'}`, // Add full label with Yes/No
                         last: selectedYes ? item.odd : 100 - item.odd
                     }
@@ -517,54 +517,54 @@ const Chart: React.FC<ChartProps> = ({
     const CustomDot = (props: any) => {
         const { cx, cy, payload, index, stroke } = props;
         const isLastPoint = index === chartData.length - 1;
-        
+
         if (!isLastPoint) return null;
-        
+
         return (
-          <g>
-            {/* Animated pulsing ring */}
-            <circle
-              cx={cx}
-              cy={cy}
-              r={8}
-              fill={stroke}
-              stroke="#7DFDFE"
-              strokeWidth={2}
-              opacity={0.6}
-            >
-              <animate
-                attributeName="r"
-                values="4;12;4"
-                dur="2s"
-                repeatCount="indefinite"
-              />
-              <animate
-                attributeName="opacity"
-                values="0.8;0;0.8"
-                dur="2s"
-                repeatCount="indefinite"
-              />
-            </circle>
-            
-            {/* Main dot */}
-            <circle
-              cx={cx}
-              cy={cy}
-              r={4}
-              fill={stroke}
-              stroke="#fff"
-              strokeWidth={2}
-            >
-              <animate
-                attributeName="r"
-                values="4;5;4"
-                dur="1.5s"
-                repeatCount="indefinite"
-              />
-            </circle>
-          </g>
+            <g>
+                {/* Animated pulsing ring */}
+                <circle
+                    cx={cx}
+                    cy={cy}
+                    r={8}
+                    fill={stroke}
+                    stroke="#7DFDFE"
+                    strokeWidth={2}
+                    opacity={0.6}
+                >
+                    <animate
+                        attributeName="r"
+                        values="4;12;4"
+                        dur="2s"
+                        repeatCount="indefinite"
+                    />
+                    <animate
+                        attributeName="opacity"
+                        values="0.8;0;0.8"
+                        dur="2s"
+                        repeatCount="indefinite"
+                    />
+                </circle>
+
+                {/* Main dot */}
+                <circle
+                    cx={cx}
+                    cy={cy}
+                    r={4}
+                    fill={stroke}
+                    stroke="#fff"
+                    strokeWidth={2}
+                >
+                    <animate
+                        attributeName="r"
+                        values="4;5;4"
+                        dur="1.5s"
+                        repeatCount="indefinite"
+                    />
+                </circle>
+            </g>
         );
-      };
+    };
 
     return (
         <Card
@@ -585,16 +585,16 @@ const Chart: React.FC<ChartProps> = ({
                                     flexShrink: 0,
                                 }}
                             >
-                                <img
+                                <Image
                                     src={image}
                                     alt="Event"
                                     width={screenWidth < 640 ? 50 : 65}
                                     height={screenWidth < 640 ? 50 : 65}
-                                    style={{ 
-                                    width: "100%", 
-                                    height: "100%", 
-                                    objectFit: "cover",
-                                    transition: "all 0.3s ease" 
+                                    style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover",
+                                        transition: "all 0.3s ease"
                                     }}
                                 />
                             </div>
@@ -641,57 +641,57 @@ const Chart: React.FC<ChartProps> = ({
                                     variant="ghost"
                                     onClick={() => setSelectedYes(!selectedYes)}
                                     size="sm"
-                                    className="h-1 px-0 sm:h-9 sm:px-3"                               
-                                    >
+                                    className="h-1 px-0 sm:h-9 sm:px-3"
+                                >
                                     <ArrowRightLeft />
                                 </Button>
                             )}
                         </div>
-                            <div className="flex items-center gap-2 pl-2 mt-0">
-                                        {seriesData?.length > 0 && (
-                                            <Popover.Root>
-                                                <Popover.Trigger asChild>
-                                                    <Button className="px-4 sm:h-7 h-6 rounded-full">
-                                                        <CountdownTimerIcon />
-                                                    </Button>
-                                                </Popover.Trigger>
-                                                <Popover.Content className="history_card" sideOffset={5}>
-                                                    <ul className="history_card_list">
-                                                    {seriesData?.length > 0 && (
-                                                        seriesData
-                                                            .filter((series) => series.status !== "active")
-                                                            ?.sort((a: any, b: any) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())
-                                                            ?.map((event) => (
-                                                                <li key={event?.slug} 
-                                                                onClick={()=>route.push(`/event-page/${event.slug}`)}
-                                                                >
-                                                                    {/* <Link href={`/event-page/${event.slug}`}> */}
-                                                                        {momentFormat(event.endDate,"D MMM YYYY, h:mm A")}
-                                                                    {/* </Link> */}
-                                                                </li>
-                                                            ))
-                                                        )}
-                                                    </ul>
-                                                    <Popover.Arrow className="HoverCardArrow" />
-                                                </Popover.Content>
-                                            </Popover.Root>
-                                        )}
-                                        {seriesData?.length > 0 && (
-                                            seriesData
-                                                .filter((series) => series.status === "active")
-                                                ?.sort((a: any, b: any) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime())
-                                                ?.map((event) => (
-                                                    <div
-                                                        key={event.slug}
-                                                        // href={`/event-page/${event.slug}`}
-                                                        onClick={() => route.push(`/event-page/${event.slug}`)}
-                                                      className="sm:w-[90px] w-[80px] h-6 sm:h-8 flex items-center justify-center rounded-full bg-transparent border border-[#262626] text-white hover:bg-[#262626] hover:text-white active:bg-[#262626] active:text-white py-0 sm:py-2 px-2 text-[12px] sm:text-sm"
-                                                    >
-                                                        {momentFormat(event?.endDate, "D MMM")}
-                                                    </div>
-                                            ))
-                                        )}
-                                      </div>
+                        <div className="flex items-center gap-2 pl-2 mt-0">
+                            {seriesData?.length > 0 && (
+                                <Popover.Root>
+                                    <Popover.Trigger asChild>
+                                        <Button className="px-4 sm:h-7 h-6 rounded-full">
+                                            <CountdownTimerIcon />
+                                        </Button>
+                                    </Popover.Trigger>
+                                    <Popover.Content className="history_card" sideOffset={5}>
+                                        <ul className="history_card_list">
+                                            {seriesData?.length > 0 && (
+                                                seriesData
+                                                    .filter((series) => series.status !== "active")
+                                                    ?.sort((a: any, b: any) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())
+                                                    ?.map((event) => (
+                                                        <li key={event?.slug}
+                                                            onClick={() => route.push(`/event-page/${event.slug}`)}
+                                                        >
+                                                            {/* <Link href={`/event-page/${event.slug}`}> */}
+                                                            {momentFormat(event.endDate, "D MMM YYYY, h:mm A")}
+                                                            {/* </Link> */}
+                                                        </li>
+                                                    ))
+                                            )}
+                                        </ul>
+                                        <Popover.Arrow className="HoverCardArrow" />
+                                    </Popover.Content>
+                                </Popover.Root>
+                            )}
+                            {seriesData?.length > 0 && (
+                                seriesData
+                                    .filter((series) => series.status === "active")
+                                    ?.sort((a: any, b: any) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime())
+                                    ?.map((event) => (
+                                        <div
+                                            key={event.slug}
+                                            // href={`/event-page/${event.slug}`}
+                                            onClick={() => route.push(`/event-page/${event.slug}`)}
+                                            className="sm:w-[90px] w-[80px] h-6 sm:h-8 flex items-center justify-center rounded-full bg-transparent border border-[#262626] text-white hover:bg-[#262626] hover:text-white active:bg-[#262626] active:text-white py-0 sm:py-2 px-2 text-[12px] sm:text-sm"
+                                        >
+                                            {momentFormat(event?.endDate, "D MMM")}
+                                        </div>
+                                    ))
+                            )}
+                        </div>
                     </CardDescription>
                     {/* Single market chance display - inside CardHeader like MonthlyListenersChart2 */}
                     {market?.length <= 1 && displayChance !== undefined && (
@@ -716,15 +716,15 @@ const Chart: React.FC<ChartProps> = ({
                                     {" "}
                                     {/* Changed from justify-center to justify-start */}
                                     {market?.length <= 1 && (
-                                    <CardTitle
-                                        className="text-4xl"
-                                        style={{ color: chanceColor }}
-                                    >
-                                        <span>{typeof displayChance === 'number' ? displayChance.toFixed(1) : ''}%</span>
-                                        <span className="text-2xl font-light"> chance</span>
-                                    </CardTitle>
+                                        <CardTitle
+                                            className="text-4xl"
+                                            style={{ color: chanceColor }}
+                                        >
+                                            <span>{typeof displayChance === 'number' ? displayChance.toFixed(1) : ''}%</span>
+                                            <span className="text-2xl font-light"> chance</span>
+                                        </CardTitle>
                                     )}
-                                    
+
                                 </div>
                             )}
                             {/* {multiDisplayChance.length > 0 && (
@@ -779,27 +779,27 @@ const Chart: React.FC<ChartProps> = ({
                                         tickMargin={4}
                                         width={100}
                                         ticks={chartData.length > 0 ? (() => {
-                                          const minTime = Math.min(...chartData.map(d => d.rawTimestamp || 0));
-                                          const maxTime = Math.max(...chartData.map(d => d.rawTimestamp || 0));
-                                          const tickCount = screenWidth < 640 ? 4 : 6;
-                                          const step = (maxTime - minTime) / (tickCount - 1);
-                                          return Array.from({ length: tickCount }, (_, i) => minTime + (step * i));
+                                            const minTime = Math.min(...chartData.map(d => d.rawTimestamp || 0));
+                                            const maxTime = Math.max(...chartData.map(d => d.rawTimestamp || 0));
+                                            const tickCount = screenWidth < 640 ? 4 : 6;
+                                            const step = (maxTime - minTime) / (tickCount - 1);
+                                            return Array.from({ length: tickCount }, (_, i) => minTime + (step * i));
                                         })() : undefined}
                                         allowDuplicatedCategory={false}
                                         tickFormatter={(t) => {
-                                          const date = new Date(t * 1000);
-                                          if (interval === "all" || interval === "1m" || interval === "1w") {
-                                            return date.toLocaleString("en-US", {
-                                              day: "numeric",
-                                              month: "short",
-                                            });
-                                          } else {
-                                            return date.toLocaleString("en-US", {
-                                              hour: "numeric",
-                                              minute: "numeric",
-                                              hour12: true
-                                            });
-                                          }
+                                            const date = new Date(t * 1000);
+                                            if (interval === "all" || interval === "1m" || interval === "1w") {
+                                                return date.toLocaleString("en-US", {
+                                                    day: "numeric",
+                                                    month: "short",
+                                                });
+                                            } else {
+                                                return date.toLocaleString("en-US", {
+                                                    hour: "numeric",
+                                                    minute: "numeric",
+                                                    hour12: true
+                                                });
+                                            }
                                         }}
                                         tick={{ fontSize: screenWidth < 640 ? 9 : 12, fill: '#bdbdbd' }}
                                     />
@@ -813,7 +813,7 @@ const Chart: React.FC<ChartProps> = ({
                                         width={32}
                                         tick={{ fontSize: screenWidth < 640 ? 9 : 12, fill: '#bdbdbd' }}
                                     />
-                                    <Tooltip 
+                                    <Tooltip
                                         content={<CustomTooltipWithState />}
                                         allowEscapeViewBox={{ x: true, y: false }}
                                         isAnimationActive={false}
@@ -830,7 +830,7 @@ const Chart: React.FC<ChartProps> = ({
                                             strokeWidth={2}
                                             name={asset.fullLabel || asset.label}
 
-                                            dot={<CustomDot color={asset.color}/>} 
+                                            dot={<CustomDot color={asset.color} />}
                                             activeDot={{
                                                 r: 3,
                                                 fill: asset.color,

@@ -43,14 +43,14 @@ export function TradingCard({ title, volume, image, activeView, setActiveView })
           <CardTitle style={{ lineHeight: "1.5" }}>
             <div style={{ display: "flex", alignItems: "center" }}>
               <div style={{ marginRight: "10px" }}>
-                <img src={image||Ye} alt="Ye" width={60} height={60} />
+                <Image src={image || Ye} alt="Ye" width={60} height={60} />
               </div>
               <div className="text-[16px]" style={{ marginRight: "0px" }}>
                 {title}
               </div>
             </div>
           </CardTitle>
-          <CardDescription>${volume||"2,173,943"}</CardDescription>
+          <CardDescription>${volume || "2,173,943"}</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -62,7 +62,7 @@ export function TradingCard({ title, volume, image, activeView, setActiveView })
             <TabsContent value="buy">
               <div className="pt-4">
                 <h1 className="pb-2">Pick side ⓘ</h1>
-                <Options defaultValue={activeView} value={activeView}  onValueChange={onTabChange}  className="w-full">
+                <Options defaultValue={activeView} value={activeView} onValueChange={onTabChange} className="w-full">
                   <OptionsList className="grid w-full grid-cols-2 gap-2">
                     <OptionsTrigger value="Yes">Yes</OptionsTrigger>
                     <OptionsTrigger

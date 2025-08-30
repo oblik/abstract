@@ -18,9 +18,7 @@ export default function Header() {
   const { signedIn } = useSelector((state) => state?.auth?.session);
   const walletData = useSelector((state) => state?.wallet?.data);
 
-  const navigateToPortfolioPage = () => router.push("/portfolio");
-
-  return (
+  const navigateToPortfolioPage = () => router.push("/portfolio"); return (
     <header className="px-1.5 sm:px-0 flex flex-col md:flex-row items-center w-full bg-transparent sm:h-12 h-11 md:h-16 pt-1 md:pt-2 container mx-auto">
       {/* Logo and Mobile Auth */}
       <div className="flex items-center justify-between ml-0 w-full lg:w-auto">

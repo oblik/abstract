@@ -88,7 +88,7 @@ interface SelectionContextType {
 const SelectionContext = React.createContext<SelectionContextType>({
   activeMarket: null,
   activeSelection: null,
-  setSelection: () => {},
+  setSelection: () => { },
 });
 
 interface AccordionItemProps
@@ -161,12 +161,12 @@ const AccordionTrigger = React.forwardRef<
 
     // Calculate prices from order book data (same logic as TradingCard)
     const descending = (a, b) => Number(b[0]) - Number(a[0]);
-    
+
     const calculateYesPrice = () => {
       const yesAsk = orderBook?.asks?.[0]?.sort(descending)?.[0];
       return yesAsk?.length > 0 ? toFixedDown(100 - yesAsk[0], 2) : null;
     };
-    
+
     const calculateNoPrice = () => {
       const noAsk = orderBook?.bids?.[0]?.sort(descending)?.[0];
       return noAsk?.length > 0 ? toFixedDown(100 - noAsk[0], 2) : null;
@@ -283,12 +283,11 @@ const AccordionTrigger = React.forwardRef<
           </div>
 
           {/* Desktop buttons - hidden on mobile to match header */}
-          <div className="hidden md:flex items-center gap-2.5" style={{minWidth: 300}}>
+          <div className="hidden md:flex items-center gap-2.5" style={{ minWidth: 300 }}>
             {/* Yes/No buttons to the right of the odds */}
             <div className="relative group w-full md:w-auto">
-              <Button
-                variant="ghost"
-                className="w-full md:w-[140px] px-8 sm:py-2.5 py-2.5 !bg-[#0d1a26] text-[#7dfdfe] hover:text-[#7dfdfe] rounded-md border border-transparent relative z-10"
+              <div
+                className="w-full md:w-[140px] h-10 px-8 sm:py-2.5 py-2.5 !bg-[#0d1a26] text-[#7dfdfe] hover:text-[#7dfdfe] rounded-md border border-transparent relative z-10 inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();
                   if (isMultiMarket && setIsDrawerOpen && setActiveView) {
@@ -310,7 +309,7 @@ const AccordionTrigger = React.forwardRef<
                     <span className="ml-0.5 text-xl">{yesPrice}¢</span>
                   )}
                 </span>
-              </Button>
+              </div>
               {/* Tron blue border animation - hover only */}
               <div className="absolute inset-0 rounded-md z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="absolute inset-0 rounded-md border border-[#00d4ff] animate-border-glow"></div>
@@ -336,9 +335,8 @@ const AccordionTrigger = React.forwardRef<
               </div>
             </div>
             <div className="relative group w-full md:w-auto">
-              <Button
-                variant="ghost"
-                className="w-full md:w-[140px] px-8 py-2.5 !bg-[#210d1a] text-[#ec4899] hover:text-[#ec4899] rounded-md border border-transparent relative z-10"
+              <div
+                className="w-full md:w-[140px] h-10 px-8 sm:py-2.5 py-2.5 !bg-[#210d1a] text-[#ec4899] hover:text-[#ec4899] rounded-md border border-transparent relative z-10 inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();
                   if (isMultiMarket && setIsDrawerOpen && setActiveView) {
@@ -362,7 +360,7 @@ const AccordionTrigger = React.forwardRef<
                     </span>
                   )}
                 </span>
-              </Button>
+              </div>
               {/* Pink border animation - hover only */}
               <div className="absolute inset-0 rounded-md z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="absolute inset-0 rounded-md border border-[#ec4899] animate-border-glow"></div>
@@ -392,9 +390,8 @@ const AccordionTrigger = React.forwardRef<
           {/* Mobile buttons - shown only on mobile */}
           <div className="flex md:hidden items-center gap-2.5 w-full sm:mt-2 mt-0.1">
             <div className="relative group w-full">
-              <Button
-                variant="ghost"
-                className="w-full px-8 sm:py-2.5 py-2 !bg-[#0d1a26] text-[#7dfdfe] hover:text-[#7dfdfe] rounded-md border border-transparent relative z-10"
+              <div
+                className="w-full h-10 px-8 sm:py-2.5 py-2 !bg-[#0d1a26] text-[#7dfdfe] hover:text-[#7dfdfe] rounded-md border border-transparent relative z-10 inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();
                   if (isMultiMarket && setIsDrawerOpen && setActiveView) {
@@ -416,7 +413,7 @@ const AccordionTrigger = React.forwardRef<
                     <span className="ml-0.5 text-xl">{yesPrice}¢</span>
                   )}
                 </span>
-              </Button>
+              </div>
               {/* Tron blue border animation - hover only */}
               <div className="absolute inset-0 rounded-md z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="absolute inset-0 rounded-md border border-[#00d4ff] animate-border-glow"></div>
@@ -442,9 +439,8 @@ const AccordionTrigger = React.forwardRef<
               </div>
             </div>
             <div className="relative group w-full">
-              <Button
-                variant="ghost"
-                className="w-full px-8 py-2.5 !bg-[#210d1a] text-[#ec4899] hover:text-[#ec4899] rounded-md border border-transparent relative z-10"
+              <div
+                className="w-full h-10 px-8 sm:py-2.5 py-2 !bg-[#210d1a] text-[#ec4899] hover:text-[#ec4899] rounded-md border border-transparent relative z-10 inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();
                   if (isMultiMarket && setIsDrawerOpen && setActiveView) {
@@ -468,7 +464,7 @@ const AccordionTrigger = React.forwardRef<
                     </span>
                   )}
                 </span>
-              </Button>
+              </div>
               {/* Pink border animation - hover only */}
               <div className="absolute inset-0 rounded-md z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="absolute inset-0 rounded-md border border-[#ec4899] animate-border-glow"></div>
@@ -520,8 +516,8 @@ const AccordionContent = React.forwardRef<
     selection === "yes"
       ? { asks: [yesAskBook], bids: [yesBidBook] }
       : selection === "no"
-      ? { asks: [noAskBook], bids: [noBidBook] }
-      : { asks: [[]], bids: [[]] }; // Empty order book when no selection
+        ? { asks: [noAskBook], bids: [noBidBook] }
+        : { asks: [[]], bids: [[]] }; // Empty order book when no selection
 
   return (
     <AccordionPrimitive.Content

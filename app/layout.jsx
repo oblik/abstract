@@ -27,11 +27,11 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/favicon.ico" type="image/x-icon" />
       </head>
 
-      <body className={`antialiased`}>
+      <body className={`antialiased`} suppressHydrationWarning={true}>
         <StoreProvider>
           <SnackbarClient>
-           <ClientLayoutEffect />
-           <WalletProvider>{children}</WalletProvider>
+            <ClientLayoutEffect />
+            <WalletProvider>{children}</WalletProvider>
           </SnackbarClient>
         </StoreProvider>
         <ToastContainer />

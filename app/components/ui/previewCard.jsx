@@ -44,8 +44,8 @@ export function PreviewCard({
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await getEventById({id: eventID});
-        if(response.status) {
+        const response = await getEventById({ id: eventID });
+        if (response.status) {
           setEvents(response.result);
           setMarkets(
             response.result?.marketId?.filter((market) => market.status === "active")
@@ -68,13 +68,13 @@ export function PreviewCard({
   // }
 
   return (
-    <Card 
-      className={`max-w-7xl mx-auto ${className || ""}`} 
-      style={{ 
-        backgroundColor: "#161616", 
-        position: 'relative', 
+    <Card
+      className={`max-w-7xl mx-auto ${className || ""}`}
+      style={{
+        backgroundColor: "#161616",
+        position: 'relative',
         zIndex: 1002,
-        ...style 
+        ...style
       }}
     >
       <div className="flex" style={{ alignItems: "stretch", height: "100%" }}>
@@ -83,21 +83,21 @@ export function PreviewCard({
           <CardHeader>
             <CardTitle onClick={handleCardClick} style={{ lineHeight: "1.5", cursor: "pointer" }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <div 
-                  style={{ 
-                    width: "85px", 
-                    height: "85px", 
-                    overflow: "hidden", 
-                    borderRadius: "11px", 
-                    flexShrink: 0 
+                <div
+                  style={{
+                    width: "85px",
+                    height: "85px",
+                    overflow: "hidden",
+                    borderRadius: "11px",
+                    flexShrink: 0
                   }}
                 >
-                  <img 
-                    src={eventImageSrc} 
-                    alt="Event" 
-                    width={85} 
-                    height={85} 
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                  <Image
+                    src={eventImageSrc}
+                    alt="Event"
+                    width={85}
+                    height={85}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
                   />
                 </div>
                 <div
@@ -128,23 +128,23 @@ export function PreviewCard({
               <Progress value={probability} className="w-[100%]" />
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-            <div className="text-[12px]" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '48%' }}>
-              <Button
-                className="w-full h-12 sm:h-10 mb-1 bg-[#152632] text-[#7dfdfe] hover:bg-[#e0e0e0] transition-colors duration-300 rounded-full"
-                onClick={handleCardClick}
-              >
-                Buy {markets?.[0]?.outcome?.[0]?.title || "Yes"}
-              </Button>
-            </div>
+              <div className="text-[12px]" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '48%' }}>
+                <Button
+                  className="w-full h-12 sm:h-10 mb-1 bg-[#152632] text-[#7dfdfe] hover:bg-[#e0e0e0] transition-colors duration-300 rounded-full"
+                  onClick={handleCardClick}
+                >
+                  Buy {markets?.[0]?.outcome?.[0]?.title || "Yes"}
+                </Button>
+              </div>
 
-            <div className="text-[12px]" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '48%' }}>
-              <Button
-                className="w-full h-12 sm:h-10 mb-1 bg-[#321b29] text-[#ec4899] hover:bg-[#e0e0e0] transition-colors duration-300 rounded-full"
-                onClick={handleCardClick}
-              >
-                Buy {markets?.[0]?.outcome?.[1]?.title || "No"} 
-              </Button>
-            </div>
+              <div className="text-[12px]" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '48%' }}>
+                <Button
+                  className="w-full h-12 sm:h-10 mb-1 bg-[#321b29] text-[#ec4899] hover:bg-[#e0e0e0] transition-colors duration-300 rounded-full"
+                  onClick={handleCardClick}
+                >
+                  Buy {markets?.[0]?.outcome?.[1]?.title || "No"}
+                </Button>
+              </div>
 
             </div>
           </CardContent>

@@ -141,7 +141,7 @@ export function TradingCard({
                   flexShrink: 0,
                 }}
               >
-                <img
+                <Image
                   src={image}
                   alt="Event"
                   width={45}
@@ -252,9 +252,9 @@ export function TradingCard({
                     {firstLetterCase(market?.outcome?.[0]?.title) || "Yes"}{" "}
                     {tab == "buy"
                       ? buyYes?.length > 0 &&
-                        `${toFixedDown(100 - buyYes?.[0], 2)}¢`
+                      `${toFixedDown(100 - buyYes?.[0], 2)}¢`
                       : sellYes?.length > 0 &&
-                        `${toFixedDown(sellYes?.[0], 2)}¢`}
+                      `${toFixedDown(sellYes?.[0], 2)}¢`}
                     {/* Tron blue border animation - hover and active states */}
                     <div className="absolute -inset-0.5 rounded-md z-20 pointer-events-none opacity-0 group-hover:opacity-100 group-data-[state=active]:opacity-100 transition-opacity duration-300">
                       <div className="absolute inset-0 rounded-md border border-[#00d4ff] animate-border-glow"></div>
@@ -286,7 +286,7 @@ export function TradingCard({
                     {firstLetterCase(market?.outcome?.[1]?.title) || "No"}{" "}
                     {tab == "buy"
                       ? buyNo?.length > 0 &&
-                        `${toFixedDown(100 - buyNo?.[0], 2)}¢`
+                      `${toFixedDown(100 - buyNo?.[0], 2)}¢`
                       : sellNo?.length > 0 && `${toFixedDown(sellNo?.[0], 2)}¢`}
                     {/* Pink border animation - hover and active states */}
                     <div className="absolute -inset-0.5 rounded-md z-20 pointer-events-none opacity-0 group-hover:opacity-100 group-data-[state=active]:opacity-100 transition-opacity duration-300">
@@ -325,11 +325,11 @@ export function TradingCard({
                         {capitalize(
                           positions?.side == "yes"
                             ? firstLetterCase(
-                                market?.outcome?.[0]?.title || "yes"
-                              )
+                              market?.outcome?.[0]?.title || "yes"
+                            )
                             : firstLetterCase(
-                                market?.outcome?.[1]?.title || "no"
-                              )
+                              market?.outcome?.[1]?.title || "no"
+                            )
                         )}{" "}
                         ({positions?.filled?.[0]?.price?.toFixed(0)}¢) owned
                       </h1>
@@ -342,19 +342,19 @@ export function TradingCard({
                 </div>
 
                 {orderType === "market" && (
-              <MarketOrder
-                activeView={activeView}
-                marketId={market?._id}
-                buyorsell={tab}
-                outcomes={market?.outcome}
-                orderBook={{
-                  bids: selectedOrderBookData?.bids?.[0] || [],
-                  asks: selectedOrderBookData?.asks?.[0] || [],
-                }}
-                status={status}
-                selectedOrder={selectedOrder}
-                takerFee={market?.takerFee}
-              />
+                  <MarketOrder
+                    activeView={activeView}
+                    marketId={market?._id}
+                    buyorsell={tab}
+                    outcomes={market?.outcome}
+                    orderBook={{
+                      bids: selectedOrderBookData?.bids?.[0] || [],
+                      asks: selectedOrderBookData?.asks?.[0] || [],
+                    }}
+                    status={status}
+                    selectedOrder={selectedOrder}
+                    takerFee={market?.takerFee}
+                  />
 
                 )}
 

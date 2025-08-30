@@ -1,5 +1,6 @@
 "use client";
 import { Fragment, useEffect, useState } from 'react';
+import Image from "next/image";
 import { formatNumber } from "@/app/helper/custommath";
 import { useSelector } from 'react-redux';
 import { getTradeHistory } from '@/services/user';
@@ -46,19 +47,19 @@ const ActivityTable: React.FC<ActivityTableProps> = (props) => {
         setLoading(true)
         const { success, result } = await getTradeHistory({ id: props.uniqueId, ...pagination });
         if (success) {
-            setTrades(result.data);
-            setHasMore(result.count > pagination.page * pagination.limit);
-        } 
+          setTrades(result.data);
+          setHasMore(result.count > pagination.page * pagination.limit);
+        }
       } catch (error) {
         console.error('Error fetching trade history:');
       } finally {
-          setLoading(false);
+        setLoading(false);
       }
     };
 
-    if (props.uniqueId) 
+    if (props.uniqueId)
       fetchTradeHistory();
-    
+
   }, [props.uniqueId, pagination]);
 
   return (
@@ -75,18 +76,18 @@ const ActivityTable: React.FC<ActivityTableProps> = (props) => {
           </tr>
         </thead>
         <tbody>
-          {!loading && trades.length>0 && trades.map((trade, index) => (
+          {!loading && trades.length > 0 && trades.map((trade, index) => (
             <Fragment key={index}>
               <tr>
                 <td colSpan={5} className='sm:py-3 py-2 px-6'>
                   <div className="flex items-center gap-4">
-                    <img
+                    <Image
                       src={trade.marketId?.eventId?.image}
                       alt="Icon"
                       width={45}
                       height={45}
                       className="rounded-[6px] object-cover aspect-square cursor-pointer"
-                      onClick={()=>route.push(`/event-page/${trade.marketId?.eventId?.slug}`)}
+                      onClick={() => route.push(`/event-page/${trade.marketId?.eventId?.slug}`)}
                     />
                     <Link href={`/event-page/${trade.marketId?.eventId?.slug}`} className="cursor-pointer">
                       {trade.marketId?.question}
@@ -94,49 +95,49 @@ const ActivityTable: React.FC<ActivityTableProps> = (props) => {
                   </div>
                 </td>
               </tr>
-            <tr  className="border-b border-[#333333]">
-              <td className="px-6 sm:py-4 py-2">
-                <span className='font-bold'>Trade Completed</span>
-                <br />
-                <span className='text-xs'>{new Date(trade.time).toLocaleString()}</span>
-              </td>
-              <td className="px-6 sm:py-4 py-2">
-                {formatNumber(trade.price)}¢
-              </td>
-              <td className="px-6 sm:py-4 py-2">
-                {formatNumber(trade.quantity)}
-              </td>
-              <td className="px-6  sm:py-4 py-2">
-                ${formatNumber((trade.fee/100),5)}
-              </td>
-              <td className={`px-6 sm:py-4 sm:py-2 ${trade.action === 'buy' ? 'text-green-500' : 'text-red-500'} capitalize`}>
-                {trade.action}
-              </td>
-              <td className={`px-6 sm:py-4 sm:py-2 ${trade.side === 'yes' ? 'text-green-500' : 'text-red-500'} capitalize`}>
-                {trade.side == "yes" ? (trade?.marketId?.outcome?.[0]?.title || "yes") : (trade?.marketId?.outcome?.[1]?.title || "no") }
-              </td>
-            </tr>
+              <tr className="border-b border-[#333333]">
+                <td className="px-6 sm:py-4 py-2">
+                  <span className='font-bold'>Trade Completed</span>
+                  <br />
+                  <span className='text-xs'>{new Date(trade.time).toLocaleString()}</span>
+                </td>
+                <td className="px-6 sm:py-4 py-2">
+                  {formatNumber(trade.price)}¢
+                </td>
+                <td className="px-6 sm:py-4 py-2">
+                  {formatNumber(trade.quantity)}
+                </td>
+                <td className="px-6  sm:py-4 py-2">
+                  ${formatNumber((trade.fee / 100), 5)}
+                </td>
+                <td className={`px-6 sm:py-4 sm:py-2 ${trade.action === 'buy' ? 'text-green-500' : 'text-red-500'} capitalize`}>
+                  {trade.action}
+                </td>
+                <td className={`px-6 sm:py-4 sm:py-2 ${trade.side === 'yes' ? 'text-green-500' : 'text-red-500'} capitalize`}>
+                  {trade.side == "yes" ? (trade?.marketId?.outcome?.[0]?.title || "yes") : (trade?.marketId?.outcome?.[1]?.title || "no")}
+                </td>
+              </tr>
             </Fragment>
           ))}
         </tbody>
       </table>
       {!loading && trades.length === 0 && (
-          <div  className="flex justify-center text-[13px] my-5 text-gray-500">
-              No Activity found
-          </div>
+        <div className="flex justify-center text-[13px] my-5 text-gray-500">
+          No Activity found
+        </div>
       )}
       {!loading && trades.length > 0 && (
-          <PaginationComp
-            pagination={pagination}
-            setPagination={setPagination}
-            hasMore={hasMore}
-          />
-      )}   
-    {loading &&  (
-      <div className="flex justify-center items-center my-5 min-h-[100px]">
-        <Loader className="w-26 h-26 animate-spin" />
-      </div>
-    )}
+        <PaginationComp
+          pagination={pagination}
+          setPagination={setPagination}
+          hasMore={hasMore}
+        />
+      )}
+      {loading && (
+        <div className="flex justify-center items-center my-5 min-h-[100px]">
+          <Loader className="w-26 h-26 animate-spin" />
+        </div>
+      )}
     </div>
   );
 }

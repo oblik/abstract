@@ -108,7 +108,7 @@ export function MultipleOptionCard({
                 flexShrink: 0,
               }}
             >
-              <img
+              <Image
                 src={imageSrc}
                 alt="Event"
                 width={40}
@@ -159,9 +159,9 @@ export function MultipleOptionCard({
                         <p>
                           {option.last
                             ? // decimalToPercentage(
-                              //   JSON.parse(option.outcomePrices)[0]
-                              // ) + "%"
-                              `${option.last}%`
+                            //   JSON.parse(option.outcomePrices)[0]
+                            // ) + "%"
+                            `${option.last}%`
                             : ""}
                         </p>
                         {/* Yes Button */}
@@ -234,9 +234,9 @@ export function MultipleOptionCard({
                 $
                 {totalPool
                   ? (parseFloat(totalPool) / 100)?.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })
                   : "0.00"}{" "}
                 Vol
               </CardDescription>

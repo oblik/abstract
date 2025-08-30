@@ -99,7 +99,7 @@ export default function ProfilePage(props: ProfilePageProps) {
 
   return (
     <div className="px-0 pb-20 sm:px-0 text-white bg-black h-auto items-center justify-items-center p-0 m-0">
-        <div className="fixed top-0 left-0 z-50 w-[100%] backdrop-blur-md bg-black/80 border-b border-[#222] lg:mb-4 mb-0" style={{ borderBottomWidth: '1px' }}>
+      <div className="fixed top-0 left-0 z-50 w-[100%] backdrop-blur-md bg-black/80 border-b border-[#222] lg:mb-4 mb-0" style={{ borderBottomWidth: '1px' }}>
         <Header />
         <NavigationBar
           menuItems={props.categories}
@@ -117,7 +117,7 @@ export default function ProfilePage(props: ProfilePageProps) {
           width: '100%'
         }}
       />
-      
+
       <div className="px-1.5 sm:px-0 container mx-auto px-0 py-5 container-sm">
         {/* 1. User information area */}
         <div className="flex items-center justify-between space-x-4 mb-6 profile_top">
@@ -140,7 +140,7 @@ export default function ProfilePage(props: ProfilePageProps) {
             </Avatar>
             <div>
               <h2 className="sm:text-xl text-lgfont-bold">
-                {props?.user?.userName ||
+                @{props?.user?.userName.toLowerCase() ||
                   (wallet ? `${wallet?.slice(0, 6)}...${wallet?.slice(-4)}` : "")}
               </h2>
               <p className="text-sm text-gray-400 whitespace-normal break-all">{wallet}</p>
@@ -229,7 +229,7 @@ export default function ProfilePage(props: ProfilePageProps) {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="border border-gray-700 bg-black rounded p-1 text-sm"
               >
-                <option>All</option> 
+                <option>All</option>
                 <option value="requested">Requested</option>
                 <option value="completed">Completed</option>
                 <option value="rejected">Rejected</option>
@@ -284,20 +284,20 @@ export default function ProfilePage(props: ProfilePageProps) {
             }
             {
               isOwnProfile && activeTab == "deposit" &&
-              <DepositTable statusFilter = {statusFilter}/>
+              <DepositTable statusFilter={statusFilter} />
             }
             {
               isOwnProfile && activeTab == "withdraw" &&
-              <WithdrawTable statusFilter = {statusFilter}/>
+              <WithdrawTable statusFilter={statusFilter} />
             }
           </TabsContent>
         </Tabs>
 
 
       </div>
-            <HeaderFixed />
+      <HeaderFixed />
 
-      
+
     </div>
   );
 }

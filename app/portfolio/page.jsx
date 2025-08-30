@@ -1,21 +1,6 @@
-export const runtime = 'edge';
-
 import PortfolioPage from "./PortfolioPage";
-import { getCategories } from "@/services/market";
 
-export default async function Page() {
-  const categories = await fetchCategories();
-  return <PortfolioPage categories={categories} />
+export default function Page() {
+  console.log("=== PORTFOLIO PAGE.JSX RENDERING ===");
+  return <PortfolioPage />
 }
-
-const fetchCategories = async () => {
-  try {
-    const { success, result } = await getCategories();
-    if (success) {
-      return result;
-    }
-    return [];
-  } catch (error) {
-    return [];
-  }
-};

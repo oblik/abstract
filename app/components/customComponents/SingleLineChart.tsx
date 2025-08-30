@@ -145,7 +145,7 @@ const SingleLineChart: React.FC<SingleLineChartProps> = ({
           // );
           // const data = await response.json();
           const data = {
-            history:[]
+            history: []
           }
           setChartDataYes(processSingleChartData(data.history, interval));
         } catch (error) {
@@ -163,7 +163,7 @@ const SingleLineChart: React.FC<SingleLineChartProps> = ({
           // );
           // const data = await response.json();
           const data = {
-            history:[]
+            history: []
           }
           setChartDataNo(processSingleChartData(data.history, interval));
         } catch (error) {
@@ -179,10 +179,10 @@ const SingleLineChart: React.FC<SingleLineChartProps> = ({
     hoveredChance !== undefined
       ? hoveredChance
       : selectedYes
-      ? chance
-      : chance !== undefined
-      ? 1 - chance
-      : undefined;
+        ? chance
+        : chance !== undefined
+          ? 1 - chance
+          : undefined;
   const chanceColor = selectedYes ? "#7dfdfe" : "#ec4899";
   const [activeDate, setActiveDate] = useState("Jun 18");
   return (
@@ -204,7 +204,7 @@ const SingleLineChart: React.FC<SingleLineChartProps> = ({
                   flexShrink: 0,
                 }}
               >
-                <img
+                <Image
                   src={image}
                   alt="Event"
                   width={screenWidth < 640 ? 40 : 40}
@@ -273,11 +273,10 @@ const SingleLineChart: React.FC<SingleLineChartProps> = ({
               </HoverCard.Root>
               <Button
                 // className="w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] active:bg-[#262626] active:text-[#fff]"
-                className={`w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] ${
-                  activeDate === "Jun 18"
+                className={`w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] ${activeDate === "Jun 18"
                     ? "bg-[#fff] text-[#262626] border-[#262626]"
                     : ""
-                }`}
+                  }`}
                 onClick={() => setActiveDate("Jun 18")}
               >
                 Jun 18

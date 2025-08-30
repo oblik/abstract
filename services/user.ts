@@ -4,10 +4,9 @@ import { setUser } from "@/store/slices/auth/userSlice";
 
 
 function getApiBaseUrl() {
-  if (process.env.NODE_ENV === "production") {
-    return config.backendURL;
-  }
-  return ""; // Use Next.js proxy in development
+  // Always use full backend URL for server-side requests to avoid malformed URL errors
+  // Next.js middleware and SSR context require absolute URLs
+  return config.backendURL;
 }
 
 
@@ -129,7 +128,7 @@ export const getInfoCards = async () => {
 export const setUserEmailNotification = async (data: any) => {
   try {
     let respData = await axios({
-      url: `$${getApiBaseUrl()}/api/v1/user/set-user-email-notification`,
+      url: `${getApiBaseUrl()}/api/v1/user/set-user-email-notification`,
       method: "post",
       data: data
     });

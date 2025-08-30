@@ -20,6 +20,8 @@ import { positionClaim } from "@/services/market";
 import { toastAlert } from "@/lib/toast";
 import html2canvas from "html2canvas";
 import { copyImageToClipboard } from "copy-image-clipboard";
+import { useSelector } from 'react-redux'
+import { getCookie } from 'cookies-next'
 
 const Positions = (props) => {
   const [positionHistory, setPositionHistory] = useState([]);
@@ -34,12 +36,62 @@ const Positions = (props) => {
   const socketContext = useContext(SocketContext);
   const cardRef = useRef();
 
+  // Get auth state from Redux
+  const data = useSelector((state) => state?.auth?.user);
+  const { signedIn } = useSelector((state) => state?.auth?.session);
+
+  // Helper function to check if user is properly authenticated
+  const isAuthenticated = () => {
+    console.log("=== POSITIONS AUTHENTICATION CHECK ===");
+    console.log("signedIn:", signedIn);
+    console.log("data exists:", !!data);
+    console.log("data.id:", data?.id);
+    console.log("data._id:", data?._id);
+
+    const token = getCookie("user-token");
+    console.log("token exists (getCookie):", !!token);
+    console.log("token value:", token);
+
+    // Standard authentication check
+    const standardAuth = signedIn && data && (data.id || data._id) && token;
+
+    // Hydration workaround: if user appears authenticated via Redux but no cookie, allow it
+    const isHydrationWorkaround = signedIn && data && data._id && !token;
+    console.log("isHydrationWorkaround:", isHydrationWorkaround ? data._id : false);
+
+    const result = standardAuth || isHydrationWorkaround;
+    console.log("isAuthenticated result:", result ? (data._id || data.id) : false);
+
+    return result;
+  };
+
   const getUserPositionHistory = async () => {
     try {
+      console.log("=== POSITIONS API CALL ===");
+      console.log("props.uniqueId:", props.uniqueId);
+      console.log("props.isPrivate:", props.isPrivate);
+      console.log("isAuthenticated():", isAuthenticated());
+
+      if (!props.uniqueId) {
+        console.log("No uniqueId provided, skipping API call");
+        return;
+      }
+
+      // For private viewing, require authentication
+      if (props.isPrivate && !isAuthenticated()) {
+        console.log("Private viewing requires authentication, skipping API call");
+        return;
+      }
+
       setLoading(true)
+      console.log("Making API call to getPositionsById with id:", props.uniqueId);
       const res = await getPositionsById(props.uniqueId);
+      console.log("getPositionsById response:", res);
       if (res.success) {
         setPositionHistory(res.result);
+        console.log("Position history set:", res.result);
+      } else {
+        console.log("getPositionsById failed:", res);
       }
     } catch (error) {
       console.error("Error fetching Position History:", error);
@@ -76,8 +128,26 @@ const Positions = (props) => {
   };
 
   useEffect(() => {
-    getUserPositionHistory();
-  }, []);
+    console.log("=== POSITIONS USEEFFECT TRIGGERED ===");
+    console.log("isAuthenticated():", isAuthenticated());
+    console.log("props.authLoaded:", props.authLoaded);
+    console.log("props.isPrivate:", props.isPrivate);
+    console.log("data:", data);
+    console.log("signedIn:", signedIn);
+
+    // For public viewing (isPrivate=false), we don't need authentication
+    // For private viewing (isPrivate=true), we need authentication
+    const shouldLoad = props.isPrivate ? isAuthenticated() : true;
+
+    if (shouldLoad && props.uniqueId) {
+      console.log("Conditions met, calling getUserPositionHistory");
+      getUserPositionHistory();
+    } else {
+      console.log("Conditions not met - skipping getUserPositionHistory");
+      console.log("shouldLoad:", shouldLoad);
+      console.log("uniqueId:", props.uniqueId);
+    }
+  }, [data, signedIn, props.isPrivate, props.uniqueId]);
 
   const getTradeHistory = async (id) => {
     try {
@@ -221,7 +291,7 @@ const Positions = (props) => {
         }
       });
     };
-    if (props.isPrivate){
+    if (props.isPrivate) {
       socket.on("pos-update", handlePositions);
     }
     return () => {
@@ -266,7 +336,7 @@ const Positions = (props) => {
                     <td colSpan={8}>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <img
+                          <Image
                             src={item.eventImage}
                             alt="Icon"
                             width={45}
@@ -345,18 +415,17 @@ const Positions = (props) => {
                         {/* <span className={(data.side == "no" ? (100 - data?.last) : data?.last) > data?.filled?.[0]?.price ? "text-green-500" : "text-red-500"}>({((((data.side == "no" ? (100 - data?.last) : data?.last) || data.filled?.[0]?.price) - data.filled?.[0]?.price) / data?.filled?.[0]?.price * 100).toFixed(2)}%)</span> */}
                       </td>
                       <td
-                        className={`${
-                          (data.side == "no" ? 100 - data?.odd : data?.odd) >=
+                        className={`${(data.side == "no" ? 100 - data?.odd : data?.odd) >=
                           data?.filled?.[0]?.price
-                            ? "text-green-500"
-                            : "text-red-500"
-                        }`}
+                          ? "text-green-500"
+                          : "text-red-500"
+                          }`}
                       >
                         $
                         {toFixedDown(
                           ((data.side == "no" ? 100 - data?.odd : data?.odd) *
                             data?.quantity) /
-                            100,
+                          100,
                           2
                         )}
                         (
@@ -366,7 +435,7 @@ const Positions = (props) => {
                             : data?.odd) -
                             data?.filled?.[0]?.price) /
                             data?.filled?.[0]?.price) *
-                            100,
+                          100,
                           2
                         )}
                         %)
@@ -397,7 +466,7 @@ const Positions = (props) => {
                             )
                           }
                         </div>
-                      </td>                     
+                      </td>
                     </tr>
                   ))}
                 </React.Fragment>
@@ -443,9 +512,8 @@ const Positions = (props) => {
                   <tr key={index}>
                     <td
                       style={{ textTransform: "capitalize" }}
-                      className={`${
-                        item.action === "sell" ? "text-green-500" : "text-red-500"
-                      } text-capitalize`}
+                      className={`${item.action === "sell" ? "text-green-500" : "text-red-500"
+                        } text-capitalize`}
                     >
                       {capitalize(item.action)}{" "}
                       {item.side == "yes"
@@ -499,7 +567,7 @@ const Positions = (props) => {
               className="bg-[#0e1c14] p-4 rounded-lg mt-4 w-full"
             >
               <div className="flex gap-3 mb-4 items-center">
-                <img
+                <Image
                   src={shareData?.eventImage}
                   alt="Icon"
                   width={60}
@@ -531,7 +599,7 @@ const Positions = (props) => {
                     {toFixedDown(
                       (selectedMarketData?.filled?.[0]?.price *
                         selectedMarketData?.quantity) /
-                        100,
+                      100,
                       2
                     )}
                   </p>

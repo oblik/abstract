@@ -150,26 +150,26 @@ export default function Home({ infoCardCms, categories, tags }) {
   return (
     <>
       <div className="px-0 sm:px-2 text-white bg-black h-auto items-center justify-items-center p-0 m-0">
-      {/* Fixed header/navbar */}
-      <div className="fixed top-0 left-0 z-50 w-full backdrop-blur-md bg-black/80 border-b border-[#222]" style={{ borderBottomWidth: '1px' }}>
-        <Header />
-        <NavigationBar
-          menuItems={categories}
-          showLiveTag={true}
-          setSelectedCategory={setSelectedCategory}
-          selectedCategory={selectCategory}
+        {/* Fixed header/navbar */}
+        <div className="fixed top-0 left-0 z-50 w-full backdrop-blur-md bg-black/80 border-b border-[#222]" style={{ borderBottomWidth: '1px' }}>
+          <Header />
+          <NavigationBar
+            menuItems={categories}
+            showLiveTag={true}
+            setSelectedCategory={setSelectedCategory}
+            selectedCategory={selectCategory}
+          />
+
+        </div>
+        {/* Spacer to prevent content from being hidden behind the fixed header/navbar */}
+        <div
+          className="lg:mb-4 mb-0"
+          style={{
+            height: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
+            minHeight: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
+            width: '100%'
+          }}
         />
-        
-      </div>
-      {/* Spacer to prevent content from being hidden behind the fixed header/navbar */}
-      <div
-        className="lg:mb-4 mb-0"
-        style={{
-          height: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
-          minHeight: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
-          width: '100%'
-        }}
-      />
 
         <div className="container mx-auto pt-0 max-w-full overflow-hidden">
           <div className="px-1.5 sm:px-0">
@@ -179,15 +179,15 @@ export default function Home({ infoCardCms, categories, tags }) {
               setSelectedSubcategory={setSelectedSubcategory}
             />
             <div className="hidden sm:block">
-            {
-              isEmpty(categoryParam) && (
-                <>
-                  <SlideshowLinting />
-                  {/* Info Cards Section */}
-                  <InfoCards infoCardCms={infoCardCms} />
-                </>
-              )
-            }
+              {
+                isEmpty(categoryParam) && (
+                  <>
+                    <SlideshowLinting />
+                    {/* Info Cards Section */}
+                    <InfoCards infoCardCms={infoCardCms} />
+                  </>
+                )
+              }
             </div>
 
             {/* Event Cards Section */}

@@ -113,7 +113,7 @@ export default function MultiLineChart({
             // );
             // const data = await response.json();
             const data = {
-              history:[]
+              history: []
             }
             return data.history;
           });
@@ -208,7 +208,7 @@ export default function MultiLineChart({
                   flexShrink: 0,
                 }}
               >
-                <img
+                <Image
                   src={image as string}
                   alt="Event"
                   width={screenWidth < 640 ? 40 : 40}
@@ -278,11 +278,10 @@ export default function MultiLineChart({
               </HoverCard.Root>
               <Button
                 // className="w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] active:bg-[#262626] active:text-[#fff]"
-                className={`w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] ${
-                  activeDate === "Jun 18"
+                className={`w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] ${activeDate === "Jun 18"
                     ? "bg-[#fff] text-[#262626] border-[#262626]"
                     : ""
-                }`}
+                  }`}
                 onClick={() => setActiveDate("Jun 18")}
               >
                 Jun 18

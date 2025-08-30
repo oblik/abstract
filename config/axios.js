@@ -18,16 +18,38 @@ axios.interceptors.request.use(
 
     if (isClient) {
       authorizationToken = getCookie("user-token");
+      if (authorizationToken) {
+        console.log("Client-side auth token found for request:", config.url);
+      } else {
+        console.log("No client-side auth token for request:", config.url);
+
+        // Fallback: Check Redux store for token during hydration
+        try {
+          const authState = store.getState()?.auth?.session;
+          if (authState?.signedIn && authState?.token) {
+            authorizationToken = authState.token;
+            console.log("Using Redux token as fallback for request:", config.url);
+          }
+        } catch (error) {
+          console.log("No Redux token available for request:", config.url);
+        }
+      }
     } else {
       try {
+        // For server-side rendering, try to get cookies from headers
         const { cookies } = await import("next/headers");
         const cookieStore = await cookies();
         const token = cookieStore.get("user-token");
         if (token) {
           authorizationToken = token.value;
+          console.log("Server-side auth token found for request:", config.url);
+        } else {
+          console.log("No server-side auth token for request:", config.url);
         }
       } catch (error) {
-        console.error("Error accessing server-side cookies:", error);
+        console.error("Error accessing server-side cookies for:", config.url, error);
+        // In edge runtime or when cookies are not available, skip auth
+        // This is expected for server-side API calls without user context
       }
     }
 
@@ -54,27 +76,50 @@ export const removeAuthorization = () => {
 export const handleResp = (respData, type = 'success', doc) => {
   try {
     const { signedIn } = store.getState()?.auth?.session;
-    // console.log(signedIn, "signedIn");
-    // console.log(respData, "respData");
+    const userData = store.getState()?.auth?.user;
+
+    // Only auto-logout on 401 if:
+    // 1. User is marked as signed in
+    // 2. User data exists (meaning they were properly authenticated)
+    // 3. The error is actually a 401
+    // 4. There's a user token cookie that should have worked
     if (
       signedIn &&
+      userData &&
+      userData.id &&
       type === "error" &&
       respData &&
       respData.response &&
       respData.response.status === 401
     ) {
-      // store.dispatch(clearUser());
-      // store.dispatch(clearWallet());
-      // disconnectWallet();
-      // dispatch(reset());
-      document.cookie = "user-token" + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-      store.dispatch(signOut());
-      toastAlert("error", "Your session has expired, please login again", "session-expired");
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 2000);
-      return true;
+      // Additional check: see if we have a token cookie
+      const isClient = typeof window !== "undefined";
+      let hasToken = false;
+
+      if (isClient) {
+        try {
+          const { getCookie } = require("cookies-next");
+          hasToken = !!getCookie("user-token");
+        } catch (e) {
+          console.error("Error checking cookie:", e);
+        }
+      }
+
+      // Only auto-logout if we had a token but it was rejected
+      if (hasToken) {
+        console.log("Valid auth token was rejected by server, logging out user");
+        document.cookie = "user-token" + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+        store.dispatch(signOut());
+        toastAlert("error", "Your session has expired, please login again", "session-expired");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 2000);
+        return true;
+      } else {
+        console.log("401 error but no auth token found, not auto-logging out");
+      }
     }
+
     if (doc === true && type == 'success' && respData && respData.data) {
       return { data: respData.data }
     }

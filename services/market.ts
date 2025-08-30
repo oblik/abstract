@@ -1,12 +1,11 @@
 import config from "@/config/config";
 
 
-// Helper to get API base URL (use proxy in dev, full URL in prod)
+// Helper to get API base URL (use full URL for all requests to avoid middleware issues)
 function getApiBaseUrl() {
-  if (process.env.NODE_ENV === "production") {
-    return config.backendURL;
-  }
-  return ""; // Use Next.js proxy in development
+  // Always use full backend URL for server-side requests to avoid malformed URL errors
+  // Next.js middleware and SSR context require absolute URLs
+  return config.backendURL;
 }
 import axios, { handleResp } from "@/config/axios";
 

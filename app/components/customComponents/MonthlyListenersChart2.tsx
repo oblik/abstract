@@ -71,41 +71,41 @@ function calculateYAxisDomain(data: any[], assetKey: string = 'asset1'): [number
     console.log('calculateYAxisDomain: No data provided');
     return [0, 100];
   }
-  
+
   // Find min and max values, filtering out null/undefined
   const values = data
     .map(d => d[assetKey])
     .filter(v => v !== null && v !== undefined && !isNaN(v));
-  
+
   // console.log('calculateYAxisDomain: Raw values for', assetKey, ':', values.slice(0, 5), '... (total:', values.length, ')');
-  
+
   if (values.length === 0) {
     // console.log('calculateYAxisDomain: No valid values found');
     return [0, 100];
   }
-  
+
   const min = Math.min(...values);
   const max = Math.max(...values);
-  
+
   // Round min down to first whole 10 below, max up to first whole 10 above
   const roundedMin = Math.floor(min / 10) * 10;
   const roundedMax = Math.ceil(max / 10) * 10;
-  
+
   // console.log('calculateYAxisDomain: min=', min, 'max=', max, 'roundedMin=', roundedMin, 'roundedMax=', roundedMax);
-  
+
   // Ensure we have at least some range
   const range = roundedMax - roundedMin;
   if (range < 10) {
     // console.log('calculateYAxisDomain: Range too small, adding padding');
     return [roundedMin - 10, roundedMax + 10];
   }
-  
+
   // console.log('calculateYAxisDomain: Final domain:', [roundedMin, roundedMax]);
   return [roundedMin, roundedMax];
 }
 
 function numUnit(n: string) {
-  if (isEmpty(n) || !["k", "t", "m", "b"].includes(n)) return 1; 
+  if (isEmpty(n) || !["k", "t", "m", "b"].includes(n)) return 1;
   if (n == "t") return 1e12;
   if (n == "b") return 1e9;
   if (n == "m") return 1e6;
@@ -138,10 +138,10 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
   const route = useRouter()
 
   // Create a custom tooltip component that can access the Chart component's state
-  const CustomTooltipWithState: React.FC<CustomTooltipProps & { isCustomData?: boolean, unit: string }> = ({ 
-    active, 
-    payload, 
-    label, 
+  const CustomTooltipWithState: React.FC<CustomTooltipProps & { isCustomData?: boolean, unit: string }> = ({
+    active,
+    payload,
+    label,
     isCustomData = false,
     unit = ""
   }) => {
@@ -156,7 +156,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
         hour12: true
       });
     }
-    
+
     if (active && payload && payload.length) {
       return (
         <div className="bg-transparent p-2 border border-transparent rounded shadow text-white">
@@ -258,11 +258,11 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
   const CustomDot = (props: any) => {
     const { cx, cy, payload, index } = props;
     const isLastPoint = index === chartData.length - 1;
-    
+
     if (!isLastPoint) return null;
-    
+
     const dotColor = "#d0d0d0ff";
-    
+
     return (
       <g>
         <circle
@@ -321,24 +321,24 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
   //   );
   // }
 
-  const getSeriesData = async(id:any)=>{
-          try{
-              let { success,result } = await getSeriesByEvent(id)
-              console.log("result",result)
-              if(success){
-                  setSeriesData(result)
-              }
-          }catch(err){
-              console.log('error',err)
-          }
+  const getSeriesData = async (id: any) => {
+    try {
+      let { success, result } = await getSeriesByEvent(id)
+      console.log("result", result)
+      if (success) {
+        setSeriesData(result)
       }
-      useEffect(()=>{
-          if(series?.slug){
-              getSeriesData(series?.slug)
-          }else{
-              setSeriesData([])
-          }
-      },[series,eventSlug])
+    } catch (err) {
+      console.log('error', err)
+    }
+  }
+  useEffect(() => {
+    if (series?.slug) {
+      getSeriesData(series?.slug)
+    } else {
+      setSeriesData([])
+    }
+  }, [series, eventSlug])
   return (
     <>
 
@@ -352,25 +352,25 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
               <div style={{ display: "flex", alignItems: "center" }}>
                 <div
                   style={{
-                   width: screenWidth < 640 ? "45px" : "65px",
-                   height: screenWidth < 640 ? "45px" : "65px",
-                   overflow: "hidden",
-                   borderRadius: screenWidth < 640 ? "7px" : "8px",
-                   flexShrink: 0,
+                    width: screenWidth < 640 ? "45px" : "65px",
+                    height: screenWidth < 640 ? "45px" : "65px",
+                    overflow: "hidden",
+                    borderRadius: screenWidth < 640 ? "7px" : "8px",
+                    flexShrink: 0,
                   }}
                 >
-              <img
-                 src={image}
-                 alt="Event"
-                 width={screenWidth < 640 ? 50 : 65}
-                 height={screenWidth < 640 ? 50 : 65}
-                 style={{ 
-                 width: "100%", 
-                 height: "100%", 
-                 objectFit: "cover",
-                 transition: "all 0.3s ease" 
-                 }}
-               />
+                  <Image
+                    src={image}
+                    alt="Event"
+                    width={screenWidth < 640 ? 50 : 65}
+                    height={screenWidth < 640 ? 50 : 65}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      transition: "all 0.3s ease"
+                    }}
+                  />
                 </div>
                 <div
                   className="text-[18px] lg:text-[26px] sm:text-[20px]"
@@ -385,7 +385,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                 <p className="text-[12px] sm:text-[14px]">Vol ${volume?.toLocaleString() || ""}</p>
                 {endDate && (
                   <p className="flex items-center gap-1 text-[12px] sm:text-[14px]">
-                  <Clock size={12} className="sm:w-[14px] sm:h-[14px] w-[12px] h-[12px]" />{" "}
+                    <Clock size={12} className="sm:w-[14px] sm:h-[14px] w-[12px] h-[12px]" />{" "}
                     {new Date(endDate)?.toLocaleString("en-US", {
                       day: "numeric",
                       month: "short",
@@ -395,52 +395,52 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                     })}
                   </p>
                 )}
-              <div className="flex items-center gap-2 pl-2 mt-0">
-                {seriesData?.length > 0 && (
+                <div className="flex items-center gap-2 pl-2 mt-0">
+                  {seriesData?.length > 0 && (
                     <Popover.Root>
-                        <Popover.Trigger asChild>
-                            <Button className="px-4 sm:h-7 h-5 rounded-full">
-                                <CountdownTimerIcon />
-                            </Button>
-                        </Popover.Trigger>
-                        <Popover.Content className="history_card" sideOffset={5}>
-                            <ul className="history_card_list">
-                            {seriesData?.length > 0 && (
-                                seriesData
-                                    .filter((series) => series.status !== "active")
-                                    ?.sort((a: any, b: any) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())
-                                    ?.map((event) => (
-                                        <li key={event?.slug} 
-                                        onClick={()=>route.push(`/event-page/${event.slug}`)}
-                                        >
-                                            {/* <Link href={`/event-page/${event.slug}`}> */}
-                                                {momentFormat(event.endDate,"D MMM YYYY, h:mm A")}
-                                            {/* </Link> */}
-                                        </li>
-                                    ))
-                                )}
-                            </ul>
-                            <Popover.Arrow className="HoverCardArrow" />
-                        </Popover.Content>
+                      <Popover.Trigger asChild>
+                        <Button className="px-4 sm:h-7 h-5 rounded-full">
+                          <CountdownTimerIcon />
+                        </Button>
+                      </Popover.Trigger>
+                      <Popover.Content className="history_card" sideOffset={5}>
+                        <ul className="history_card_list">
+                          {seriesData?.length > 0 && (
+                            seriesData
+                              .filter((series) => series.status !== "active")
+                              ?.sort((a: any, b: any) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())
+                              ?.map((event) => (
+                                <li key={event?.slug}
+                                  onClick={() => route.push(`/event-page/${event.slug}`)}
+                                >
+                                  {/* <Link href={`/event-page/${event.slug}`}> */}
+                                  {momentFormat(event.endDate, "D MMM YYYY, h:mm A")}
+                                  {/* </Link> */}
+                                </li>
+                              ))
+                          )}
+                        </ul>
+                        <Popover.Arrow className="HoverCardArrow" />
+                      </Popover.Content>
                     </Popover.Root>
-                )}
-                {seriesData?.length > 0 && (
+                  )}
+                  {seriesData?.length > 0 && (
                     seriesData
-                        .filter((series) => series.status === "active")
-                        ?.sort((a: any, b: any) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime())
-                        ?.map((event) => (
+                      .filter((series) => series.status === "active")
+                      ?.sort((a: any, b: any) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime())
+                      ?.map((event) => (
                         <div
-                            key={event.slug}
-                            // href={`/event-page/${event.slug}`}
-                            onClick={() => route.push(`/event-page/${event.slug}`)}
-                            className="sm:w-[90px] w-[80px] h-6 sm:h-8 flex items-center justify-center rounded-full bg-transparent border border-[#262626] text-white hover:bg-[#262626] hover:text-white active:bg-[#262626] active:text-white py-0 sm:py-2 px-2 text-[12px] sm:text-sm"
+                          key={event.slug}
+                          // href={`/event-page/${event.slug}`}
+                          onClick={() => route.push(`/event-page/${event.slug}`)}
+                          className="sm:w-[90px] w-[80px] h-6 sm:h-8 flex items-center justify-center rounded-full bg-transparent border border-[#262626] text-white hover:bg-[#262626] hover:text-white active:bg-[#262626] active:text-white py-0 sm:py-2 px-2 text-[12px] sm:text-sm"
                         >
-                            {momentFormat(event?.endDate, "D MMM")}
+                          {momentFormat(event?.endDate, "D MMM")}
                         </div>
-                    ))
-                )}
+                      ))
+                  )}
+                </div>
               </div>
-            </div>
             </CardDescription>
             {displayChance !== undefined && (
               <div className="flex pt-2 sm:pt-3 pb-2 flex-wrap gap-3 items-center w-full">
@@ -456,9 +456,9 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
           </CardHeader>
 
           <CardContent className="gap-0 sm:gap-2 p-0">
-              <div className="w-full test">
-                <CardHeader className="p-0 sm:pb-4">
-                </CardHeader>
+            <div className="w-full test">
+              <CardHeader className="p-0 sm:pb-4">
+              </CardHeader>
               <CardContent className="p-0">
                 <ChartContainer
                   className="h-[300px] sm:h-[300px] lg:h-[300px] p-0 pr-0 w-full"
@@ -516,7 +516,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
 
                     />
                     <YAxis
-                      domain={[0, 'dataMax']}                    
+                      domain={[0, 'dataMax']}
                       tickFormatter={(tick) => customData ? `${tick}` : `${tick}`}
                       tickLine={false}
                       axisLine={false}
@@ -525,7 +525,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                       width={40}
                       tick={{ fontSize: screenWidth < 640 ? 9 : 12, fill: '#bdbdbd' }}
                     />
-                    <Tooltip 
+                    <Tooltip
                       content={<CustomTooltipWithState isCustomData={!!customData} unit={unit ?? ""} />}
                       allowEscapeViewBox={{ x: true, y: false }}
                       isAnimationActive={false}
@@ -547,7 +547,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                   </LineChart>
                 </ChartContainer>
               </CardContent>
-              </div>
+            </div>
           </CardContent>
         </div>
       </Card>

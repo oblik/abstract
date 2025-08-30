@@ -1,44 +1,43 @@
 import config from "@/config/config";
 
-// Helper to get API base URL (use proxy in dev, full URL in prod)
+// Helper to get API base URL (use full URL for all requests to avoid middleware issues)
 function getApiBaseUrl() {
-  if (process.env.NODE_ENV === "production") {
-    return config.backendURL;
-  }
-  return ""; // Use Next.js proxy in development
+  // Always use full backend URL for server-side requests to avoid malformed URL errors
+  // Next.js middleware and SSR context require absolute URLs
+  return config.backendURL;
 }
 import axios, { handleResp } from "@/config/axios";
 import { setWallet } from "@/store/slices/wallet/dataSlice";
 import { setUser } from "@/store/slices/auth/userSlice";
 
 export const userDeposit = async (data: any, dispatch: any) => {
-    try {
-      let respData = await axios({
-        url: `${getApiBaseUrl()}/api/v1/user/user-deposit`,
-        method: "post",
-        data,
-      });
-      const { wallet,user } = respData.data;
-      console.log(user,wallet,"user");
-      dispatch(setWallet(wallet));
-       dispatch(setUser(user));
-      return handleResp(respData, "success");
-    } catch (error: any) {
-      return handleResp(error, "error");
-    }
+  try {
+    let respData = await axios({
+      url: `${getApiBaseUrl()}/api/v1/user/user-deposit`,
+      method: "post",
+      data,
+    });
+    const { wallet, user } = respData.data;
+    console.log(user, wallet, "user");
+    dispatch(setWallet(wallet));
+    dispatch(setUser(user));
+    return handleResp(respData, "success");
+  } catch (error: any) {
+    return handleResp(error, "error");
+  }
 };
 
 export const addressCheck = async (data: any) => {
-    try {
-      let respData = await axios({
-        url: `${getApiBaseUrl()}/api/v1/user/address-check`,
-        method: "post",
-        data,
-      });
-      return handleResp(respData, "success");
-    } catch (error: any) {
-      return handleResp(error, "error");
-    }
+  try {
+    let respData = await axios({
+      url: `${getApiBaseUrl()}/api/v1/user/address-check`,
+      method: "post",
+      data,
+    });
+    return handleResp(respData, "success");
+  } catch (error: any) {
+    return handleResp(error, "error");
+  }
 };
 
 export const saveWalletEmail = async (data: any) => {
@@ -55,7 +54,7 @@ export const saveWalletEmail = async (data: any) => {
 };
 
 
-export const withdrawRequest = async (data: any,dispatch: any) => {
+export const withdrawRequest = async (data: any, dispatch: any) => {
   try {
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/user/withdraw-request`,
@@ -63,7 +62,7 @@ export const withdrawRequest = async (data: any,dispatch: any) => {
       data,
     });
     const { wallet } = respData.data;
-    console.log(wallet,"walletwallet");
+    console.log(wallet, "walletwallet");
     dispatch(setWallet(wallet));
     return handleResp(respData, "success");
   } catch (error: any) {

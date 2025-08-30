@@ -4,6 +4,7 @@ import HeaderFixed from "@/app/HeaderFixed";
 // import { Nav as NavigationComponent } from "@/app/components/ui/navigation-menu";
 // import { navigationItems } from "@/constants";
 import React, { useState, useEffect, useCallback } from "react";
+import { getCookie } from "cookies-next";
 import { Button } from "@/app/components/ui/button";
 import config from "../../config/config";
 import {
@@ -61,6 +62,7 @@ import { setWalletConnect } from "@/store/slices/walletconnect/walletSlice";
 import { PnLFormatted } from "@/utils/helpers";
 import { parsePriceData } from "@pythnetwork/client";
 import { getWalletSettings, getCoinList } from "@/services/user";
+import { getAuthToken } from "@/lib/cookies";
 import depositIDL from "../../components/IDL/DEPOSITIDL.json";
 import Withdraw from "./withdraw";
 import { getUserPnL } from "@/services/portfolio";
@@ -82,7 +84,9 @@ let initialValue = {
   walletAddress: "",
 };
 
-export default function PortfolioPage({ categories }) {
+export default function PortfolioPage() {
+  console.log("=== PORTFOLIO PAGE COMPONENT RENDERING ===");
+
   const programID = new PublicKey(config?.programID);
   const connection = new Connection(config?.rpcUrl, "confirmed");
   const PYTH_PRICE_ACCOUNT = new PublicKey(config?.PYTH_PRICE_ACCOUNT);
@@ -92,6 +96,56 @@ export default function PortfolioPage({ categories }) {
   );
   const walletData = useSelector((state) => state?.wallet?.data);
   const data = useSelector((state) => state?.auth?.user);
+  const { signedIn } = useSelector((state) => state?.auth?.session);
+
+  console.log("=== INITIAL AUTH STATE ===");
+  console.log("signedIn:", signedIn);
+  console.log("data:", data);
+  console.log("walletData:", walletData);
+
+  // Helper function to check if user is properly authenticated
+  const isAuthenticated = () => {
+    const token = getAuthToken(); // Use the improved getAuthToken function
+
+    // TEMPORARY WORKAROUND: If no token but user data exists and signedIn is true,
+    // assume authentication is valid (this handles hydration issues)
+    const isHydrationWorkaround = !token && signedIn && data && (data.id || data._id);
+
+    // Additional debugging
+    const allCookies = typeof document !== 'undefined' ? document.cookie : 'N/A';
+    const cookiesNextToken = getCookie("user-token");
+
+    console.log("=== AUTHENTICATION CHECK ===");
+    console.log("signedIn:", signedIn);
+    console.log("data exists:", !!data);
+    console.log("data.id:", data?.id);
+    console.log("data._id:", data?._id);
+    console.log("token exists (getAuthToken):", !!token);
+    console.log("token value:", token ? "***exists***" : "null");
+    console.log("cookies-next token:", cookiesNextToken ? "***exists***" : "null");
+    console.log("All cookies:", allCookies);
+    console.log("isHydrationWorkaround:", isHydrationWorkaround);
+    console.log("isAuthenticated result:", (signedIn && data && (data.id || data._id) && token) || isHydrationWorkaround);
+
+    // Return true if we have a token OR if this looks like a hydration issue
+    return (signedIn && data && (data.id || data._id) && token) || isHydrationWorkaround;
+  };
+
+  const [authLoaded, setAuthLoaded] = useState(false);
+
+  console.log("=== PORTFOLIO PAGE RENDER ===");
+  console.log("authLoaded:", authLoaded);
+
+  // Wait a moment for auth state to stabilize
+  useEffect(() => {
+    console.log("=== AUTH LOADED TIMER STARTING ===");
+    const timer = setTimeout(() => {
+      console.log("=== AUTH LOADED TIMER COMPLETE - Setting authLoaded to true ===");
+      setAuthLoaded(true);
+      console.log("=== authLoaded should now be true ===");
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const [open, setOpen] = useState(false);
   const [check, setCheck] = useState(false);
@@ -135,11 +189,26 @@ export default function PortfolioPage({ categories }) {
   var { currency, amount, minDeposit } = depositData;
 
   useEffect(() => {
-    getPnl();
-  }, [walletData, interval]);
+    // Only call getPnl if user is authenticated and auth state is loaded
+    console.log("=== PORTFOLIO USEEFFECT ===");
+    console.log("authLoaded:", authLoaded);
+    console.log("About to check isAuthenticated()");
+    if (authLoaded && isAuthenticated()) {
+      console.log("Calling getPnl()");
+      getPnl();
+    } else {
+      console.log("Skipping getPnl - authLoaded:", authLoaded, "isAuthenticated:", isAuthenticated());
+    }
+  }, [walletData, interval, data, signedIn, authLoaded]);
 
   const getPnl = async () => {
     try {
+      // Additional check to ensure user is authenticated before API call
+      if (!isAuthenticated()) {
+        console.log("User not authenticated, skipping getPnL call");
+        return;
+      }
+
       const { success, result } = await getUserPnL(interval);
       console.log("success,result", success, result);
       if (success) {
@@ -289,6 +358,12 @@ export default function PortfolioPage({ categories }) {
 
   const getWalletSettingsData = async () => {
     try {
+      // Only call if user is authenticated
+      if (!isAuthenticated()) {
+        console.log("User not authenticated, skipping getWalletSettings call");
+        return;
+      }
+
       let respData = await getWalletSettings();
       if (respData.success) {
         setWalletsetting(respData?.result);
@@ -300,6 +375,12 @@ export default function PortfolioPage({ categories }) {
 
   const getCoinData = async () => {
     try {
+      // Check if user is authenticated before making API call
+      if (!isAuthenticated()) {
+        console.log("User not authenticated, skipping getCoinList call");
+        return;
+      }
+
       let respData = await getCoinList();
       if (respData.success) {
         setCoin(respData?.result);
@@ -319,8 +400,31 @@ export default function PortfolioPage({ categories }) {
   };
 
   useEffect(() => {
-    getWalletSettingsData();
-    getCoinData();
+    // Only call authenticated APIs if user is logged in and auth state is loaded
+    console.log("=== WALLET/COIN DATA USEEFFECT ===");
+    console.log("authLoaded:", authLoaded);
+    console.log("About to check isAuthenticated() for wallet/coin data");
+    if (authLoaded && isAuthenticated()) {
+      console.log("Calling getWalletSettingsData() and getCoinData()");
+      getWalletSettingsData();
+      getCoinData();
+    } else {
+      console.log("Skipping wallet/coin data - authLoaded:", authLoaded, "isAuthenticated:", isAuthenticated());
+    }
+  }, [data, signedIn, authLoaded]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { success, result } = await getCategories();
+        if (success) {
+          setNavigationItems(result);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchCategories();
   }, []);
 
   const getSolanaTxFee = async () => {
@@ -845,40 +949,40 @@ export default function PortfolioPage({ categories }) {
   return (
     <>
       <div className="px-0 pb-20 sm:px-0 text-white bg-black h-auto items-center justify-items-center p-0 m-0">
-      <div className="fixed top-0 left-0 z-50 w-full backdrop-blur-md bg-black/80 border-b border-[#222]" style={{ borderBottomWidth: '1px' }}>
-        <Header />
-        <NavigationBar
-          menuItems={categories}
-          showLiveTag={true}
-          setSelectedCategory={setSelectedCategory}
-          selectedCategory={selectCategory}
+        <div className="fixed top-0 left-0 z-50 w-full backdrop-blur-md bg-black/80 border-b border-[#222]" style={{ borderBottomWidth: '1px' }}>
+          <Header />
+          <NavigationBar
+            menuItems={navigationItems}
+            showLiveTag={true}
+            setSelectedCategory={setSelectedCategory}
+            selectedCategory={selectCategory}
+          />
+        </div>
+        {/* Spacer to prevent content from being hidden behind the fixed header/navbar */}
+        <div
+          className="lg:mb-4 mb-0"
+          style={{
+            height: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
+            minHeight: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
+            width: '100%'
+          }}
         />
-      </div>
-      {/* Spacer to prevent content from being hidden behind the fixed header/navbar */}
-      <div
-        className="lg:mb-4 mb-0"
-        style={{
-          height: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
-          minHeight: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
-          width: '100%'
-        }}
-      />
         <div className="px-1.5 sm:px-0 container mx-auto pb-0 sm:pb-4 container-sm">
           <div className="flex justify-end sm:mb-2 mb-0 sm:mt-2 mt-4">
             {isConnected ? (
               <>
                 <Button className="mr-2">{shortText(address)}</Button>
-                <Button 
-                variant="outline"
-                className="ml-auto min-w-[95px] text-[12px] sm:text-sm max-h-8 sm:max-h-12 px-4"
-                onClick={() => disconnect()}>Disconnect</Button>
-                
+                <Button
+                  variant="outline"
+                  className="ml-auto min-w-[95px] text-[12px] sm:text-sm max-h-8 sm:max-h-12 px-4"
+                  onClick={() => disconnect()}>Disconnect</Button>
+
               </>
             ) : (
-              <Button 
-              variant='default'
-              className="ml-auto min-w-[95px] text-[12px] sm:text-sm max-h-8 sm:max-h-12 px-4"
-              onClick={() => setOpen(true)}>Connect Wallet</Button>
+              <Button
+                variant='default'
+                className="ml-auto min-w-[95px] text-[12px] sm:text-sm max-h-8 sm:max-h-12 px-4"
+                onClick={() => setOpen(true)}>Connect Wallet</Button>
             )}
           </div>
           {/* <p>Your Wallet Address : {shortValue(data?.walletAddress)}</p> */}
@@ -1488,13 +1592,12 @@ export default function PortfolioPage({ categories }) {
                     PROFIT/LOSS
                   </span>
                   <span
-                    className={`sm:mt-2 mt-0 sm:text-3xl text-2xl font-semibold ${
-                      profitAmount >= 0 ? "text-green-400" : "text-red-400"
-                    }`}
+                    className={`sm:mt-2 mt-0 sm:text-3xl text-2xl font-semibold ${profitAmount >= 0 ? "text-green-400" : "text-red-400"
+                      }`}
                   >
                     {PnLFormatted(formatNumber(profitAmount, 2))}
                   </span>
-                    <span className="text-sm text-gray-500 mt-1">
+                  <span className="text-sm text-gray-500 mt-1">
                     <span className={todayReal >= 0 ? "text-green-500" : "text-red-500"}>{todayReal < 0 && "-"}${Math.abs(trunc(todayReal, 2))}
                       {" "}
                       <span className={todayRealPercent >= 0 ? "text-green-500" : "text-red-500"}>({trunc(todayRealPercent, 2)}%)</span>
@@ -1510,7 +1613,7 @@ export default function PortfolioPage({ categories }) {
                 </div>
               </div>
             </div>
-             </div>
+          </div>
 
           {/* 3. Tab 与筛选区 */}
           {/* 3. Tab and filter area */}
@@ -1529,15 +1632,15 @@ export default function PortfolioPage({ categories }) {
             </div>
             <TabsContent value="positions">
 
-              <Positions uniqueId={data?.uniqueId} isPrivate={true} />
+              <Positions uniqueId={data?.uniqueId} isPrivate={true} authLoaded={authLoaded} />
             </TabsContent>
             <TabsContent value="openorders">
 
-              <OpenOrders />
+              <OpenOrders authLoaded={authLoaded} />
             </TabsContent>
             <TabsContent value="history">
 
-              <History />
+              <History authLoaded={authLoaded} />
             </TabsContent>
           </Tabs>
         </div>
@@ -1551,7 +1654,7 @@ export default function PortfolioPage({ categories }) {
               <div className="flex gap-3 justify-between mt-4 sm:flex-nowrap flex-wrap">
                 <Button
                   onClick={() => ConnectPhantomWallet()}
-                className="rounded-[6px] w-full sm:h-13 h-10 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]"
+                  className="rounded-[6px] w-full sm:h-13 h-10 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]"
                 >
                   <Image
                     src={"/images/wallet_icon_02.png"}
@@ -1570,9 +1673,9 @@ export default function PortfolioPage({ categories }) {
           </Dialog.Portal>
         </Dialog.Root>
       </div>
-            <div className="hidden sm:block">
-              <Footer />
-            </div>
+      <div className="hidden sm:block">
+        <Footer />
+      </div>
       <HeaderFixed />
     </>
   );

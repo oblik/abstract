@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
+import Image from "next/image";
 import SearchBar from '../components/ui/SearchBar'
 import { getOpenOrders } from '@/services/portfolio'
 import { cancelOrder } from '@/services/market'
@@ -10,16 +11,53 @@ import { SocketContext } from '@/config/socketConnectivity'
 import store from "@/store/index";
 import { toFixedDown } from '@/lib/roundOf'
 import { isEmpty } from '@/lib/isEmpty'
+import { useSelector } from 'react-redux'
+import { getCookie } from 'cookies-next'
 
-const OpenOrders = () => {
+const OpenOrders = (props) => {
     const [openOrders, setOpenOrders] = useState([])
     const [loading, setLoading] = useState(false)
     const route = useRouter()
     const socketContext = useContext(SocketContext)
     const { user } = store.getState().auth;
 
+    // Get auth state from Redux
+    const data = useSelector((state) => state?.auth?.user);
+    const { signedIn } = useSelector((state) => state?.auth?.session);
+
+    // Helper function to check if user is properly authenticated
+    const isAuthenticated = () => {
+        console.log("=== OPEN ORDERS AUTHENTICATION CHECK ===");
+        console.log("signedIn:", signedIn);
+        console.log("data exists:", !!data);
+        console.log("data.id:", data?.id);
+        console.log("data._id:", data?._id);
+
+        const token = getCookie("user-token");
+        console.log("token exists (getCookie):", !!token);
+        console.log("token value:", token);
+
+        // Standard authentication check
+        const standardAuth = signedIn && data && (data.id || data._id) && token;
+
+        // Hydration workaround: if user appears authenticated via Redux but no cookie, allow it
+        const isHydrationWorkaround = signedIn && data && data._id && !token;
+        console.log("isHydrationWorkaround:", isHydrationWorkaround ? data._id : false);
+
+        const result = standardAuth || isHydrationWorkaround;
+        console.log("isAuthenticated result:", result ? (data._id || data.id) : false);
+
+        return result;
+    };
+
     const getUserOpenOrders = async () => {
         try {
+            // Only make API call if user is authenticated
+            if (!isAuthenticated()) {
+                console.log("User not authenticated, skipping getOpenOrders call");
+                return;
+            }
+
             setLoading(true)
             const res = await getOpenOrders({})
             if (res.success) {
@@ -33,8 +71,11 @@ const OpenOrders = () => {
     }
 
     useEffect(() => {
-        getUserOpenOrders()
-    }, [])
+        // Only call API if user is authenticated and authLoaded is true
+        if (isAuthenticated() && props.authLoaded) {
+            getUserOpenOrders()
+        }
+    }, [data, signedIn, props.authLoaded || false])
 
     const handleCancelOrder = async (orderId) => {
         // console.log("orderId", orderId);
@@ -168,7 +209,7 @@ const OpenOrders = () => {
                                         <td colSpan={8}>
                                             <div className="flex items-center space-x-2 cursor-pointer" onClick={() => route.push(`/event-page/${item?.eventSlug}`)}>
                                                 <span className="text-2xl">
-                                                    <img
+                                                    <Image
                                                         src={item?.eventImage}
                                                         alt="Icon"
                                                         width={45}

@@ -155,9 +155,9 @@ export default function HeaderFixed() {
         </nav>
       </div>
 
-      {/* Search Bar */}      
+      {/* Search Bar */}
       <Drawer open={isSearchOpen} onOpenChange={setIsSearchOpen}>
-      <DrawerContent className="h-[80vh] z-[9999999] rounded-t-2xl bg-black border border-grey-500 lg:hidden">
+        <DrawerContent className="h-[80vh] z-[9999999] rounded-t-2xl bg-black border border-grey-500 lg:hidden">
           {/* Hidden DrawerTitle to satisfy component requirements */}
           <div hidden>
             <DrawerHeader>

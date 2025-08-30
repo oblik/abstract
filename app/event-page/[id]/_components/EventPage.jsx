@@ -88,15 +88,15 @@ export default function EventPage({ categories }) {
   const getLowestAskPrice = (marketId) => {
     const orderBook = books?.find(book => book.marketId === marketId);
     if (!orderBook) return null;
-    
+
     // Get Yes ask price (100 - lowest yes ask)
     const yesAsk = orderBook?.asks?.[0]?.sort(descending)?.[0];
     const yesPrice = yesAsk?.length > 0 ? toFixedDown(100 - yesAsk[0], 2) : null;
-    
+
     return yesPrice;
   };
 
-    const getHighestBidPrice = (marketId) => {
+  const getHighestBidPrice = (marketId) => {
     const orderBook = books?.find(book => book.marketId === marketId);
     if (!orderBook) return null;
 
@@ -159,24 +159,24 @@ export default function EventPage({ categories }) {
         prev.map((item) =>
           item._id === recentTrade.market
             ? {
-                ...item,
-                last:
-                  recentTrade.side == "no"
-                    ? 100 - recentTrade.p
-                    : recentTrade.p,
-              }
+              ...item,
+              last:
+                recentTrade.side == "no"
+                  ? 100 - recentTrade.p
+                  : recentTrade.p,
+            }
             : item
         )
       );
     };
 
     const chartUpdate = (result) => {
-        // console.log("socket update odd ",result)
-        if(!result) return
-        const res = JSON.parse(result);
-        const marketId = res.m;
-        const price = res.pc.p;
-        setMarkets(prev => prev.map(market => market._id === marketId ? {...market, odd: price} : market)) 
+      // console.log("socket update odd ",result)
+      if (!result) return
+      const res = JSON.parse(result);
+      const marketId = res.m;
+      const price = res.pc.p;
+      setMarkets(prev => prev.map(market => market._id === marketId ? { ...market, odd: price } : market))
     };
 
     socket.on("orderbook", handleOrderbook);
@@ -241,7 +241,7 @@ export default function EventPage({ categories }) {
     }
   };
 
-  const checkOverflow =(container)=> {
+  const checkOverflow = (container) => {
     if (container.scrollHeight > container.clientHeight) {
       setShowMore(true);
       setShowFullText(false);
@@ -252,8 +252,8 @@ export default function EventPage({ categories }) {
   }
 
   useEffect(() => {
-    if(!isEmpty(disContainer)) checkOverflow(disContainer);
-  },[disContainer])
+    if (!isEmpty(disContainer)) checkOverflow(disContainer);
+  }, [disContainer])
 
   // Get Books Data
   useEffect(() => {
@@ -302,7 +302,7 @@ export default function EventPage({ categories }) {
     try {
       if (isEmpty(events)) return false;
       if (isEmpty(market)) return false;
-      
+
       const outcomeType = events?.outcomeType;
       if (outcomeType == 'single') {
         if (events?.marketId.length == 1) {
@@ -329,7 +329,7 @@ export default function EventPage({ categories }) {
               showLiveTag={true}
               setSelectedCategory={setSelectedCategory}
               selectedCategory={selectCategory}
-              redirect={true}              
+              redirect={true}
             />
           </div>
         </div>
@@ -352,11 +352,11 @@ export default function EventPage({ categories }) {
                     {events?.forecast ? (
                       <MonthlyListenersChart2
                         title={events?.title}
-                      volume={
-                        Number(
-                          ((markets?.reduce((acc, market) => acc + (market.volume || 0), 0) || 0) / 100)
-                        ).toFixed(2)
-                      }
+                        volume={
+                          Number(
+                            ((markets?.reduce((acc, market) => acc + (market.volume || 0), 0) || 0) / 100)
+                          ).toFixed(2)
+                        }
                         image={events?.image}
                         endDate={events.endDate}
                         eventId={events?._id}
@@ -395,8 +395,8 @@ export default function EventPage({ categories }) {
                     <div className="">
                       {events?.status == "resolved" && <hr className="mt-4" />}
                       {markets?.length < 2 &&
-                      books &&
-                      events?.status != "resolved" ? (
+                        books &&
+                        events?.status != "resolved" ? (
                         <OrderbookAccordion
                           type="single"
                           value={openItem}
@@ -444,7 +444,7 @@ export default function EventPage({ categories }) {
                               <div className="flex-1 flex justify-end md:justify-center md:justify-end md:pl-0">
                                 Chance
                               </div>
-                              <div className="hidden md:flex items-center gap-1" style={{minWidth: 300}}>
+                              <div className="hidden md:flex items-center gap-1" style={{ minWidth: 300 }}>
                                 {/* Empty for Yes/No buttons - hidden on mobile */}
                               </div>
                             </div>
@@ -467,26 +467,25 @@ export default function EventPage({ categories }) {
                                         </div>
                                         <div className="flex items-center gap-1">
                                           <p
-                                            
-                                            className={`text-sm font-semibold ${
-                                              isWinning(events, market)
+
+                                            className={`text-sm font-semibold ${isWinning(events, market)
                                                 ? "text-green-500"
                                                 : "text-red-500"
-                                            }`}
+                                              }`}
                                           >
-                                            {events?.outcomeType == "single" ? capitalize(events.outcome): getOutcomeTitle(market.outcome, market.outcomeId)}
+                                            {events?.outcomeType == "single" ? capitalize(events.outcome) : getOutcomeTitle(market.outcome, market.outcomeId)}
                                           </p>
                                           {isWinning(events, market) ? (
                                             <CheckCircle
                                               className="w-5 h-5 text-green-500"
                                               strokeWidth={2.5}
                                             />
-                                            ) : (
+                                          ) : (
                                             <XCircle
                                               className="w-5 h-5 text-red-500"
                                               strokeWidth={2.5}
                                             />
-                                            )
+                                          )
                                           }
                                         </div>
                                       </div>
@@ -521,7 +520,7 @@ export default function EventPage({ categories }) {
                                         setActiveView={setActiveView}
                                       >
                                         <div className="pr-6">
-                                          <img
+                                          <Image
                                             src={events?.image}
                                             alt="Market 1"
                                             width={42}
@@ -562,7 +561,7 @@ export default function EventPage({ categories }) {
                                         setForecastGraph={setForecastGraph}
                                       />
                                     </AccordionItem>
-                                    )
+                                  )
                                 })}
                           </Accordion>
                         </>
@@ -573,42 +572,41 @@ export default function EventPage({ categories }) {
                         Rules
                       </h3>
                       <SelectSeparator className="my-2" />
-                        <div
-                          className="sm:text-base pb-0 text-[12px] text-gray-400 w-full sm:w-full px-0 mx-0"
-                          style={{
-                            paddingLeft: 0,
-                            paddingRight: 0,
-                            marginLeft: 0,
-                            marginRight: 0,
-                          }}
-                        >
-                                {events?.description?.length > 250 ? (
-                                  <div className="space-y-0 w-full">
-                                    <div
-                                      className={`block w-full sm:w-full transition-all duration-300 ${
-                                        showFullText ? "" : "line-clamp-5"
-                                      }`}
-                                      style={{ whiteSpace: "pre-line" }}
-                                    >
-                                      {showFullText
-                                        ? events?.description
-                                        : events?.description?.slice(0, 250) + " ..."}
-                                    </div>
+                      <div
+                        className="sm:text-base pb-0 text-[12px] text-gray-400 w-full sm:w-full px-0 mx-0"
+                        style={{
+                          paddingLeft: 0,
+                          paddingRight: 0,
+                          marginLeft: 0,
+                          marginRight: 0,
+                        }}
+                      >
+                        {events?.description?.length > 250 ? (
+                          <div className="space-y-0 w-full">
+                            <div
+                              className={`block w-full sm:w-full transition-all duration-300 ${showFullText ? "" : "line-clamp-5"
+                                }`}
+                              style={{ whiteSpace: "pre-line" }}
+                            >
+                              {showFullText
+                                ? events?.description
+                                : events?.description?.slice(0, 250) + " ..."}
+                            </div>
 
-                                    <div className="flex items-center justify-between">
-                                      <Button
-                                        variant="link"
-                                        onClick={() => setShowFullText(!showFullText)}
-                                        className="text-[12px] sm:text-sm text-gray-400 font-bold px-0 mt-0.5 !no-underline"
-                                      >
-                                        {showFullText ? "Show Less" : "Show More"}
-                                      </Button>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  events?.description
-                                )}
-                        </div>
+                            <div className="flex items-center justify-between">
+                              <Button
+                                variant="link"
+                                onClick={() => setShowFullText(!showFullText)}
+                                className="text-[12px] sm:text-sm text-gray-400 font-bold px-0 mt-0.5 !no-underline"
+                              >
+                                {showFullText ? "Show Less" : "Show More"}
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          events?.description
+                        )}
+                      </div>
 
                       {events?.status === "closed" && (
                         <div className="flex items-start gap-3 p-4 my-3 rounded-md border border-red-500 bg-[#2a1414] text-red-300">
@@ -641,7 +639,7 @@ export default function EventPage({ categories }) {
                           rel="noopener noreferrer"
                           className="bg-[#5865F2] hover:bg-[#4752c4] text-white font-semibold px-2 py-2 rounded-md transition-colors duration-200 text-xs sm:text-sm flex items-center gap-1"
                         >
-                          <img src="/images/discordnew.png" alt="Discord" width={16} height={16} className="mr-1" />
+                          <Image src="/images/discordnew.png" alt="Discord" width={16} height={16} className="mr-1" />
                           Join Discord
                         </a>
                       </div>
@@ -708,7 +706,7 @@ export default function EventPage({ categories }) {
                               {capitalize(markets?.[0]?.outcome?.[0]?.title || "Yes")}
                               {markets?.length === 1 && (
                                 <span className="ml-0 pl-0 text-xl text-[#7DFDFE] font-semibold">
-                               {getLowestAskPrice(markets[0]?._id) !== null && getLowestAskPrice(markets[0]?._id) !== undefined ? `${getLowestAskPrice(markets[0]?._id)}¢` : '--'}
+                                  {getLowestAskPrice(markets[0]?._id) !== null && getLowestAskPrice(markets[0]?._id) !== undefined ? `${getLowestAskPrice(markets[0]?._id)}¢` : '--'}
                                 </span>
                               )}
                             </div>
@@ -716,7 +714,7 @@ export default function EventPage({ categories }) {
                               {capitalize(markets?.[0]?.outcome?.[1]?.title || "No")}
                               {markets?.length === 1 && (
                                 <span className="ml-0 pl-0 text-xl text-[#EC4899] font-semibold">
-                               {getHighestBidPrice(markets[0]?._id) !== null && getHighestBidPrice(markets[0]?._id) !== undefined ? `${getHighestBidPrice(markets[0]?._id)}¢` : '--'}
+                                  {getHighestBidPrice(markets[0]?._id) !== null && getHighestBidPrice(markets[0]?._id) !== undefined ? `${getHighestBidPrice(markets[0]?._id)}¢` : '--'}
                                 </span>
                               )}
                             </div>
@@ -734,7 +732,7 @@ export default function EventPage({ categories }) {
                           <div className="no-shadow p-0">
                             <TradingCard
 
-                            className="border-none box-shadow-none no-shadow !shadow-none shadow-none"
+                              className="border-none box-shadow-none no-shadow !shadow-none shadow-none"
                               activeView={activeView}
                               setActiveView={setActiveView}
                               selectedOrderBookData={
@@ -756,7 +754,7 @@ export default function EventPage({ categories }) {
                         </DrawerContent>
                       </Drawer>
                     )}
-                    
+
                     {/* Drawer for multiple markets - controlled by accordion buttons */}
                     {markets?.length > 1 && (
                       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
@@ -822,7 +820,7 @@ export default function EventPage({ categories }) {
             rel="noopener noreferrer"
             className="bg-[#5865F2] hover:bg-[#4752c4] text-white font-semibold px-2 py-2 rounded-md transition-colors duration-200 text-xs flex items-center gap-1"
           >
-            <img src="/images/discordnew.png" alt="Discord" width={16} height={16} className="mr-1" />
+            <Image src="/images/discordnew.png" alt="Discord" width={16} height={16} className="mr-1" />
             Join Discord
           </a>
         </div>

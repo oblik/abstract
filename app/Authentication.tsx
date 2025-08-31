@@ -252,7 +252,7 @@ export default function Authentication() {
       };
       const { success, message, result } = await walletLogin(valuedata, dispatch);
       if (success) {
-        if (isEmpty(result?.user?.email) && address || result?.user?.status === "unverified") {
+        if ((isEmpty(result?.user?.email) && address) || result?.user?.status === "unverified") {
           setWalletEmail(true)
           setEmailOpen(true)
           setUserData(initialValue)
@@ -279,7 +279,7 @@ export default function Authentication() {
           };
           let { success, message, result } = await walletLogin(valuedata, dispatch);
           if (success) {
-            if (isEmpty(result?.user?.email) && address || result?.user?.status === "unverified") {
+            if ((isEmpty(result?.user?.email) && address) || result?.user?.status === "unverified") {
               setWalletEmail(true);
               setEmailOpen(true);
               setOpen(false);

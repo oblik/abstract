@@ -229,11 +229,11 @@ const Chart: React.FC<ChartProps> = ({
     const fetchData = useCallback(async () => {
         try {
             console.log('Chart fetchData called with:', { selectedYes, interval });
+            // Request all available data by setting interval to "all"
             const data = {
                 market: selectedYes ? "yes" : "no",
-interval: "all",
+                interval: "all",
                 fidelity: 30,
-                // Remove timestamp parameters to get all available data
             };
 
             const response = await getPriceHistory(id, data as any);

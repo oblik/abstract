@@ -70,7 +70,7 @@ export function TradingCard({
 
   const [tab, setTab] = React.useState("buy");
   const [positions, setPositions] = React.useState({});
-  // Calculate days left when customDate changes
+  // Load user positions for the current market
 
   useEffect(() => {
     const fetchPositions = async () => {
@@ -93,6 +93,7 @@ export function TradingCard({
     }
   }, [market]);
 
+  // Listen for real-time position updates
   useEffect(() => {
     let socket = socketContext?.socket;
     if (!socket) return;

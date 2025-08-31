@@ -556,7 +556,7 @@ export default function Authentication() {
                 />
               </div>
             </GoogleOAuthProvider>
-            <div className="custom_seperator">
+            <div className="custom_separator">
               <Separator.Root
                 className="SeparatorRoot"
                 style={{ margin: "15px 0" }}

@@ -298,11 +298,9 @@ export default function Authentication() {
   }, [isConnected, address, connect, LoginHistory, dispatch]);
 
   useEffect(() => {
-    if (expireTime > 0 && expireTime !== 0) {
+    if (expireTime > 0) {
       setTimeout(() => {
-        if (expireTime !== 0) {
-          setExpireTime(prev => (prev > 1 ? prev - 1 : 0));
-        }
+        setExpireTime(prev => (prev > 1 ? prev - 1 : 0));
       }, 1000);
     }
   }, [expireTime]);

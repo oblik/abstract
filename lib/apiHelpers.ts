@@ -12,12 +12,12 @@ export const checkApiSuccess = (response: ApiResponse): boolean => {
  * Helper to safely get data from API response that might use either 'data' or 'result'
  */
 export const getResponseData = <T>(response: ApiResponse<T>): T | undefined => {
-  return response.data || response.result;
+  return response.data ?? response.result;
 };
 
 /**
  * Helper to safely get result from API response that might use either 'data' or 'result'
  */
 export const getResponseResult = <T>(response: ApiResponse<T>): T | undefined => {
-  return response.result || response.data;
+  return response.result ?? response.data;
 };

@@ -10,7 +10,6 @@ const CONFIG = {
   excludeDirs: ['node_modules', '.git', 'dist', 'build', '.next', 'out'],
   preservePatterns: [
     '/\\*\\*.*?\\*/', // JSDoc comments
-'
     '//\\s*@', // Annotations
     '/\\*\\s*license.*?\\*/', // License headers
     '//\\s*license', // Single line license comments

@@ -129,7 +129,7 @@ const History = () => {
   const getUserClosedPnL = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await getClosedPnL({});
+      const res = await getClosedPnL();
       if (res.success) {
         if (res && res.result && res.result.length > 0) {
           const fClosedPnl = formatClosedPnL(res.result);

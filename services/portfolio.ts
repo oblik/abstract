@@ -35,12 +35,12 @@ export const getPositionsById = async (id: string): Promise<ApiResponse<Position
   }
 };
 
-export const getOpenOrders = async (data: any) => {
+export const getOpenOrders = async (params?: any) => {
   try {
-    let respData = await axios({
+    const respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/user/open-position`,
       method: "get",
-      data,
+      params,
     });
     return handleResp(respData, "success");
   } catch (error: any) {
@@ -48,12 +48,12 @@ export const getOpenOrders = async (data: any) => {
   }
 };
 
-export const getClosedPnL = async (data: any) => {
+export const getClosedPnL = async (params?: any) => {
   try {
-    let respData = await axios({
+    const respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/user/closedPnL`,
       method: "get",
-      data,
+      params,
     });
     return handleResp(respData, "success");
   } catch (error: any) {
@@ -61,12 +61,12 @@ export const getClosedPnL = async (data: any) => {
   }
 };
 
-export const getUserPnL = async (data: any) => {
+export const getUserPnL = async (timeframe: string) => {
   try {
-    let respData = await axios({
-      url: `${getApiBaseUrl()}/api/v1/user/position-value?timeframe=${data}`,
+    const respData = await axios({
+      url: `${getApiBaseUrl()}/api/v1/user/position-value`,
       method: "get",
-      data,
+      params: { timeframe },
     });
     return handleResp(respData, "success");
   } catch (error: unknown) {

@@ -70,7 +70,7 @@ const OpenOrders = () => {
     const getUserOpenOrders = async () => {
         try {
             setLoading(true)
-            const res = await getOpenOrders({})
+            const res = await getOpenOrders()
             if (res.success) {
                 setOpenOrders(res.result)
             }

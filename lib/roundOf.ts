@@ -172,18 +172,19 @@ export const approxDecimal = (x: number): string => {
 };
 
 export const toFixedDown = (item: any, type: number = 2): string => {
-	try {
-		if (!isEmpty(item) && !isNaN(item)) {
-			item = convert(item);
-		const decReg = new RegExp("^-?\\d+(?:\\.\\d{" + type + "})(\\d)"),
-				m = item.toString().match(decReg);
-			return m ? parseFloat(m[1]).toString() : item.toString();
-		}
-		return "";
-	} catch (err) {
+        try {
+                if (isEmpty(item) || isNaN(item)) {
+                        return item?.toString?.() ?? "";
+                }
+                const original = item.toString();
+                item = convert(item);
+                const decReg = new RegExp("^-?\\d+(?:\\.\\d{0," + type + "})?");
+                const m = item.toString().match(decReg);
+                return m ? parseFloat(m[0]).toString() : original;
+        } catch (err) {
 
-		return "";
-	}
+                return "";
+        }
 };
 
 export const convert = (n: any): string => {

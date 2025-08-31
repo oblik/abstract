@@ -118,25 +118,30 @@ export const getAccumulativeValue = (arr: any[] | null | undefined, length: numb
   if (!Array.isArray(arr)) {
     return 0;
   }
-  let arr2 = [...arr];
+  const arr2 = [...arr];
   let total = 0;
-  for (let i = 0; i < length + 1; i++) {
-    total += Number(arr2[i]?.[0]) * Number(arr2[i]?.[1]);
+  const maxIterations = Math.min(length + 1, arr2.length);
+  for (let i = 0; i < maxIterations; i++) {
+    const current = arr2[i];
+    if (current === undefined) continue;
+    total += Number(current[0]) * Number(current[1]);
   }
-  return total;
+  return Number.isFinite(total) ? total : 0;
 };
 
 export const getAccumulativeValueReverse = (arr: any[] | null | undefined, length: number): number => {
   if (!Array.isArray(arr)) {
     return 0;
   }
-  let arr2 = [...arr];
-  arr2 = arr2.reverse();
+  const arr2 = [...arr].reverse();
   let total = 0;
-  for (let i = 0; i <= length; i++) {
-    total += Number(arr2[i]?.[0]) * Number(arr2[i]?.[1]);
+  const maxIterations = Math.min(length + 1, arr2.length);
+  for (let i = 0; i < maxIterations; i++) {
+    const current = arr2[i];
+    if (current === undefined) continue;
+    total += Number(current[0]) * Number(current[1]);
   }
-  return total;
+  return Number.isFinite(total) ? total : 0;
 };
 
 export const PnLFormatted = (pnl: number): string => {

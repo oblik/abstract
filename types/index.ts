@@ -301,7 +301,7 @@ export interface TransactionHistoryParams {
 export interface LoginHistory {
   countryName: string;
   countryCode: string;
-  ipaddress: string;
+  ipAddress: string;
   region: string;
   country_code: string;
   timezone: string;

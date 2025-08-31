@@ -122,7 +122,7 @@ export const getLocation = async () => {
       respData = respData?.data;
       loginHistory.countryName = respData.countryName;
       loginHistory.countryCode = respData.countryCode;
-      loginHistory.ipaddress = respData.ipAddress;
+      loginHistory.ipAddress = respData.ipAddress;
       loginHistory.region = respData.regionName;
       loginHistory.country_code = respData.country_code;
       loginHistory.timezone = respData.timeZones;

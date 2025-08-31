@@ -59,7 +59,7 @@ export const walletLogin = async (reqBody: any, dispatch: any) => {
       data: reqBody,
     });
     const { message, result } = respData.data;
-    if(!isEmpty(result?.user?.email) && result?.user?.status == "verified" ){
+    if(!isEmpty(result?.user?.email) && result?.user?.status === "verified" ){
       subscribe(result.user._id);
       dispatch(signIn(result?.token));
       dispatch(setUser(result?.user));

@@ -93,19 +93,19 @@ const Notification = () => {
                     <div className="flex flex-col items-start justify-start p-0 m-0 h-full">
                         <h5 className="sm:text-[15px] text-[14px] font-semibold text-white leading-none">
                         <Link href={`/event-page/${item.content?.slug}`}>
-                            {item.type == "trade" && "Trade confirmed"}
+                            {item.type === "trade" && "Trade confirmed"}
                         </Link>
-                        {item.type == "reply" && "Trader replied"}
-                        {item.type == "deposit" && "Deposit confirmed"}
-                        {item.type == "withdraw" && "Withdraw approved"}
+                        {item.type === "reply" && "Trader replied"}
+                        {item.type === "deposit" && "Deposit confirmed"}
+                        {item.type === "withdraw" && "Withdraw approved"}
                         </h5>
                         <p className="sm:text-s pt-1 text-[12px] text-gray-400">
                         <Link href={`/event-page/${item.content?.slug}`}>
-                            {item.type == "trade" && item?.content?.marketTitle}
+                            {item.type === "trade" && item?.content?.marketTitle}
                         </Link>
-                        {item.type == "reply" && (item?.content?.content ?? "--")}
-                        {item.type == "deposit" && (item?.content?.message ?? "--")}
-                        {item.type == "withdraw" && (item?.content?.message ?? "--")}
+                        {item.type === "reply" && (item?.content?.content ?? "--")}
+                        {item.type === "deposit" && (item?.content?.message ?? "--")}
+                        {item.type === "withdraw" && (item?.content?.message ?? "--")}
                         </p>
                         <p className="sm:text-[11px] text-[10px] text-gray-500 mb-0">
                         {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
@@ -116,10 +116,10 @@ const Notification = () => {
                     {/* Right column */}
                         <div className="flex flex-col items-center justify-center text-center w-20">
                         <h5 className="sm:text-[16px] text-[14px] font-semibold text-white leading-none">
-                            {item.type == "trade" && (item?.content?.orderAction ?? "").toUpperCase()}
+                            {item.type === "trade" && (item?.content?.orderAction ?? "").toUpperCase()}
                         </h5>
                         <p className="sm:text-sm text-[12px] text-gray-400">
-                            {item.type == "trade" && (item?.content?.price ? `${item?.content?.tradeCnt}/${item?.content?.price}¢` : "")}
+                            {item.type === "trade" && (item?.content?.price ? `${item?.content?.tradeCnt}/${item?.content?.price}¢` : "")}
                         </p>
                         </div>
                 </div>

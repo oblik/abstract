@@ -233,7 +233,7 @@ const History = () => {
                       return ( 
                         <tr key={marketId}>
                           <td>{ m.groupItemTitle || ""}</td>
-                          <td className={`${(m.shares ?? 0) > 0 ? "" : "text-gray-500"}`}>{(m.shares ?? 0) > 0 ? `${m.shares} ${capitalize(m.closedSide == "yes" ? (m.outcome?.[0]?.title || "yes") : (m.outcome?.[1]?.title || "no"))}` : "--"}</td>
+                          <td className={`${(m.shares ?? 0) > 0 ? "" : "text-gray-500"}`}>{(m.shares ?? 0) > 0 ? `${m.shares} ${capitalize(m.closedSide === "yes" ? (m.outcome?.[0]?.title || "yes") : (m.outcome?.[1]?.title || "no"))}` : "--"}</td>
                           <td className={`${(m.shares ?? 0) > 0 ? "" : "text-gray-500"}`}>{(m.shares ?? 0) > 0 ? `$${Number(m.shares).toFixed(2)}` : "--"}</td>
                           <td>${Number(m.entry).toFixed(2)}</td>
                           <td>${Number(m.exit).toFixed(2)}</td>

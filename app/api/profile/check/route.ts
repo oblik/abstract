@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (error) {
-      console.error('Error checking/creating profile:', error);
+      console.error('检查/创建用户资料失败 ❌ Error checking/creating profile:', error);
       return NextResponse.json(
         { error: error.message }, 
         { status: 500 }
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data[0] as ProfileData);
     
   } catch (error) {
-    console.error('Server error:', error);
+    console.error('服务器错误 ❌ Server error:', error);
     return NextResponse.json(
       { error: 'Internal server error' }, 
       { status: 500 }

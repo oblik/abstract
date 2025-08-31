@@ -44,14 +44,14 @@ export async function GET(request: Request): Promise<NextResponse> {
   const state = searchParams.get('state');
   
   if (!code || !state) {
-    console.error("Missing code or state.");
+    console.error("缺少 code 或 state 参数 ❌ Missing code or state.");
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL!}/register?status=error`);
   }
 
   const [email, name] = state.split(',');
 
   if (!email || !name) {
-    console.error("Missing email or name.");
+    console.error("缺少 email 或 name 参数 ❌ Missing email or name.");
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL!}/register?status=error`);
   }
 
@@ -72,7 +72,7 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     const tokenData: SpotifyTokenResponse = await tokenResponse.json();
     if (!tokenResponse.ok || !tokenData.access_token) {
-      console.error("Failed to fetch access token:", tokenData);
+      console.error("获取 Spotify 访问令牌失败 ❌ Failed to fetch access token:", tokenData);
       return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL!}/register?status=error`);
     }
 
@@ -84,7 +84,7 @@ export async function GET(request: Request): Promise<NextResponse> {
     const artistData: SpotifyTopArtistsResponse = await userTopArtistsResponse.json();
 
     if (!userTopArtistsResponse.ok || !artistData.items) {
-      console.error("Failed to fetch top artists:", artistData);
+      console.error("获取 Spotify 热门艺术家失败 ❌ Failed to fetch top artists:", artistData);
       return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL!}/register?status=error`);
     }
 
@@ -105,14 +105,14 @@ export async function GET(request: Request): Promise<NextResponse> {
       .insert([userData]);
 
     if (insertError) {
-      console.error("Error inserting data in Supabase:", insertError);
+      console.error("Supabase 数据插入失败 ❌ Error inserting data in Supabase:", insertError);
       return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL!}/register?status=error`);
     }
 
-    console.log("Successfully inserted user with Spotify data for email:", email);
+    console.log("成功插入用户 Spotify 数据 ✅ Successfully inserted user with Spotify data for email:", email);
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL!}/register/success`);
   } catch (err) {
-    console.error("Unexpected error:", err);
+    console.error("未知错误 ❌ Unexpected error:", err);
     return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL!}/register?status=error`);
   }
 }

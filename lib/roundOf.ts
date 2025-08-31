@@ -221,14 +221,21 @@ export const avoidExponents = (x: number): number => {
 	}
 };
 
-export const precentConvetPrice = (price: any, percentage: any): number => {
-	price = parseFloat(price);
-	percentage = parseFloat(percentage);
+/**
+ * Calculates the value of a percentage of a given price.
+ *
+ * @param price - The original price value or numeric string.
+ * @param percentage - The percentage to convert the price by.
+ * @returns The portion of the price represented by the percentage, or 0 if the price is empty.
+ */
+export const percentConvertPrice = (price: any, percentage: any): number => {
+        price = parseFloat(price);
+        percentage = parseFloat(percentage);
 
-	if (!isEmpty(price)) {
-		return price * (percentage / 100);
-	}
-	return 0;
+        if (!isEmpty(price)) {
+                return price * (percentage / 100);
+        }
+        return 0;
 };
 
 Number.prototype.toFixedNoRoundingNoDecimals = function (n: number): string {

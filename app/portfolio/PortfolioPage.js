@@ -588,7 +588,7 @@ const amount = new BN(parseFloat(depsoitAmt) * 10 ** 6);
         }
 
         settransactionHash(tx);
-        console.log(tx, "dataaaaatxxxx")
+        console.log("Transaction hash:", tx);
         setloader(true);
 
         const parsedTx = await connection.getParsedTransaction(tx, {

@@ -35,17 +35,17 @@ const Notification = () => {
         const fetchData = async () => {
             try {
                 const { success, result } = await getNotifications();
-                setLoading(false);
 
                 if (success) {
                   console.log(success, result, "success, result")
                     setData(result);
                 }
             } catch (err) {
+                // Optionally handle error
+            } finally {
                 setLoading(false);
             }
         }
-        setLoading(false);
         fetchData();
     }, [signedIn]);
     

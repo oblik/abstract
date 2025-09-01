@@ -1,6 +1,5 @@
 import localFont from "next/font/local";
 import "./globals.css";
-// import { WalletProvider } from "@/app/walletconnect/walletContext";
 import SnackbarClient from "@/app/helper/SnackbarClient";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { ToastContainer } from "react-toastify";
@@ -32,7 +31,6 @@ export default function RootLayout({ children }) {
           <SnackbarClient>
             <ClientLayoutEffect />
             {children}
-            {/* <WalletProvider>{children}</WalletProvider> */}
           </SnackbarClient>
         </StoreProvider>
         <ToastContainer />

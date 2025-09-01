@@ -38,12 +38,12 @@ export function middleware(request: NextRequest) {
         return;
     }
 
-    const authPathnameRegex = new RegExp(
+    const authPathnameRegex = authRoutes.length > 0 ? new RegExp(
         `^(${(authRoutes as string[])
             .map((route) => (route.includes("[") ? route.replace(/\[.*?\]/g, "[^/]+") : route))
             .join("|")})/?$`,
         "i"
-    );
+    ) : null;
 
     const protectedPathnameRegex = new RegExp(
         `^(${(protectedRoutes as string[])
@@ -63,10 +63,10 @@ export function middleware(request: NextRequest) {
         return response;
     }
 
-    if (authPathnameRegex.test(pathname) && currentUser) {
+    if (authPathnameRegex && authPathnameRegex.test(pathname) && currentUser) {
         console.log("Middleware - REDIRECTING: Auth route with existing token");
         console.log("=== MIDDLEWARE END (REDIRECT FROM AUTH) ===");
-        return NextResponse.redirect(new URL(request.url));
+        return NextResponse.redirect(new URL("/", request.url));
     }
 
     console.log("Middleware - ALLOWING: Request passed through");

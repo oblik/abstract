@@ -55,8 +55,14 @@ axios.interceptors.request.use(
 
     if (authorizationToken) {
       config.headers.Authorization = `Bearer ${authorizationToken}`;
+      if (config.url?.includes('/comments')) {
+        console.log("Setting auth header for comment request:", config.headers.Authorization);
+      }
     } else {
       delete config.headers.Authorization;
+      if (config.url?.includes('/comments')) {
+        console.log("No auth token available for comment request:", config.url);
+      }
     }
     return config;
   },

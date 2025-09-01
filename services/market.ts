@@ -151,13 +151,23 @@ export const getCommentsPaginate = async (eventId: string, data: { page: number;
 
 export const postComment = async (data: any) => {
   try {
+    console.log("PostComment - Sending data:", data);
+
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/user/comments`,
       method: "post",
       data,
     });
+
+    console.log("PostComment - Success response:", respData.data);
     return handleResp(respData, "success");
   } catch (error: any) {
+    console.error("PostComment - Error details:", {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      message: error.message
+    });
     return handleResp(error, "error");
   }
 };

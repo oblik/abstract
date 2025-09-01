@@ -15,7 +15,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/app/components/ui/carousel";
-import EventLinting from "@/app/components/customComponents/EventLinting";
+import EventListing from "@/app/components/customComponents/EventListing";
 import SlideshowListing from "@/app/components/customComponents/SlideshowListing";
 // import { infoCards } from "@/app/components/constants";
 import { getCategories, getTagsByCategory } from "@/services/market";
@@ -193,7 +193,7 @@ export default function Home({ infoCardCms, categories, tags }) {
             {/* Event Cards Section */}
             <div className={"flex pb-6 justify-center w-full mt-0"}>
               <div className="w-full">
-                <EventLinting
+                <EventListing
                   selectCategory={selectCategory}
                   showClosed={showClosed}
                   selectedSubcategory={selectedSubcategory}

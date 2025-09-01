@@ -4,7 +4,6 @@ import Image from "next/image";
 import { MultipleOptionCard } from "@/app/components/ui/multipleOptionCard";
 import { Card } from "@/app/components/ui/card";
 import { useRouter } from "next/navigation";
-// import Polymarket from "/public/images/polymarket.png";
 
 interface Option {
   title?: string;

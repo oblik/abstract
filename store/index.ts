@@ -1,12 +1,19 @@
 /* Core */
-import { configureStore, type Action, type ThunkAction } from "@reduxjs/toolkit";
+import { configureStore, type Action, type ThunkAction, type UnknownAction } from "@reduxjs/toolkit";
+import { compose } from "redux";
 import { FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE } from "redux-persist";
-// import { encryptTransform } from "redux-persist-transform-encrypt";
 import autoMergeLevel1 from "redux-persist/lib/stateReconciler/autoMergeLevel1";
 import storage from "./storage";
 import { useDispatch as useReduxDispatch, useSelector as useReduxSelector, type TypedUseSelectorHook } from "react-redux";
 
 import rootReducer from "./rootReducer";
+import { RootState } from "@/types";
+
+declare global {
+  interface Window {
+    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
+  }
+}
 
 const isClient = typeof window !== "undefined";
 
@@ -15,12 +22,11 @@ const persistConfig = {
 	version: 1,
 	storage,
 	stateReconciler: autoMergeLevel1,
-	whitelist: ["auth","wallet","walletconnect"],
+        whitelist: ["wallet", "walletconnect", "auth"],
 	debug: false, // Set to false to reduce console noise
 	// transforms: [
 	// 	encryptTransform({
 	// 		secretKey: "my-super-secret-key",
-	// 		onError: function () {
 	// 			// Handle the error.
 	// 		},
 	// 	}),
@@ -29,7 +35,7 @@ const persistConfig = {
 
 const mainReducer = persistReducer(persistConfig, rootReducer());
 
-export const reduxStore: any = configureStore({
+export const reduxStore = configureStore({
 	reducer: mainReducer,
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({
@@ -41,29 +47,29 @@ export const reduxStore: any = configureStore({
 	devTools: true,
 });
 
-reduxStore.asyncReducers = {};
+(reduxStore as any).asyncReducers = {};
 export const persistor = isClient ? persistStore(reduxStore) : null;
 
-export const injectReducer = (key: any, reducer: any) => {
+export const injectReducer = (key: string, reducer: any) => {
 	if (!isClient) {
 		return false;
 	}
-	if (reduxStore.asyncReducers[key]) {
+	const store = reduxStore as any;
+	if (store.asyncReducers[key]) {
 		return false;
 	}
-	reduxStore.asyncReducers[key] = reducer;
-	reduxStore.replaceReducer(persistReducer(persistConfig, rootReducer(reduxStore.asyncReducers)));
-	(persistor as any).persist();
+	store.asyncReducers[key] = reducer;
+	reduxStore.replaceReducer(persistReducer(persistConfig, rootReducer(store.asyncReducers)));
+	(persistor as any)?.persist();
 	return reduxStore;
 };
 
 export const useDispatch = () => useReduxDispatch<ReduxDispatch>();
-export const useSelector: TypedUseSelectorHook<ReduxState> = useReduxSelector;
+export const useSelector: TypedUseSelectorHook<RootState> = useReduxSelector;
 
 export default reduxStore;
 
 // types
 export type ReduxStore = typeof reduxStore;
-export type ReduxState = ReturnType<typeof reduxStore.getState>;
 export type ReduxDispatch = typeof reduxStore.dispatch;
-export type ReduxThunkAction<ReturnType = void> = ThunkAction<ReturnType, ReduxState, unknown, Action>;
+export type ReduxThunkAction<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, Action>;

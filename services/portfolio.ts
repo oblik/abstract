@@ -1,12 +1,14 @@
 import config from "@/config/config";
 
-// Helper to get API base URL (use full URL for all requests to avoid middleware issues)
+// Helper to get API base URL (use proxy in dev, full URL in prod)
 function getApiBaseUrl() {
-  // Always use full backend URL for server-side requests to avoid malformed URL errors
-  // Next.js middleware and SSR context require absolute URLs
-  return config.backendURL;
+  if (process.env.NODE_ENV === "production") {
+    return config.backendURL;
+  }
+  return ""; // Use Next.js proxy in development
 }
 import axios, { handleResp } from "@/config/axios";
+import { ApiResponse, Position } from "@/types";
 
 export const getPositionHistory = async (data: any) => {
   try {
@@ -21,24 +23,24 @@ export const getPositionHistory = async (data: any) => {
   }
 };
 
-export const getPositionsById = async (id: string) => {
+export const getPositionsById = async (id: string): Promise<ApiResponse<Position[]>> => {
   try {
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/user/position-history/user/${id}`,
       method: "get",
     });
     return handleResp(respData, "success");
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleResp(error, "error");
   }
 };
 
-export const getOpenOrders = async (data: any) => {
+export const getOpenOrders = async (params?: any) => {
   try {
-    let respData = await axios({
+    const respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/user/open-position`,
       method: "get",
-      data,
+      params,
     });
     return handleResp(respData, "success");
   } catch (error: any) {
@@ -46,12 +48,12 @@ export const getOpenOrders = async (data: any) => {
   }
 };
 
-export const getClosedPnL = async (data: any) => {
+export const getClosedPnL = async (params?: any) => {
   try {
-    let respData = await axios({
+    const respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/user/closedPnL`,
       method: "get",
-      data,
+      params,
     });
     return handleResp(respData, "success");
   } catch (error: any) {
@@ -59,15 +61,16 @@ export const getClosedPnL = async (data: any) => {
   }
 };
 
-export const getUserPnL = async (data: any) => {
+export const getUserPnL = async (timeframe: string) => {
   try {
-    let respData = await axios({
-      url: `${getApiBaseUrl()}/api/v1/user/position-value?timeframe=${data}`,
+    const respData = await axios({
+      url: `${getApiBaseUrl()}/api/v1/user/position-value`,
       method: "get",
-      data,
+      params: { timeframe },
     });
     return handleResp(respData, "success");
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleResp(error, "error");
   }
 };
+

@@ -9,7 +9,7 @@ import { formatNumber } from "../helper/custommath";
 import { toastAlert } from "../../lib/toast"
 import { useDispatch } from "react-redux";
 import { useSelector } from "@/store";
-import isEmpty from "is-empty";
+import isEmpty from "@/app/helper/isEmpty";
 import {
     Cross2Icon,
     InfoCircledIcon,
@@ -39,7 +39,6 @@ export default function Withdraw() {
     const [loader, setLoader] = useState(false)
     const [open, setOpen] = useState(false)
     const [coin, setCoin] = useState({})
-    // const minWithdraw = 0.01
     const availableBalance = walletData?.balance
         ? formatNumber(walletData?.balance - walletData?.locked, 2)
         : 0
@@ -66,7 +65,7 @@ export default function Withdraw() {
             isError = true;
             errMsg = "Insufficient Balance";
         }
-        else if (parseFloat(amount) < coin?.minWithdraw || amount == 0 || amount == "0") {
+        else if (parseFloat(amount) < coin?.minWithdraw || amount === 0 || amount === "0") {
             isError = true;
             errMsg = `Minimum withdrawal amount is ${coin?.minWithdraw}.`
         } else if (parseFloat(amount) > parseFloat(availableBalance)) {
@@ -95,10 +94,11 @@ export default function Withdraw() {
                 const feeAmt = (coin?.withdrawFee / 100) * amount;
                 withdraw.withdrawAmt = amount - feeAmt
                 withdraw.minWithdraw = coin?.minWithdraw
-                console.log(withdraw, coin, feeAmt, "withdrawaaaa");
+
                 let { success, message } = await withdrawRequest(withdraw, dispatch);
                 if (success) {
                     setLoader(false)
+                    console.log(withdraw, coin, feeAmt, "withdrawaaaa")
                     setWithdraw(initialValue)
                     setError({})
                     setOpen(false)
@@ -109,7 +109,8 @@ export default function Withdraw() {
                 }
             }
         } catch (err) {
-            console.log(err, "errr");
+          console.log(err, "errr")
+
         }
     };
 
@@ -122,10 +123,11 @@ export default function Withdraw() {
                 if (usdcCoin) {
                     setCoin(usdcCoin);
                 } else {
-                    console.warn("USDC coin not found.");
+
                 }
             }
         } catch (error) {
+            console.warn("USDC coin not found.")
             console.error("Error getting coin list:", error);
         }
     };
@@ -134,7 +136,7 @@ export default function Withdraw() {
     useEffect(() => {
         getCoinData()
     }, []);
-    console.log(withdraw, coin, "withdraw");
+
     return (
         <div
             className="text-[12px]"
@@ -248,21 +250,7 @@ export default function Withdraw() {
                                 }
 
                             </fieldset>
-{/* 
-                            <div className="flex items-center space-x-2 mt-4">
-                                <Checkbox.Root
-                                    className="CheckboxRoot"
-                                    defaultChecked
-                                    id="c1"
-                                >
-                                    <Checkbox.Indicator className="CheckboxIndicator">
-                                        <CheckIcon className="h-[20px] w-[20px]" />
-                                    </Checkbox.Indicator>
-                                </Checkbox.Root>
-                                <label className="Label" htmlFor="c1">
-                                    Send USDC.e (don’t swap to native USDC)
-                                </label>
-                            </div> */}
+{}
 
                             <Button type="button" disabled={loader} className="mt-4 w-full" onClick={handleClick}>Withdraw
                                 {loader && (

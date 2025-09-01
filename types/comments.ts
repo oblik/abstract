@@ -36,7 +36,6 @@ export interface CommentListProps {
   isFetching: boolean;
 }
 
-//post request data type
 export interface PostCommentRequestData {
   userId: string;
   eventId: string;

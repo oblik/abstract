@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/app/components/ui/button";
 import { Legend, Line, LineChart, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
@@ -11,6 +11,7 @@ import { processSingleChartData, ChartDataPoint } from "@/utils/processChartData
 import { toTwoDecimal } from "@/utils/helpers";
 import ChartIntervals from "@/app/components/customComponents/ChartIntervals";
 import { getForecastHistory, getSeriesByEvent } from "@/services/market";
+import { checkApiSuccess, getResponseResult } from '@/lib/apiHelpers';
 import { isEmpty } from "@/lib/isEmpty";
 import { Popover } from "radix-ui";
 import { CountdownTimerIcon } from "@radix-ui/react-icons";
@@ -68,7 +69,6 @@ interface MultiListenersChart2Props {
 
 function calculateYAxisDomain(data: any[], assetKey: string = 'asset1'): [number, number] {
   if (!data || data.length === 0) {
-    console.log('calculateYAxisDomain: No data provided');
     return [0, 100];
   }
 
@@ -77,10 +77,7 @@ function calculateYAxisDomain(data: any[], assetKey: string = 'asset1'): [number
     .map(d => d[assetKey])
     .filter(v => v !== null && v !== undefined && !isNaN(v));
 
-  // console.log('calculateYAxisDomain: Raw values for', assetKey, ':', values.slice(0, 5), '... (total:', values.length, ')');
-
   if (values.length === 0) {
-    // console.log('calculateYAxisDomain: No valid values found');
     return [0, 100];
   }
 
@@ -91,25 +88,21 @@ function calculateYAxisDomain(data: any[], assetKey: string = 'asset1'): [number
   const roundedMin = Math.floor(min / 10) * 10;
   const roundedMax = Math.ceil(max / 10) * 10;
 
-  // console.log('calculateYAxisDomain: min=', min, 'max=', max, 'roundedMin=', roundedMin, 'roundedMax=', roundedMax);
-
   // Ensure we have at least some range
   const range = roundedMax - roundedMin;
   if (range < 10) {
-    // console.log('calculateYAxisDomain: Range too small, adding padding');
     return [roundedMin - 10, roundedMax + 10];
   }
 
-  // console.log('calculateYAxisDomain: Final domain:', [roundedMin, roundedMax]);
   return [roundedMin, roundedMax];
 }
 
 function numUnit(n: string) {
   if (isEmpty(n) || !["k", "t", "m", "b"].includes(n)) return 1;
-  if (n == "t") return 1e12;
-  if (n == "b") return 1e9;
-  if (n == "m") return 1e6;
-  if (n == "k") return 1e3;
+  if (n === "t") return 1e12;
+  if (n === "b") return 1e9;
+  if (n === "m") return 1e6;
+  if (n === "k") return 1e3;
   return 1;
 }
 
@@ -192,37 +185,39 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
     setChartData(chartDataYes);
   }, [chartDataYes]);
 
-  useEffect(() => {
-    const fetchAllPriceHistories = async () => {
-      try {
-        const payload = {
-          start_ts: getIntervalDate("all"),
-          end_ts: new Date().getTime(),
-        };
-        const { success, result } = await getForecastHistory(eventSlug, payload);
-        if (success) {
-          const formattedData = result.map((item: any) => ({
-            t: Math.floor(new Date(item.createdAt).getTime() / 1000),
-            p: item.forecast / 100,
-          }));
-          setAllChartData(formattedData);
-          const processedData = processSingleChartData(formattedData, interval);
-          setChartDataYes(processedData);
-        } else {
-          console.error("MonthlyListenersChart2: Failed to fetch data");
-        }
-      } catch (error) {
-        console.error("Error fetching all market data:", error);
+  const fetchAllPriceHistories = useCallback(async () => {
+    try {
+      const payload = {
+        start_ts: getIntervalDate("all"),
+        end_ts: new Date().getTime(),
+      };
+      const response = await getForecastHistory(eventSlug, payload as any);
+      if (checkApiSuccess(response)) {
+        const result = getResponseResult(response) || [];
+        const formattedData = Array.isArray(result) ? result.map((item: any) => ({
+          t: Math.floor(new Date(item.createdAt).getTime() / 1000),
+          p: item.forecast / 100,
+        })) : [];
+        setAllChartData(formattedData as any);
+        const processedData = processSingleChartData(formattedData, interval);
+        setChartDataYes(processedData);
+      } else {
+        console.error("MonthlyListenersChart2: Failed to fetch data");
       }
-    };
+    } catch (error) {
+      console.log('error', error)
+      console.error("Error fetching all market data:", error);
+    }
+  }, [eventSlug, interval]);
 
+  useEffect(() => {
     fetchAllPriceHistories();
-  }, [eventSlug]);
+  }, [fetchAllPriceHistories]);
 
   useEffect(() => {
     if (allChartData.length > 0) {
       const dataPoints = allChartData.map(({ t, p }) => ({ t, p }));
-      const processedData = processSingleChartData(dataPoints, interval);
+      const processedData = processSingleChartData(dataPoints as any, interval);
       setChartDataYes(processedData);
     }
   }, [interval, allChartData]);
@@ -231,7 +226,6 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
     if (chartDataYes && chartDataYes.length > 0 && hoveredChance === undefined) {
       const lastDataPoint: any = chartDataYes[chartDataYes.length - 1];
       if (lastDataPoint && lastDataPoint.asset1 !== null) {
-        // Don't auto-set hoveredChance here, let it stay undefined when not hovering
       }
     }
   }, [chartDataYes, hoveredChance]);
@@ -240,7 +234,6 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
     if (chartData && chartData.length > 0) {
       const lastPoint: any = chartData[chartData.length - 1];
       if (lastPoint && lastPoint.asset1 !== null && lastPoint.asset1 !== undefined) {
-        // Don't auto-set hoveredChance here, let it stay undefined when not hovering
       }
     }
   }, [chartData]);
@@ -306,32 +299,18 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
     );
   };
 
-  // if (!chartData || chartData.length === 0) {
-  //   return (
-  //     <Card
-  //       className="w-[115vw] lg:w-[55vw] sm:w-[90vw] h-auto"
-  //       style={{ backgroundColor: "transparent", borderColor: "transparent" }}
-  //     >
-  //       <CardContent className="p-4">
-  //         <div className="text-center text-gray-500">
-  //           Loading chart data...
-  //         </div>
-  //       </CardContent>
-  //     </Card>
-  //   );
-  // }
-
   const getSeriesData = async (id: any) => {
     try {
-      let { success, result } = await getSeriesByEvent(id)
-      console.log("result", result)
-      if (success) {
-        setSeriesData(result)
+      const response = await getSeriesByEvent(id)
+
+      if (checkApiSuccess(response)) {
+        setSeriesData(getResponseResult(response) || [])
       }
     } catch (err) {
       console.log('error', err)
     }
   }
+
   useEffect(() => {
     if (series?.slug) {
       getSeriesData(series?.slug)
@@ -339,9 +318,9 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
       setSeriesData([])
     }
   }, [series, eventSlug])
+
   return (
     <>
-
       <Card
         className="h-auto"
         style={{ backgroundColor: "transparent", borderColor: "transparent" }}
@@ -413,9 +392,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                                 <li key={event?.slug}
                                   onClick={() => route.push(`/event-page/${event.slug}`)}
                                 >
-                                  {/* <Link href={`/event-page/${event.slug}`}> */}
                                   {momentFormat(event.endDate, "D MMM YYYY, h:mm A")}
-                                  {/* </Link> */}
                                 </li>
                               ))
                           )}
@@ -431,7 +408,6 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                       ?.map((event) => (
                         <div
                           key={event.slug}
-                          // href={`/event-page/${event.slug}`}
                           onClick={() => route.push(`/event-page/${event.slug}`)}
                           className="sm:w-[90px] w-[80px] h-6 sm:h-8 flex items-center justify-center rounded-full bg-transparent border border-[#262626] text-white hover:bg-[#262626] hover:text-white active:bg-[#262626] active:text-white py-0 sm:py-2 px-2 text-[12px] sm:text-sm"
                         >
@@ -449,7 +425,6 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                     {displayChance !== undefined && displayChance !== null ? Number(displayChance).toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
                   </span>
                   <span className="text-lg font-light ml-2" style={{ color: chanceColor }}>forecast</span>
-
                 </div>
               </div>
             )}
@@ -489,8 +464,8 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                       tickMargin={8}
                       width={100}
                       ticks={chartData.length > 0 ? (() => {
-                        const minTime = Math.min(...chartData.map(d => d.rawTimestamp || 0));
-                        const maxTime = Math.max(...chartData.map(d => d.rawTimestamp || 0));
+                        const minTime = Math.min(...chartData.map(d => Number(d.rawTimestamp) || 0));
+                        const maxTime = Math.max(...chartData.map(d => Number(d.rawTimestamp) || 0));
                         const tickCount = screenWidth < 640 ? 4 : 6;
                         const step = (maxTime - minTime) / (tickCount - 1);
                         return Array.from({ length: tickCount }, (_, i) => minTime + (step * i));
@@ -498,7 +473,6 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                       allowDuplicatedCategory={false}
                       tickFormatter={(t) => {
                         const date = new Date(t * 1000);
-                        // For shorter intervals, show time; for longer intervals, show date
                         if (interval === '1h' || interval === '6h' || interval === '1d') {
                           return date.toLocaleString("en-US", {
                             hour: "numeric",
@@ -532,7 +506,6 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
                       shared={true}
                       cursor={false}
                     />
-                    {/* Legend and forecast label removed */}
                     <Line
                       type="stepAfter"
                       dataKey="asset1"

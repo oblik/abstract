@@ -608,7 +608,7 @@ body {
 .google_btn:hover {
   background: #121212 !important;
 }
-.custom_seperator {
+.custom_separator {
   display: flex;
   align-items: center;
   gap: 12px;

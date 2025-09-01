@@ -1,13 +1,14 @@
-// in here fetch trarde histry and render the table
 //that table have coloums like excecute time, execUserId,price, quantity, side
 "use client";
 import { Fragment, useEffect, useState } from 'react';
-import Image from "next/image";
+import Image from 'next/image';
 import { formatNumber, shortText } from "@/app/helper/custommath";
 import { useSelector } from 'react-redux';
 import { getTradeHistory } from '@/services/user';
+import { checkApiSuccess, getResponseResult } from '@/lib/apiHelpers';
 import PaginationComp from '../components/customComponents/PaginationComp';
 import Link from 'next/link';
+import { TradeHistory } from '@/types';
 import { useRouter } from 'next/navigation';
 import { Loader } from 'lucide-react';
 
@@ -29,7 +30,7 @@ interface PaginationState {
 }
 
 const ActivityTable = () => {
-  const [trades, setTrades] = useState<Trade[]>([]);
+  const [trades, setTrades] = useState<TradeHistory[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState<boolean>(false);
   const [pagination, setPagination] = useState<PaginationState>({
@@ -46,10 +47,9 @@ const ActivityTable = () => {
     const fetchTradeHistory = async () => {
       try {
         setLoading(true)
-        const { success, result } = await getTradeHistory({ id: uniqueId, ...pagination });
-        if (success) {
-          setTrades(result.data);
-          setHasMore(result.count > pagination.page * pagination.limit);
+        const response = await getTradeHistory({ id: uniqueId, ...pagination });
+        if (checkApiSuccess(response)) {
+          setTrades(getResponseResult(response) || []);
         }
       } catch (error) {
         console.error('Error fetching trade history:');
@@ -61,10 +61,6 @@ const ActivityTable = () => {
     fetchTradeHistory();
   }, [uniqueId, pagination]);
 
-  // if (loading) {
-  //   return (
-  //     <div className="flex justify-center items-center my-5 min-h-[100px]">
-  //       <Loader className="w-26 h-26 animate-spin" />
   //     </div>
   //   )
   // }
@@ -75,7 +71,7 @@ const ActivityTable = () => {
         <thead>
           <tr>
             <th className="px-6 py-3">Time</th>
-            {/* <th className="px-6 py-3">User</th> */}
+            { }
             <th className="px-6 py-3">Price</th>
             <th className="px-6 py-3">Quantity</th>
             <th className="px-6 py-3">Fees</th>
@@ -90,15 +86,15 @@ const ActivityTable = () => {
                 <td colSpan={5} className='py-3 px-6'>
                   <div className="flex items-center gap-4">
                     <Image
-                      src={trade.marketId?.eventId?.image}
+                      src={(trade as any).marketId?.eventId?.image}
                       alt="Icon"
                       width={45}
                       height={45}
                       className="rounded-[6px] object-cover aspect-square cursor-pointer"
-                      onClick={() => route.push(`/event-page/${trade.marketId?.eventId?.slug}`)}
+                      onClick={() => route.push(`/event-page/${(trade as any).marketId?.eventId?.slug}`)}
                     />
-                    <Link href={`/event-page/${trade.marketId?.eventId?.slug}`} className="cursor-pointer">
-                      {trade.marketId?.question}
+                    <Link href={`/event-page/${(trade as any).marketId?.eventId?.slug}`} className="cursor-pointer">
+                      {(trade as any).marketId?.question}
                     </Link>
                   </div>
                 </td>
@@ -107,25 +103,23 @@ const ActivityTable = () => {
                 <td className="px-6 py-4">
                   <span className='font-bold'>Trade Completed</span>
                   <br />
-                  <span className='text-xs'>{new Date(trade.time).toLocaleString()}</span>
+                  <span className='text-xs'>{new Date((trade as any).time).toLocaleString()}</span>
                 </td>
-                {/* <td className="px-6 py-4">
-                {trade.execUserId?.uniqueId}
-              </td> */}
+                { }
                 <td className="px-6 py-4">
-                  {formatNumber(trade.price)}¢
+                  {formatNumber((trade as any).price)}¢
                 </td>
                 <td className="px-6 py-4">
-                  {formatNumber(trade.quantity)}
+                  {formatNumber((trade as any).quantity)}
                 </td>
                 <td className="px-6 py-4">
-                  ${formatNumber((trade.fee / 100), 5)}
+                  ${formatNumber(((trade as any).fee / 100), 5)}
                 </td>
-                <td className={`px-6 py-4 ${trade.action === 'buy' ? 'text-green-500' : 'text-red-500'} capitalize`}>
-                  {trade.action}
+                <td className={`px-6 py-4 ${(trade as any).action === 'buy' ? 'text-green-500' : 'text-red-500'} capitalize`}>
+                  {(trade as any).action}
                 </td>
-                <td className={`px-6 py-4 ${trade.side === 'yes' ? 'text-green-500' : 'text-red-500'} capitalize`}>
-                  {trade.side == "yes" ? (trade?.marketId?.outcome?.[0]?.title || "yes") : (trade?.marketId?.outcome?.[1]?.title || "no")}
+                <td className={`px-6 py-4 ${(trade as any).side === 'yes' ? 'text-green-500' : 'text-red-500'} capitalize`}>
+                  {(trade as any).side === "yes" ? ((trade as any)?.marketId?.outcome?.[0]?.title || "yes") : ((trade as any)?.marketId?.outcome?.[1]?.title || "no")}
                 </td>
               </tr>
             </Fragment>

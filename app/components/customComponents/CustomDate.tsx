@@ -19,7 +19,6 @@ const CustomDateComponent: React.FC<CustomDateProps> = (props) => {
   const { showCustomDialog, setShowCustomDialog, customDate, setCustomDate } = props;
   const [selectedDateTime, setSelectedDateTime] = useState<any>(null);
   
-  // Calculate the minimum allowed time (current time + 1 hour)
   const getOneHourAhead = () => {
     const now = new Date();
     now.setHours(now.getHours() + 1);

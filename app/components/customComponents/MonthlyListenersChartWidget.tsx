@@ -11,6 +11,7 @@ import { processSingleChartData, ChartDataPoint } from "@/utils/processChartData
 import { toTwoDecimal } from "@/utils/helpers";
 import ChartIntervals from "@/app/components/customComponents/ChartIntervals";
 import { getForecastHistory } from "@/services/market";
+import { checkApiSuccess, getResponseResult } from '@/lib/apiHelpers';
 
 const getIntervalDate = (interval: string) => {
   const now = new Date();
@@ -59,7 +60,7 @@ interface MultiListenersChart2Props {
 
 function calculateYAxisDomain(data: any[], assetKey: string = 'asset1'): [number, number] {
   if (!data || data.length === 0) {
-    console.log('calculateYAxisDomain: No data provided');
+
     return [0, 100];
   }
   
@@ -68,10 +69,8 @@ function calculateYAxisDomain(data: any[], assetKey: string = 'asset1'): [number
     .map(d => d[assetKey])
     .filter(v => v !== null && v !== undefined && !isNaN(v));
   
-  // console.log('calculateYAxisDomain: Raw values for', assetKey, ':', values.slice(0, 5), '... (total:', values.length, ')');
   
   if (values.length === 0) {
-    // console.log('calculateYAxisDomain: No valid values found');
     return [0, 100];
   }
   
@@ -82,16 +81,13 @@ function calculateYAxisDomain(data: any[], assetKey: string = 'asset1'): [number
   const roundedMin = Math.floor(min / 10) * 10;
   const roundedMax = Math.ceil(max / 10) * 10;
   
-  // console.log('calculateYAxisDomain: min=', min, 'max=', max, 'roundedMin=', roundedMin, 'roundedMax=', roundedMax);
   
   // Ensure we have at least some range
   const range = roundedMax - roundedMin;
   if (range < 10) {
-    // console.log('calculateYAxisDomain: Range too small, adding padding');
     return [roundedMin - 10, roundedMax + 10];
   }
   
-  // console.log('calculateYAxisDomain: Final domain:', [roundedMin, roundedMax]);
   return [roundedMin, roundedMax];
 }
 
@@ -174,14 +170,15 @@ const MonthlyListenersChartWidget: React.FC<MultiListenersChart2Props> = ({
           start_ts: getIntervalDate("all"),
           end_ts: new Date().getTime(),
         };
-        const { success, result } = await getForecastHistory(eventSlug, payload);
-        if (success) {
+        const response = await getForecastHistory(eventSlug, payload as any);
+        if (checkApiSuccess(response)) {
+          const result = getResponseResult(response) || [];
           const formattedData = result.map((item: any) => ({
             t: Math.floor(new Date(item.createdAt).getTime() / 1000),
             p: item.forecast / 100,
           }));
           setAllChartData(formattedData);
-          const processedData = processSingleChartData(formattedData, interval);
+          const processedData = processSingleChartData(formattedData as any, interval);
           setChartDataYes(processedData);
         } else {
           console.error("MonthlyListenersChart2: Failed to fetch data");
@@ -190,14 +187,14 @@ const MonthlyListenersChartWidget: React.FC<MultiListenersChart2Props> = ({
         console.error("Error fetching all market data:", error);
       }
     };
-
+    
     fetchAllPriceHistories();
-  }, [eventSlug]);
+  }, [eventSlug, interval]);
 
   useEffect(() => {
     if (allChartData.length > 0) {
       const dataPoints = allChartData.map(({ t, p }) => ({ t, p }));
-      const processedData = processSingleChartData(dataPoints, interval);
+      const processedData = processSingleChartData(dataPoints as any, interval);
       setChartDataYes(processedData);
     }
   }, [interval, allChartData]);
@@ -206,7 +203,6 @@ const MonthlyListenersChartWidget: React.FC<MultiListenersChart2Props> = ({
     if (chartDataYes && chartDataYes.length > 0 && hoveredChance === undefined) {
       const lastDataPoint: any = chartDataYes[chartDataYes.length - 1];
       if (lastDataPoint && lastDataPoint.asset1 !== null) {
-        // Don't auto-set hoveredChance here, let it stay undefined when not hovering
       }
     }
   }, [chartDataYes, hoveredChance]);
@@ -215,7 +211,6 @@ const MonthlyListenersChartWidget: React.FC<MultiListenersChart2Props> = ({
     if (chartData && chartData.length > 0) {
       const lastPoint: any = chartData[chartData.length - 1];
       if (lastPoint && lastPoint.asset1 !== null && lastPoint.asset1 !== undefined) {
-        // Don't auto-set hoveredChance here, let it stay undefined when not hovering
       }
     }
   }, [chartData]);
@@ -352,8 +347,8 @@ const MonthlyListenersChartWidget: React.FC<MultiListenersChart2Props> = ({
                       tickMargin={8}
                       width={100}
                       ticks={chartData.length > 0 ? (() => {
-                        const minTime = Math.min(...chartData.map(d => d.rawTimestamp || 0));
-                        const maxTime = Math.max(...chartData.map(d => d.rawTimestamp || 0));
+                        const minTime = Math.min(...chartData.map(d => Number(d.rawTimestamp) || 0));
+                        const maxTime = Math.max(...chartData.map(d => Number(d.rawTimestamp) || 0));
                         const tickCount = screenWidth < 640 ? 4 : 6;
                         const step = (maxTime - minTime) / (tickCount - 1);
                         return Array.from({ length: tickCount }, (_, i) => minTime + (step * i));

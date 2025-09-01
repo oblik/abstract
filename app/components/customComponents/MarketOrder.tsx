@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useState, useCallback } from "react";
 
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
@@ -19,7 +19,7 @@ interface MarketOrderProps {
     bids: [string, number][];
     asks: [string, number][];
   };
-  takerFee?: number; // e.g., 5 for 5%
+takerFee?: number;
 }
 
 const initialFormValue = {
@@ -43,7 +43,7 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
   const { activeView, marketId, buyorsell, selectedOrder, outcomes, orderBook, takerFee } = props;
   const { signedIn } = useSelector((state) => state?.auth.session);
   const user = useSelector((state) => state?.auth.user);
-  const asset = useSelector((state) => state?.wallet?.data);
+  const asset = useSelector((state) => state?.walletconnect);
   const [orderBtn, setOrderBtn] = useState<boolean>(true);
 
   const [formValue, setFormValue] = useState<FormState>(initialFormValue);
@@ -54,7 +54,7 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
   const feeFactor = takerFee ? 1 - takerFee / 100 : 1;
   const feeAdjustedOrdVal = Number(ordVal) * feeFactor;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     setFormValue((prev: any) => {
@@ -75,9 +75,9 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
       }
       return prev;
     });
-  };
+  }, []);
 
-  const marketOrderValidation = () => {
+  const marketOrderValidation = useCallback(() => {
     let errors: any = {};
     if (buyorsell === "buy") {
       if (!ordVal) errors.ordVal = "Amount field is required";
@@ -89,14 +89,14 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
     }
     setErrors(errors);
     return Object.keys(errors).length === 0;
-  };
+  }, [buyorsell, ordVal, amount]);
 
   useEffect(() => {
     setFormValue(initialFormValue);
     setErrors({});
   }, [activeView, buyorsell, marketId]);
 
-  const handlePlaceOrder = async (action: any) => {
+  const handlePlaceOrder = useCallback(async (action: any) => {
     if (!marketOrderValidation()) return;
 
     let activeTab = activeView?.toLowerCase();
@@ -107,13 +107,13 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
       action: action,
       capped: action === "sell" ? true : false,
       marketId,
-      userId: user?._id,
+      userId: user?.userId,
       ordVal: action === "buy" ? Number(ordVal) * 100 : 0, // use original input
       quantity: action === "sell" ? Number(amount) : 0,
       type: "market",
     };
 
-    const { success, message } = await placeOrder(data);
+    const { success, message } = await placeOrder(data as any);
     if (success) {
       toastAlert("success", "Order placed successfully!", "order-success");
       setFormValue(initialFormValue);
@@ -121,19 +121,19 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
       toastAlert("error", message, "order-failed");
     }
 
-  };
+  }, [marketOrderValidation, activeView, user?.userId, ordVal, amount, marketId]);
 
   useEffect(() => {
     if (isEmpty(selectedOrder)) return;
 
-    if (buyorsell == "buy" && selectedOrder?.bidOrAsk == "ask") {
-      setFormValue({ ...formValue, ordVal: selectedOrder?.ordCost || "" });
-    } else if (buyorsell == "sell" && selectedOrder?.bidOrAsk == "bid") {
-      setFormValue({ ...formValue, amount: selectedOrder?.row[1] || "" });
+    if (buyorsell === "buy" && selectedOrder?.bidOrAsk === "ask") {
+      setFormValue(f => ({ ...f, ordVal: selectedOrder?.ordCost || "" }));
+    } else if (buyorsell === "sell" && selectedOrder?.bidOrAsk === "bid") {
+      setFormValue(f => ({ ...f, amount: selectedOrder?.row[1] || "" }));
     } else {
       setFormValue(initialFormValue);
     }
-  }, [selectedOrder]);
+  }, [selectedOrder, buyorsell]);
 
   // Market order summary calculations
   let priceLevels: [string, number][] = [];
@@ -157,7 +157,7 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
   }
 
   if (isBuy) {
-    let remaining = feeAdjustedOrdVal * 100; // adjust for taker fee
+let remaining = feeAdjustedOrdVal * 100;
     for (const [price, qty] of priceLevels) {
       let priceNum = Number(price);
       const maxContracts = Math.min(Math.floor(remaining / priceNum), qty);
@@ -192,14 +192,14 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
           <div className="w-full flex items-center border border-input rounded-md bg-background px-0 py-0 h-12 overflow-hidden">
             <Input
               type="text"
-              value={buyorsell == "buy" ? ordVal : amount}
-              name={buyorsell == "buy" ? "ordVal" : "amount"}
+              value={buyorsell === "buy" ? ordVal : amount}
+              name={buyorsell === "buy" ? "ordVal" : "amount"}
               placeholder="Amount"
               onChange={handleChange}
               className="border-0 text-left bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
             />
             <span className="cursor-default text-[16px] p-3">
-              {buyorsell == "buy" ? "USD" : "Contracts"}
+              {buyorsell === "buy" ? "USD" : "Contracts"}
             </span>
           </div>
         </div>
@@ -222,7 +222,7 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
             <div>
               <span className="text-muted-foreground">Total return if </span>
               <span className="text-white">
-                {`${activeView == "Yes" ? firstLetterCase(outcomes?.[0]?.title || "yes") : firstLetterCase(outcomes?.[1]?.title || "no")}`}
+                {`${activeView === "Yes" ? firstLetterCase(outcomes?.[0]?.title || "yes") : firstLetterCase(outcomes?.[1]?.title || "no")}`}
               </span>
               <span className="text-muted-foreground"> wins</span>
             </div>
@@ -241,7 +241,7 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
             disabled={orderBtn ? false : true}
           >
             {`${buyorsell === "buy" ? "Buy" : "Sell"} ${
-              activeView == "Yes" ? firstLetterCase(outcomes?.[0]?.title || "yes") : firstLetterCase(outcomes?.[1]?.title || "no")
+              activeView === "Yes" ? firstLetterCase(outcomes?.[0]?.title || "yes") : firstLetterCase(outcomes?.[1]?.title || "no")
             }`}
           </Button>
         ) : (

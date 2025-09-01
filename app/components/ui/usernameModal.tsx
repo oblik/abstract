@@ -35,9 +35,9 @@ const UsernameModal = ({
             <Dialog.Title className="DialogTitle text-lg font-bold mb-4 text-white">
               Update Username
             </Dialog.Title>
-              {/* <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"> */}
-              {/* <div className="rounded-lg p-6 w-96 shadow-lg"> */}
-              {/* <h2 className="text-lg font-bold mb-4 text-white">Update Username</h2> */}
+              {}
+              {}
+              {}
               <p className="text-sm text-gray-400 mb-4">
                 Please enter your username to comment.
               </p>

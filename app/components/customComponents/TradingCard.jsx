@@ -70,36 +70,36 @@ export function TradingCard({
 
   const [tab, setTab] = React.useState("buy");
   const [positions, setPositions] = React.useState({});
-  // Calculate days left when customDate changes
-
-  const fetchPositions = async () => {
-    try {
-      const { success, result } = await getPositionsByEvtId({
-        id: market?._id,
-      });
-      if (success) {
-        setPositions(result[0] || {});
-      } else {
-        setPositions({});
-      }
-    } catch (error) {
-      console.error("Error fetching positions:", error);
-    }
-  };
+  // Load user positions for the current market
 
   useEffect(() => {
+    const fetchPositions = async () => {
+      try {
+        const { success, result } = await getPositionsByEvtId({
+          id: market?._id,
+        });
+        if (success) {
+          setPositions(result[0] || {});
+        } else {
+          setPositions({});
+        }
+      } catch (error) {
+        console.error("Error fetching positions:", error);
+      }
+    };
+
     if (market) {
       fetchPositions();
     }
   }, [market]);
 
+  // Listen for real-time position updates
   useEffect(() => {
     let socket = socketContext?.socket;
     if (!socket) return;
     const handlePositions = (result) => {
       const resData = JSON.parse(result);
-      // console.log("Received position update:", resData)
-      if (resData?.quantity == 0) {
+      if (resData?.quantity === 0) {
         setPositions({});
       } else {
         setPositions((prev) => {
@@ -153,7 +153,7 @@ export function TradingCard({
                 className="text-[14px]"
                 style={{ paddingLeft: "8px", marginRight: "0px" }}
               >
-                {market?.groupItemTitle != ""
+                {market?.groupItemTitle !== ""
                   ? firstLetterCase(market?.groupItemTitle)
                   : firstLetterCase(title)}
               </div>
@@ -250,7 +250,7 @@ export function TradingCard({
                     value="Yes"
                   >
                     {firstLetterCase(market?.outcome?.[0]?.title) || "Yes"}{" "}
-                    {tab == "buy"
+                    {tab === "buy"
                       ? buyYes?.length > 0 &&
                       `${toFixedDown(100 - buyYes?.[0], 2)}¢`
                       : sellYes?.length > 0 &&
@@ -284,7 +284,7 @@ export function TradingCard({
                     value="No"
                   >
                     {firstLetterCase(market?.outcome?.[1]?.title) || "No"}{" "}
-                    {tab == "buy"
+                    {tab === "buy"
                       ? buyNo?.length > 0 &&
                       `${toFixedDown(100 - buyNo?.[0], 2)}¢`
                       : sellNo?.length > 0 && `${toFixedDown(sellNo?.[0], 2)}¢`}
@@ -323,7 +323,7 @@ export function TradingCard({
                       <h1 className="text-xs text-gray-500">
                         {toFixedDown(positions?.quantity, 2)} &middot;{" "}
                         {capitalize(
-                          positions?.side == "yes"
+                          positions?.side === "yes"
                             ? firstLetterCase(
                               market?.outcome?.[0]?.title || "yes"
                             )

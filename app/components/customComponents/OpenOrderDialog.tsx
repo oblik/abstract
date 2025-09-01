@@ -56,28 +56,28 @@ export const OpenOrderDialog = ({
                         <span
                           style={{
                             color:
-                              item.userSide == "yes"
+                              item.userSide === "yes"
                                 ? "rgba(125, 253, 254, 1)"
                                 : "rgba(236, 72, 153, 1)",
                             textTransform: "capitalize",
                           }}
                         >
                           {item.action}{" "}
-                          {item.userSide == "yes"
+                          {item.userSide === "yes"
                             ? item?.marketId?.outcome?.[0]?.title || "yes"
                             : item?.marketId?.outcome?.[1]?.title || "no"}
                         </span>
                       </td>
-                      {/* <td>{item.side}</td> */}
-                      {/* <td>{item.side}</td> */}
+                      {}
+                      {}
                       <td>
-                        {item.action == "sell" ? 100 - item.price : item.price}
+                        {item.action === "sell" ? 100 - item.price : item.price}
                       </td>
                       <td>{item.execQty ?? 0}</td>
                       <td>{item.quantity}</td>
                       <td>
                         {" "}
-                        {item.timeInForce == "GTC"
+                        {item.timeInForce === "GTC"
                           ? "Good 'til canceled"
                           : `Good 'til ${momentFormat(item.expiration,"MMM D, YYYY · hh:mm A")}`}
                       </td>

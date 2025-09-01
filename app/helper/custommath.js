@@ -3,9 +3,10 @@ import { PublicKey } from "@solana/web3.js";
 
 export function isAddress(address) {
   try {
-    new PublicKey(address); // Will throw if invalid
+new PublicKey(address);
     return true;
   } catch (e) {
+    console.log(err, "numberOnly")
     return false;
   }
 }
@@ -23,7 +24,7 @@ export function shortText(address) {
 
 export function numberFloatOnly(value) {
     //eslint-disable-next-line
-    const regxFormat = /^[]?\d*(?:[.]\d*)?$/;
+    const regxFormat = /^-?\d*(?:[.]\d*)?$/;
     var result = regxFormat.test(value)
     return result;
   }
@@ -34,7 +35,7 @@ export function numberFloatOnly(value) {
         var result = regxFormat.test(value)
         return result;
     } catch (err) {
-        console.log(err, "numberOnly")
+
         return false;
     }
   
@@ -103,7 +104,7 @@ export function toFixedWithoutRound(number, decimalPlaces = 2) {
   
       var chkDeci = numval.split(".");
       var returnNum = num;
-      if (chkDeci.length == 2) {
+      if (chkDeci.length === 2) {
         if (defaultFixed < chkDeci[1].length) {
           returnNum = toFixedWithoutRound(numval, defaultFixed);
         } else {

@@ -3,6 +3,7 @@ export const runtime = 'edge';
 import { getUserById } from "@/services/user";
 import ProfilePage from "./Profile";
 import { getCategories } from "@/services/market";
+import { checkApiSuccess, getResponseResult } from '@/lib/apiHelpers';
 
 export default async function Page(props: { params: Promise<{ slug: string; }> }) {
 	const params = await props.params;
@@ -14,16 +15,16 @@ export default async function Page(props: { params: Promise<{ slug: string; }> }
   ]);
 
   return (
-    <ProfilePage user={userResult.user} categories={categories} />
+    <ProfilePage user={userResult.user && Object.keys(userResult.user).length > 0 ? userResult.user as any : null} categories={categories} />
   );
 }
 
 const fetchUser = async (username: string) => {
   try {
-    const { status, result, wallet } = await getUserById(username);
+    const response = await getUserById(username);
     return {
-      user: status ? result : null,
-      wallet: status ? wallet : null
+      user: checkApiSuccess(response) ? getResponseResult(response) : null,
+      wallet: checkApiSuccess(response) ? (getResponseResult(response) as any).wallet : null
     };
   } catch {
     return { user: null, wallet: null };
@@ -32,8 +33,8 @@ const fetchUser = async (username: string) => {
 
 const fetchCategories = async () => {
   try {
-    const { success, result } = await getCategories();
-    return success ? result : [];
+    const response = await getCategories();
+    return checkApiSuccess(response) ? getResponseResult(response) : [];
   } catch {
     return [];
   }

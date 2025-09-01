@@ -6,7 +6,6 @@ import { Button } from "@/app/components/ui/button";
 import { Legend, Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
 import { ArrowRightLeft, Clock } from "lucide-react";
 import { ChartContainer, ChartConfig as UIChartConfig } from "@/app/components/ui/chart";
-// import Polymarket from "/public/images/polymarket.png";
 
 import {
   Card,
@@ -107,8 +106,6 @@ export default function MiniLineChart({
         const yes = market?.[0]?.clobTokenIds ? JSON.parse(market?.[0]?.clobTokenIds)[0] : "";
         const no = market?.[0]?.clobTokenIds ? JSON.parse(market?.[0]?.clobTokenIds)[1] : "";
         try {
-          // const response = await fetch(
-          //   `/api/event-data/price-history?interval=${interval}&market=${yes}&fidelity=${30}`,
           //   {
           //     method: "GET",
           //     headers: {
@@ -116,7 +113,6 @@ export default function MiniLineChart({
           //     },
           //   }
           // );
-          // const data = await response.json();
           const data = {
             history:[]
           }
@@ -125,8 +121,6 @@ export default function MiniLineChart({
           console.error("Error fetching PriceHistory:", error);
         }
         try {
-          // const response = await fetch(
-          //   `/api/event-data/price-history?interval=${interval}&market=${no}&fidelity=${30}`,
           //   {
           //     method: "GET",
           //     headers: {
@@ -134,7 +128,6 @@ export default function MiniLineChart({
           //     },
           //   }
           // );
-          // const data = await response.json();
           const data = {
             history:[]
           }

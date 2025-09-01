@@ -1,14 +1,16 @@
 import config from "@/config/config";
 
-// Helper to get API base URL (use full URL for all requests to avoid middleware issues)
+// Helper to get API base URL (use proxy in dev, full URL in prod)
 function getApiBaseUrl() {
-  // Always use full backend URL for server-side requests to avoid malformed URL errors
-  // Next.js middleware and SSR context require absolute URLs
-  return config.backendURL;
+  if (process.env.NODE_ENV === "production") {
+    return config.backendURL;
+  }
+  return ""; // Use Next.js proxy in development
 }
 import axios, { handleResp } from "@/config/axios";
 import { setWallet } from "@/store/slices/wallet/dataSlice";
 import { setUser } from "@/store/slices/auth/userSlice";
+import { ApiResponse, Wallet, User, AppDispatch, ApiError } from "@/types";
 
 export const userDeposit = async (data: any, dispatch: any) => {
   try {
@@ -40,7 +42,7 @@ export const addressCheck = async (data: any) => {
   }
 };
 
-export const saveWalletEmail = async (data: any) => {
+export const saveWalletEmail = async (data: { email: string }): Promise<ApiResponse> => {
   try {
     let respData = await axios({
       method: "post",
@@ -48,13 +50,12 @@ export const saveWalletEmail = async (data: any) => {
       data,
     });
     return handleResp(respData, "success");
-  } catch (error) {
+  } catch (error: unknown) {
     return handleResp(error, "error");
   }
 };
 
-
-export const withdrawRequest = async (data: any, dispatch: any) => {
+export const withdrawRequest = async (data: { amount: number; address: string; currency: string }, dispatch: AppDispatch): Promise<ApiResponse> => {
   try {
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/user/withdraw-request`,
@@ -62,10 +63,10 @@ export const withdrawRequest = async (data: any, dispatch: any) => {
       data,
     });
     const { wallet } = respData.data;
-    console.log(wallet, "walletwallet");
+
     dispatch(setWallet(wallet));
     return handleResp(respData, "success");
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleResp(error, "error");
   }
 };

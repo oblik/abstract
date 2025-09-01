@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState, useCallback } from "react";
 import SearchBar from "../components/ui/SearchBar";
 import Image from "next/image";
 import Link from "next/link";
@@ -65,7 +65,7 @@ const Positions = (props) => {
     return result;
   };
 
-  const getUserPositionHistory = async () => {
+  const getUserPositionHistory = useCallback(async () => {
     try {
       console.log("=== POSITIONS API CALL ===");
       console.log("props.uniqueId:", props.uniqueId);
@@ -94,11 +94,12 @@ const Positions = (props) => {
         console.log("getPositionsById failed:", res);
       }
     } catch (error) {
+      console.log("error", error)
       console.error("Error fetching Position History:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [props.uniqueId, props.isPrivate, isAuthenticated]);
 
   const waitForImageLoad = (imgElement) => {
     return new Promise((resolve) => {
@@ -163,10 +164,11 @@ const Positions = (props) => {
   };
 
   const handleTradeOpen = async (id, outcomes) => {
-    console.log(id, outcomes, "handleTradeOpen");
+
     setSelectedMarketOutcome(outcomes);
     await getTradeHistory(id);
     setTradeOpen(true);
+    console.log(id, outcomes, "handleTradeOpen")
   };
 
   const handleShareOpen = async (data) => {
@@ -186,7 +188,7 @@ const Positions = (props) => {
         const eventIndex = prev.findIndex(
           (event) => event._id === resData.eventId
         );
-        if (eventIndex == -1) {
+        if (eventIndex === -1) {
           const newEvent = {
             _id: resData.eventId,
             eventTitle: resData.eventTitle,
@@ -235,7 +237,6 @@ const Positions = (props) => {
               ...prev.slice(eventIndex + 1),
             ];
           } else {
-            // let positionIndex = prev[eventIndex].positions.findIndex(position => position._id === resData._id)
             if (resData.quantity === 0) {
               const filteredPositions = prev[eventIndex].positions.filter(
                 (p) => p._id !== resData._id
@@ -286,7 +287,6 @@ const Positions = (props) => {
             // positionData.last = resData.marketLast
             // positionData.side = resData.side
             // positionData.filled = resData.filled
-            // return prev
           }
         }
       });
@@ -308,7 +308,7 @@ const Positions = (props) => {
         toastAlert("error", message, "positionErr");
       }
     } catch (error) {
-      console.log("error", error);
+
     }
   };
 
@@ -355,7 +355,7 @@ const Positions = (props) => {
                         </div>
                         <div className="flex items-center gap-2">
                           {
-                            props.isPrivate && item?.positions.length == 1 && (
+                            props.isPrivate && item?.positions.length === 1 && (
                               <button
                                 className="text-gray-400 hover:text-white transition-colors duration-300"
                                 onClick={() =>
@@ -388,14 +388,14 @@ const Positions = (props) => {
                           <span
                             style={{
                               color:
-                                data.side == "yes"
+                                data.side === "yes"
                                   ? "rgba(125, 253, 254, 1)"
                                   : "rgba(236, 72, 153, 1)",
                               textTransform: "capitalize",
                             }}
                           >
                             {data.action}
-                            {data.side == "yes"
+                            {data.side === "yes"
                               ? data?.outcomes?.[0]?.title || "yes"
                               : data?.outcomes?.[1]?.title || "no"}
                           </span>
@@ -411,8 +411,8 @@ const Positions = (props) => {
                         )}
                       </td>
                       <td>
-                        {data.side == "no" ? 100 - data?.odd : data?.odd}¢
-                        {/* <span className={(data.side == "no" ? (100 - data?.last) : data?.last) > data?.filled?.[0]?.price ? "text-green-500" : "text-red-500"}>({((((data.side == "no" ? (100 - data?.last) : data?.last) || data.filled?.[0]?.price) - data.filled?.[0]?.price) / data?.filled?.[0]?.price * 100).toFixed(2)}%)</span> */}
+                        {data.side === "no" ? 100 - data?.odd : data?.odd}¢
+                        { }
                       </td>
                       <td
                         className={`${(data.side == "no" ? 100 - data?.odd : data?.odd) >=
@@ -423,14 +423,14 @@ const Positions = (props) => {
                       >
                         $
                         {toFixedDown(
-                          ((data.side == "no" ? 100 - data?.odd : data?.odd) *
+                          ((data.side === "no" ? 100 - data?.odd : data?.odd) *
                             data?.quantity) /
                           100,
                           2
                         )}
                         (
                         {toFixedDown(
-                          (((data.side == "no"
+                          (((data.side === "no"
                             ? 100 - data?.odd
                             : data?.odd) -
                             data?.filled?.[0]?.price) /
@@ -444,7 +444,7 @@ const Positions = (props) => {
 
                       <td>
                         <div className="flex justify-start items-center gap-2">
-                          {props.isPrivate && data.claim && data.profit == true && (
+                          {props.isPrivate && data.claim && data.profit === true && (
                             <Button
                               size="sm"
                               className="bg-[#37ce37] text-[#fff] hover:text-[#000]"
@@ -516,7 +516,7 @@ const Positions = (props) => {
                         } text-capitalize`}
                     >
                       {capitalize(item.action)}{" "}
-                      {item.side == "yes"
+                      {item.side === "yes"
                         ? selectedMarketOutcome?.[0]?.title || "yes"
                         : selectedMarketOutcome?.[1]?.title || "no"}{" "}
                       ({item.type} at {item.price}¢)

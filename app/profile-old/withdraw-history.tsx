@@ -1,10 +1,10 @@
-// in here fetch trarde histry and render the table
 //that table have coloums like excecute time, execUserId,price, quantity, side
 "use client";
 import { Fragment, useEffect, useState } from 'react';
 import { formatNumber, shortText, isFirstLetterCaps } from "@/app/helper/custommath";
 import { useSelector } from 'react-redux';
 import { transactionHistory } from '@/services/user';
+import { checkApiSuccess, getResponseResult } from '@/lib/apiHelpers';
 import PaginationComp from '../components/customComponents/PaginationComp';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -56,10 +56,11 @@ const WithdrawTable = () => {
                     type: "withdraw",
                     id: uniqueId, ...pagination
                 }
-                const { success, result } = await transactionHistory(data);
-                if (success) {
-                    setWithdraw(result.data);
-                    setHasMore(result.count > pagination.page * pagination.limit);
+                const response = await transactionHistory(data);
+                if (checkApiSuccess(response)) {
+                    const result = getResponseResult(response);
+                    setWithdraw((result as any).data || []);
+                    setHasMore((result as any).count > pagination.page * pagination.limit);
                 }
             } catch (error) {
                 console.error('Error fetching trade history:');
@@ -71,8 +72,6 @@ const WithdrawTable = () => {
         fetchDepositHistory();
     }, [uniqueId, pagination]);
 
-    // if (loading) {
-    //     return <div className="text-center py-4">Loading...</div>;
     // }
 
 

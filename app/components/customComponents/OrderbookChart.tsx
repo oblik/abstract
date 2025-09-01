@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState, useCallback } from "react";
 import { Button } from "@/app/components/ui/button";
 import { Legend, Line, LineChart, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 import { ArrowRightLeft } from "lucide-react";
@@ -11,6 +11,7 @@ import Image from "next/image";
 import SONOTRADE from "/images/SONOTRADE.png";
 import { processSingleChartData } from "@/utils/processChartData";
 import { getPriceHistory } from "@/services/market";
+import { checkApiSuccess, getResponseResult } from '@/lib/apiHelpers';
 import { SocketContext } from "@/config/socketConnectivity";
 import { isEmpty } from "@/lib/isEmpty";
 import { toFixedDown } from "@/lib/roundOf";
@@ -101,39 +102,39 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
     }
   }, []);
 
-  const fetchData = async() => {
+  const fetchData = useCallback(async() => {
     try {
-      // Fetch all data without timestamp filtering (like Chart.tsx)
+      console.log('OrderbookChart fetchData called with:', { selectedYes, interval, selectedMarket });
       const data = {
         market: selectedYes ? "yes" : "no",
-        interval: "all", // Always fetch all data
+interval: "all",
         fidelity: 30,
       };
-      const { success, result } = await getPriceHistory(id, data);
-      if (success) {
+      const response = await getPriceHistory(id, data as any);
+      if (checkApiSuccess(response)) {
+        console.log('OrderbookChart API response success');
+        const result = getResponseResult(response) || [];
         // Find the specific market data that matches selectedMarket
         const filteredResult = result.find(
           (item: any) => item.groupItemTitle === selectedMarket.groupItemTitle
         );
         
         if (filteredResult) {
-          let formattedData = filteredResult.data?.map((item: any) => {
+          let formattedData = (filteredResult as any).data?.map((item: any) => {
             let formattedTime: any = Math.floor(new Date(item.t).getTime() / 1000);
             return {
               t: formattedTime,
-              p: item.p / 100, // Divide by 100 to get proper percentage (like Chart.tsx)
+p: item.p / 100,
             };
           });
         
         
-        // Store all data for current selection (like Chart.tsx)
         if(selectedYes){
           setAllChartDataYes(formattedData || []);
         } else {
           setAllChartDataNo(formattedData || []);
         }
         
-        // Process data with current interval (like Chart.tsx)
         let processedData = processSingleChartData(formattedData || [], interval);
         if(selectedYes){
           setChartDataYes(processedData);
@@ -144,28 +145,28 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
       }
     } catch (error) {
       console.log(error)
+      console.log(error, "err");
+
     }
-  }
+  }, [id, selectedYes, selectedMarket, interval]);
 
   useEffect(() => {
     fetchData();
-  }, [id, market, selectedMarket, selectedYes]); // Remove interval from dependencies like Chart.tsx
+  }, [fetchData]); // Remove interval from dependencies like Chart.tsx
 
-  // Add separate effect to handle interval changes using stored data (like Chart.tsx)
   useEffect(() => {
-    console.log('OrderbookChart interval changed:', interval);
-    console.log('OrderbookChart allChartDataYes length:', allChartDataYes.length);
-    console.log('OrderbookChart allChartDataNo length:', allChartDataNo.length);
-    
+
+
+
     if (selectedYes && allChartDataYes.length > 0) {
-      console.log('Processing Yes data with interval:', interval);
+
       let processedData = processSingleChartData(allChartDataYes, interval);
-      console.log('Processed Yes data length:', processedData.length);
+
       setChartDataYes(processedData);
     } else if (!selectedYes && allChartDataNo.length > 0) {
-      console.log('Processing No data with interval:', interval);
+
       let processedData = processSingleChartData(allChartDataNo, interval);
-      console.log('Processed No data length:', processedData.length);
+
       setChartDataNo(processedData);
     }
   }, [interval, allChartDataYes, allChartDataNo, selectedYes]);
@@ -179,10 +180,8 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
       };
       
       socket.on("chart-update", chartUpdate);
-      // return () => {
-      //   socket.off("chart-update", chartUpdate);
       // };
-  }, [market, selectedYes]); // Remove interval from dependencies like Chart.tsx
+  }, [fetchData, socketContext]); // Remove interval from dependencies like Chart.tsx
 
   useEffect(() => {
     if (selectedYes) {
@@ -195,13 +194,12 @@ const OrderbookChart: React.FC<OrderbookChartProps> = ({
   }, [selectedYes, chartDataYes, chartDataNo]);
 
   // Calculate the current displayed chance value and color
-  // const displayChance = selectedYes ? title : 1 - title;
   const displayChance =
         hoveredChance !== undefined
             ? hoveredChance
             : selectedYes
                 ? title
-                : title == 0
+                : title === 0
                     ? 0
                     : title !== undefined
                         ? 100 - title

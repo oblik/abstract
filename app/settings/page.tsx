@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
-// import { useActiveAccount } from "thirdweb/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
@@ -11,8 +10,6 @@ import {
 } from "@/app/components/ui/avatar";
 import { Label } from "@/app/components/ui/label";
 import Header from "@/app/Header";
-// import { Nav as NavigationComponent } from "@/app/components/ui/navigation-menu";
-// import { navigationItems } from "@/constants";
 import imageCompression from "browser-image-compression";
 import { supabase } from "@/utils/supabaseClient";
 import { Plus, Check } from "lucide-react";
@@ -28,7 +25,6 @@ import ProfileSettings from "./ProfileSettings";
 import { Footer } from "../components/customComponents/Footer";
 import HeaderFixed from "@/app/HeaderFixed";
 
-// Helper function to upload image to Supabase storage
 const uploadToStorage = async (file: File): Promise<string> => {
   try {
     const fileExt = file.name.split('.').pop();

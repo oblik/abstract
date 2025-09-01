@@ -1,7 +1,5 @@
 "use client";
 import Header from "@/app/Header";
-// import { Nav as NavigationComponent } from "@/app/components/ui/navigation-menu";
-// import { navigationItems } from "@/constants";
 import React, { useState, useEffect, useCallback } from "react";
 import HeaderFixed from "@/app/HeaderFixed";
 import {
@@ -19,14 +17,15 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "@/types";
 import { getPositions, getTradeOverview, getUserData } from "@/services/user";
+import { checkApiSuccess, getResponseResult } from '@/lib/apiHelpers';
 import ActivityTable from "./activity";
 import DepositTable from "./deposit-history"
 import WithdrawTable from "./withdraw-history"
 import Positions from "../portfolio/Positions";
 import { Footer } from "../components/customComponents/Footer";
 
-// Define PolygonScan transaction type
 interface PolygonTx {
   blockNumber: string;
   timeStamp: string;
@@ -59,9 +58,8 @@ const initialTradeOverview = {
 export default function PortfolioPage() {
 
   //get profile data from redux
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { profileImg , uniqueId} = useSelector((state: any) => state?.auth?.user);
-  // const { address} = useWallet();
   const { address } = useSelector((state: any) => state?.walletconnect?.walletconnect);
   const [account, setaccount] = useState(address);
   const wallet: string = address ? address : "";
@@ -72,7 +70,6 @@ export default function PortfolioPage() {
   const [positions, setPositions] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("activity");
   const [tradeOverview, setTradeOverview] = useState<any>(initialTradeOverview);
-  // console.log("tradeOverview",tradeOverview)
   const [tradeOverviewLoading, setTradeOverviewLoading] = useState(true);
   const [profileData, setProfileData] = useState<{
     username: string;
@@ -80,47 +77,38 @@ export default function PortfolioPage() {
     bio: string;
   } | any>(null);
 
-  // useEffect(() => {
-  //   if (!wallet) return;
-  //   const fetchTx = async () => {
-  //     setLoadingTx(true);
-  //     const res = await fetch(`/api/polygon/transactions?address=${wallet}`);
-  //     const data = await res.json();
-  //     setTransactions(data.result || []);
-  //     setLoadingTx(false);
   //   };
-  //   fetchTx();
-  // }, [wallet]);
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
-      const { status, result } = await getUserData(dispatch);
-      if (status) {
-        setProfileData(result);
+      const response = await getUserData(dispatch);
+      if (checkApiSuccess(response)) {
+        setProfileData(getResponseResult(response));
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
     }
-  };
+  }, [dispatch]);
 
   //get positions
-  const fetchPositions = async () => {
-    const { status, result } = await getPositions();
-    if (status) {
-      setPositions(result);
+  const fetchPositions = useCallback(async () => {
+    const response = await getPositions();
+    if (checkApiSuccess(response)) {
+      setPositions(getResponseResult(response) || []);
     }
-  };
+  }, []);
 
-  const fetchTradeOverview = async () => {
+  const fetchTradeOverview = useCallback(async () => {
     setTradeOverviewLoading(true);
     try {
-      const { success, result } = await getTradeOverview();
-      if (success) {
+      const response = await getTradeOverview();
+      if (checkApiSuccess(response)) {
+        const result = getResponseResult(response);
         setTradeOverview({
-          total_value: result.totalPositionValue.toFixed(2),
-          total_profit_loss: result.totalTradeProfitLoss.toFixed(2),
-          total_volume_traded: result.totalTradeVolume.toFixed(2),
-          total_events_traded: result.totalTradeEventTraded,
+          total_value: (result as any).totalPositionValue?.toFixed(2) || "0",
+          total_profit_loss: (result as any).totalTradeProfitLoss?.toFixed(2) || "0",
+          total_volume_traded: (result as any).totalTradeVolume?.toFixed(2) || "0",
+          total_events_traded: (result as any).totalTradeEventTraded || 0,
         });
         setTradeOverviewLoading(false);
       }
@@ -129,14 +117,14 @@ export default function PortfolioPage() {
     } finally {
       setTradeOverviewLoading(false);
     }
-  };
+  }, []);
 
 
   useEffect(() => {
     fetchProfile();
     fetchPositions()
     fetchTradeOverview()
-  }, []);
+  }, [fetchProfile, fetchPositions, fetchTradeOverview]);
 
   const router = useRouter();
 
@@ -149,7 +137,7 @@ export default function PortfolioPage() {
     <div className="text-white bg-black h-auto items-center justify-items-center p-0 m-0">
       <div className="sticky top-0 z-50 w-[100%] bg-black lg:bg-transparent backdrop-blur-0 lg:backdrop-blur-md border-b border-[#222] lg:mb-4 mb-0 pb-2" style={{ borderBottomWidth: '1px' }}>
         <Header />
-        {/* <NavigationComponent menuItems={navigationItems} showLiveTag={true} /> */}
+        {}
       </div>
       <div className="container mx-auto py-10 px-4 container-sm">
         {/* 1. 用户信息区 */}
@@ -291,13 +279,13 @@ export default function PortfolioPage() {
                 </Button>
               </div>
             </div>
-            {activeTab == "activity" &&
+            {activeTab === "activity" &&
             <ActivityTable />
                 }
-                  {activeTab == "deposit" &&
+                  {activeTab === "deposit" &&
              <DepositTable />
                 }
-                  {activeTab == "withdraw" &&
+                  {activeTab === "withdraw" &&
              <WithdrawTable />
                 }
 

@@ -44,8 +44,6 @@ import { Footer } from "@/app/components/customComponents/Footer";
 import { Button } from "@/app/components/ui/button";
 import ResolutionCard from "@/app/components/customComponents/ResolutionCard";
 import MonthlyListenersChart2 from "@/app/components/customComponents/MonthlyListenersChart2";
-// import TravisScott from "../../../public/images/travis.png";
-// import SpotifyLogo from "../../../public/images/spotifylogo.png";
 import Jackboys2 from "@/public/images/jackboys2.png";
 import Astroworld from "@/public/images/astroworld.png";
 import { NavigationBar } from "@/app/components/ui/navigation-menu";
@@ -55,8 +53,12 @@ import { toFixedDown } from "@/lib/roundOf";
 export default function EventPage({ categories }) {
   const param = useParams();
   const id = param.id;
-  const disContainer = document.getElementById("event-discription")
   const socketContext = useContext(SocketContext);
+  const [disContainer, setDisContainer] = useState(null);
+  const [windowSize, setWindowSize] = useState({
+    width: 0,
+    height: 0,
+  });
   const [events, setEvents] = useState([]);
   const [eventsLoading, setEventsLoading] = useState(true);
   const [markets, setMarkets] = useState([]);
@@ -66,10 +68,7 @@ export default function EventPage({ categories }) {
   const [forecastGraph, setForecastGraph] = React.useState(false);
   const [interval, setInterval] = useState("all");
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [selectedOrderBookData, setSelectedOrderBookData] = useState([
-    books[0],
-    books[1],
-  ]);
+  const [selectedOrderBookData, setSelectedOrderBookData] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [openItem, setOpenItem] = useState("orderbook");
   const [openOrders, setOpenOrders] = useState([]);
@@ -80,16 +79,13 @@ export default function EventPage({ categories }) {
   const [showMore, setShowMore] = useState(false);
 
 
-  // Helper functions for price calculation (same as TradingCard)
   const descending = (a, b) => Number(b[0]) - Number(a[0]);
   const ascending = (a, b) => Number(a[0]) - Number(b[0]);
 
-  // Function to calculate the lowest ask price for a market
   const getLowestAskPrice = (marketId) => {
     const orderBook = books?.find(book => book.marketId === marketId);
     if (!orderBook) return null;
 
-    // Get Yes ask price (100 - lowest yes ask)
     const yesAsk = orderBook?.asks?.[0]?.sort(descending)?.[0];
     const yesPrice = yesAsk?.length > 0 ? toFixedDown(100 - yesAsk[0], 2) : null;
 
@@ -100,12 +96,33 @@ export default function EventPage({ categories }) {
     const orderBook = books?.find(book => book.marketId === marketId);
     if (!orderBook) return null;
 
-    // Get Yes bid price (100 - highest yes bid)
     const yesBid = orderBook?.bids?.[0]?.sort(descending)?.[0];
     const yesPrice = yesBid?.length > 0 ? toFixedDown(100 - yesBid[0], 2) : null;
 
     return yesPrice;
   };
+
+  useEffect(() => {
+    // Only run on client
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    // Set initial size only on client side
+    if (typeof window !== 'undefined') {
+      handleResize();
+      window.addEventListener("resize", handleResize);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener("resize", handleResize);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const eventId = events?._id;
@@ -124,13 +141,12 @@ export default function EventPage({ categories }) {
     if (!socket || !eventId) return;
 
     const handleDisconnect = () => {
-      console.log("socket disconnected", eventId);
+
       subscribe(eventId);
     };
 
     socket.on("disconnect", handleDisconnect);
 
-    // Cleanup function
     return () => {
       socket.off("disconnect", handleDisconnect);
     };
@@ -142,7 +158,6 @@ export default function EventPage({ categories }) {
 
     const handleOrderbook = (result) => {
       const orderbook = JSON.parse(result);
-      // console.log("socket: orderbook result", orderbook);
       setBooks((prev) =>
         prev.map((item) =>
           item.marketId === orderbook.marketId
@@ -154,14 +169,13 @@ export default function EventPage({ categories }) {
 
     const handleRecentTrade = (result) => {
       const recentTrade = JSON.parse(result);
-      // console.log("socket: recent trades result", recentTrade);
       setMarkets((prev) =>
         prev.map((item) =>
           item._id === recentTrade.market
             ? {
               ...item,
               last:
-                recentTrade.side == "no"
+                recentTrade.side === "no"
                   ? 100 - recentTrade.p
                   : recentTrade.p,
             }
@@ -171,7 +185,6 @@ export default function EventPage({ categories }) {
     };
 
     const chartUpdate = (result) => {
-      // console.log("socket update odd ",result)
       if (!result) return
       const res = JSON.parse(result);
       const marketId = res.m;
@@ -202,22 +215,17 @@ export default function EventPage({ categories }) {
 
     const fetchEvents = async () => {
       try {
+        console.log('EventPage fetchEvents called with id:', id);
         setEventsLoading(true);
         let { success, result } = await getEventById({ id: id });
         if (success) {
+          console.log('EventPage fetchEvents success:', result);
           setEvents(result);
           if (result?.marketId && result?.marketId.length > 0) {
             setMarkets(
               result.marketId.filter((market) =>
                 ["active", "closed", "resolved"].includes(market.status)
               )
-            );
-            console.log(
-              result?.marketId,
-              result.marketId.filter((market) =>
-                ["active", "closed", "resolved"].includes(market.status)
-              ),
-              "active.Iad"
             );
           }
         }
@@ -230,7 +238,7 @@ export default function EventPage({ categories }) {
     fetchEvents();
   }, [id]);
 
-  const fetchAllBooks = async () => {
+  const fetchAllBooks = useCallback(async () => {
     try {
       const { success, orderbook } = await getOrderBook({ id: id });
       if (success) {
@@ -239,7 +247,7 @@ export default function EventPage({ categories }) {
     } catch (error) {
       console.error("Error fetching PriceHistory:", error);
     }
-  };
+  }, [id]);
 
   const checkOverflow = (container) => {
     if (container.scrollHeight > container.clientHeight) {
@@ -252,6 +260,14 @@ export default function EventPage({ categories }) {
   }
 
   useEffect(() => {
+    // Only run on client side
+    if (typeof window !== 'undefined') {
+      const container = document.getElementById("event-discription");
+      setDisContainer(container);
+    }
+  }, []);
+
+  useEffect(() => {
     if (!isEmpty(disContainer)) checkOverflow(disContainer);
   }, [disContainer])
 
@@ -262,7 +278,6 @@ export default function EventPage({ categories }) {
       const bookLabelsTemp = [];
       markets
         .filter((market) => market.status === "active")
-        // .sort((a, b) => b.bestAsk - a.bestAsk)
         .forEach((market, index) => {
           if (market.clobTokenIds) {
             const yes = JSON.parse(market?.clobTokenIds)?.[0] || "";
@@ -274,7 +289,7 @@ export default function EventPage({ categories }) {
       fetchAllBooks();
       setBookLabels(bookLabelsTemp);
     }
-  }, [id, markets, interval]);
+  }, [id, markets, interval, fetchAllBooks]);
 
   const getOpenOrders = async (id) => {
     try {
@@ -291,32 +306,32 @@ export default function EventPage({ categories }) {
 
   const getOutcomeTitle = (arr, id) => {
     try {
-      const find = arr.find(item => item._id == id);
+      const find = arr.find(item => item._id === id);
       return find?.title ? capitalize(find?.title) : 'Yes';
     } catch {
       return '';
     }
   }
 
-  const isWinning = useCallback((events, market) => {
+  const isWinning = useCallback((eventsParam, marketParam) => {
     try {
-      if (isEmpty(events)) return false;
-      if (isEmpty(market)) return false;
+      if (isEmpty(eventsParam)) return false;
+      if (isEmpty(marketParam)) return false;
 
-      const outcomeType = events?.outcomeType;
-      if (outcomeType == 'single') {
-        if (events?.marketId.length == 1) {
-          return events?.marketId?.[0]?.outcome?.[0]._id == events?.outcomeId;
+      const outcomeType = eventsParam?.outcomeType;
+      if (outcomeType === 'single') {
+        if (eventsParam?.marketId.length === 1) {
+          return eventsParam?.marketId?.[0]?.outcome?.[0]._id === eventsParam?.outcomeId;
         } else {
-          return events?.outcomeId == market?._id;
+          return eventsParam?.outcomeId === marketParam?._id;
         }
-      } else if (outcomeType == 'multi') {
-        return market?.outcome?.[0]._id == market?.outcomeId;
+      } else if (outcomeType === 'multi') {
+        return marketParam?.outcome?.[0]._id === marketParam?.outcomeId;
       }
     } catch {
       return false;
     }
-  }, [events]);
+  }, []);
 
   return (
     <>
@@ -347,7 +362,7 @@ export default function EventPage({ categories }) {
               {/* Preview Card Section */}
               <div className="flex justify-center items-center">
                 <div className="flex justify-center sm:max-w-8xl mb-0 w-full gap-5">
-                  {/* Main Content (Charts, Accordion, etc.) */}
+                  { }
                   <div className="w-full lg:w-[70%]">
                     {events?.forecast ? (
                       <MonthlyListenersChart2
@@ -367,8 +382,8 @@ export default function EventPage({ categories }) {
                       />
                     ) : (
                       <Chart
-                        title1={event.marketId?.[0]?.outcome?.[0]?.title || "Yes"}
-                        title2={event.marketId?.[0]?.outcome?.[1]?.title || "No"}
+                        title1={events?.marketId?.[0]?.outcome?.[0]?.title || "Yes"}
+                        title2={events?.marketId?.[0]?.outcome?.[1]?.title || "No"}
                         id={id}
                         title={events?.title}
                         volume={
@@ -384,7 +399,6 @@ export default function EventPage({ categories }) {
                         series={events?.seriesId}
                       />
                     )}
-
                     <div className="flex justify-center items-center mt-2 sm:mt-0 mb-4 sm:mb-8 md:mb-8 text-xs sm:text-base" style={{ marginTop: '0.5rem', marginBottom: '1rem', transform: 'scale(0.85)', transformOrigin: 'center', maxWidth: '90vw' }}>
                       <ChartIntervals
                         interval={interval}
@@ -393,10 +407,10 @@ export default function EventPage({ categories }) {
                     </div>
 
                     <div className="">
-                      {events?.status == "resolved" && <hr className="mt-4" />}
+                      {events?.status === "resolved" && <hr className="mt-4" />}
                       {markets?.length < 2 &&
                         books &&
-                        events?.status != "resolved" ? (
+                        events?.status !== "resolved" ? (
                         <OrderbookAccordion
                           type="single"
                           value={openItem}
@@ -413,7 +427,7 @@ export default function EventPage({ categories }) {
                               orderBook={
                                 books?.find(
                                   (book) =>
-                                    book.marketId ==
+                                    book.marketId ===
                                     markets[0]?._id
                                 ) || {}
                               }
@@ -427,7 +441,6 @@ export default function EventPage({ categories }) {
                               index={0}
                               selectedMarket={markets[0]}
                               setSelectedOrder={setSelectedOrder}
-                              // isResolved={events?.isResolved}
                               forecastGraph={forecastGraph}
                               setForecastGraph={setForecastGraph}
                               interval={interval}
@@ -445,16 +458,14 @@ export default function EventPage({ categories }) {
                                 Chance
                               </div>
                               <div className="hidden md:flex items-center gap-1" style={{ minWidth: 300 }}>
-                                {/* Empty for Yes/No buttons - hidden on mobile */}
                               </div>
                             </div>
 
                             {markets &&
                               markets?.length > 0 &&
                               markets
-                                // .filter((market) => market.status === "active")
                                 ?.map((market, index) => {
-                                  if (market.status == "resolved") {
+                                  if (market.status === "resolved") {
                                     return (
                                       <div key={index} className="flex justify-between items-center px-4 py-3 border-t border-[#2a2a2a] hover:bg-[#0a0a0a] duration-300 cursor-pointer">
                                         <div>
@@ -469,11 +480,11 @@ export default function EventPage({ categories }) {
                                           <p
 
                                             className={`text-sm font-semibold ${isWinning(events, market)
-                                                ? "text-green-500"
-                                                : "text-red-500"
+                                              ? "text-green-500"
+                                              : "text-red-500"
                                               }`}
                                           >
-                                            {events?.outcomeType == "single" ? capitalize(events.outcome) : getOutcomeTitle(market.outcome, market.outcomeId)}
+                                            {events?.outcomeType === "single" ? capitalize(events?.outcome || "") : getOutcomeTitle(market.outcome, market.outcomeId)}
                                           </p>
                                           {isWinning(events, market) ? (
                                             <CheckCircle
@@ -508,8 +519,7 @@ export default function EventPage({ categories }) {
                                         orderBook={
                                           books?.find(
                                             (book) =>
-                                              book.marketId ==
-                                              // JSON?.parse(market?.clobTokenIds)[0]
+                                              book.marketId ===
                                               market?._id
                                           ) || {}
                                         }
@@ -540,8 +550,7 @@ export default function EventPage({ categories }) {
                                         orderBook={
                                           books?.find(
                                             (book) =>
-                                              book.marketId ==
-                                              // JSON?.parse(market?.clobTokenIds)[0]
+                                              book.marketId ===
                                               market?._id
                                           ) || {}
                                         }
@@ -555,7 +564,6 @@ export default function EventPage({ categories }) {
                                         index={index}
                                         selectedMarket={market}
                                         setSelectedOrder={setSelectedOrder}
-                                        // isResolved={events?.isResolved}
                                         forecast={events?.forecast}
                                         forecastGraph={forecastGraph}
                                         setForecastGraph={setForecastGraph}
@@ -646,8 +654,8 @@ export default function EventPage({ categories }) {
                     </div>
                   </div>
 
-                  {/* Trading Card (Desktop: Sticky, Hidden on Mobile) */}
-                  {events?.status == "resolved" ? (
+                  { }
+                  {events?.status === "resolved" ? (
                     <div className="hidden lg:block lg:w-[15%] relative">
                       <div className="fixed top-[147px] z-60 w-[15%]">
                         <ResolutionCard
@@ -669,7 +677,7 @@ export default function EventPage({ categories }) {
                           selectedOrderBookData={
                             books?.find(
                               (book) =>
-                                book.marketId == markets[selectedIndex]?._id
+                                book.marketId === markets[selectedIndex]?._id
                             ) || {}
                           }
                           market={markets[selectedIndex]}
@@ -685,7 +693,7 @@ export default function EventPage({ categories }) {
                 </div>
               </div>
 
-              {/* Trading Card Drawer for Mobile */}
+              { }
               <div className="lg:hidden justify-center pt-5 pb-8 items-center mt-0 fixed bottom-[24px] left-0 w-full">
                 {isDrawerOpen && (
                   <div
@@ -693,11 +701,11 @@ export default function EventPage({ categories }) {
                     onClick={() => setIsDrawerOpen(false)}
                   ></div>
                 )}
-                {events?.status == "resolved" ? (
+                {events?.status === "resolved" ? (
                   <ResolutionCard />
                 ) : (
                   <>
-                    {/* Only show drawer trigger for single markets */}
+                    { }
                     {markets?.length <= 1 && (
                       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
                         <DrawerTrigger className="w-full py-2 font-semibold bg-black border-t border-[#1E1E1E] text-black rounded-lg mt-10">
@@ -739,8 +747,7 @@ export default function EventPage({ categories }) {
                                 selectedOrderBookData ||
                                 books?.find(
                                   (book) =>
-                                    book.marketId ==
-                                    // JSON?.parse(market?.clobTokenIds)[0]
+                                    book.marketId ===
                                     markets[selectedIndex]?._id
                                 ) ||
                                 {}
@@ -755,7 +762,7 @@ export default function EventPage({ categories }) {
                       </Drawer>
                     )}
 
-                    {/* Drawer for multiple markets - controlled by accordion buttons */}
+                    { }
                     {markets?.length > 1 && (
                       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
                         <DrawerContent className="pb-0 border border-grey-500 bg-black h-auto">
@@ -775,8 +782,7 @@ export default function EventPage({ categories }) {
                                 selectedOrderBookData ||
                                 books?.find(
                                   (book) =>
-                                    book.marketId ==
-                                    // JSON?.parse(market?.clobTokenIds)[0]
+                                    book.marketId ===
                                     markets[selectedIndex]?._id
                                 ) ||
                                 {}
@@ -828,7 +834,7 @@ export default function EventPage({ categories }) {
       <div className="hidden sm:block">
         <Footer />
       </div>
-      {/* Add extra bottom space for mobile so HeaderFixed does not overlay content */}
+      { }
       <div className="block sm:hidden" style={{ height: '120px' }} />
       <HeaderFixed />
     </>

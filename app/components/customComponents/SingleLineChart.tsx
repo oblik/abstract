@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import Ye from "/public/images/Ye.png";
-// import Polymarket from "/public/images/polymarket.png";
 import Image from "next/image";
 import { Button } from "@/app/components/ui/button";
 import { Legend, Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
@@ -134,8 +133,6 @@ const SingleLineChart: React.FC<SingleLineChartProps> = ({
         const yes = market?.[0]?.clobTokenIds ? JSON.parse(market?.[0]?.clobTokenIds || "")[0] : "";
         const no = market?.[0]?.clobTokenIds ? JSON.parse(market?.[0]?.clobTokenIds || "")[1] : "";
         try {
-          // const response = await fetch(
-          //   `/api/event-data/price-history?interval=${interval}&market=${yes}&fidelity=${30}`,
           //   {
           //     method: "GET",
           //     headers: {
@@ -143,7 +140,6 @@ const SingleLineChart: React.FC<SingleLineChartProps> = ({
           //     },
           //   }
           // );
-          // const data = await response.json();
           const data = {
             history: []
           }
@@ -152,8 +148,6 @@ const SingleLineChart: React.FC<SingleLineChartProps> = ({
           console.error("Error fetching PriceHistory:", error);
         }
         try {
-          // const response = await fetch(
-          //   `/api/event-data/price-history?interval=${interval}&market=${no}&fidelity=${30}`,
           //   {
           //     method: "GET",
           //     headers: {
@@ -161,7 +155,6 @@ const SingleLineChart: React.FC<SingleLineChartProps> = ({
           //     },
           //   }
           // );
-          // const data = await response.json();
           const data = {
             history: []
           }
@@ -245,7 +238,7 @@ const SingleLineChart: React.FC<SingleLineChartProps> = ({
               )}
             </div>
 
-            {/* Second line (mobile) - Polymarket and Swap Button */}
+            { }
             <div className="flex gap-1 items-center">
               <Button
                 variant="ghost"
@@ -272,7 +265,6 @@ const SingleLineChart: React.FC<SingleLineChartProps> = ({
                 </HoverCard.Portal>
               </HoverCard.Root>
               <Button
-                // className="w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] active:bg-[#262626] active:text-[#fff]"
                 className={`w-[90px] rounded-full bg-[transparent] border border-[#262626] text-[#fff] hover:bg-[#262626] hover:text-[#fff] ${activeDate === "Jun 18"
                     ? "bg-[#fff] text-[#262626] border-[#262626]"
                     : ""

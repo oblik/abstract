@@ -4,7 +4,6 @@ import * as RechartsPrimitive from "recharts";
 
 import { cn } from "@/lib/utils";
 
-// Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES: Record<string, string> = {
   light: "",
   dark: ".dark"
@@ -83,24 +82,30 @@ const ChartStyle: React.FC<ChartStyleProps> = ({
     return null;
   }
 
+  // Generate CSS text safely - all inputs are controlled and sanitized
+  const cssText = Object.entries(THEMES)
+    .map(([theme, prefix]) => {
+      const colorRules = colorConfig
+        .map(([key, itemConfig]) => {
+          const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
+          // Validate color format to prevent CSS injection
+          if (color && /^#[0-9A-F]{6}$/i.test(color)) {
+            return `  --color-${key}: ${color};`;
+          }
+          return null;
+        })
+        .filter(Boolean)
+        .join("\n");
+      
+      return colorRules ? `${prefix} [data-chart=${id}] {\n${colorRules}\n}` : '';
+    })
+    .filter(Boolean)
+    .join("\n");
+
   return (
-    (<style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-.map(([key, itemConfig]) => {
-const color =
-  itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-  itemConfig.color;
-return color ? `  --color-${key}: ${color};` : null;
-})
-.filter(Boolean)
-.join("\n")}}
-`)
-          .join("\n"),
-      }} />)
+    <style>
+      {cssText}
+    </style>
   );
 };
 

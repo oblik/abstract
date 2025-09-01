@@ -1,13 +1,26 @@
 import config from "@/config/config";
-
-
-// Helper to get API base URL (use full URL for all requests to avoid middleware issues)
-function getApiBaseUrl() {
-  // Always use full backend URL for server-side requests to avoid malformed URL errors
-  // Next.js middleware and SSR context require absolute URLs
-  return config.backendURL;
-}
 import axios, { handleResp } from "@/config/axios";
+import {
+  EventsQueryParams,
+  EventSearchData,
+  Event,
+  PlaceOrderData,
+  OrderBook,
+  PriceHistoryPoint,
+  PriceHistoryParams,
+  Comment,
+  PostCommentData,
+  ApiResponse,
+  PaginatedResponse,
+} from "@/types";
+
+// Helper to get API base URL (use proxy in dev, full URL in prod)
+function getApiBaseUrl() {
+  if (process.env.NODE_ENV === "production") {
+    return config.backendURL;
+  }
+  return ""; // Use Next.js proxy in development
+}
 
 export const getEvents = async (data: any) => {
   try {
@@ -66,20 +79,28 @@ export const placeOrder = async (data: any) => {
       method: "post",
       data,
     });
+
+    console.log("PostComment - Success response:", respData.data);
     return handleResp(respData, "success");
   } catch (error: any) {
+    console.error("PostComment - Error details:", {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      message: error.message
+    });
     return handleResp(error, "error");
   }
 };
 
-export const cancelOrder = async (id: string) => {
+export const cancelOrder = async (id: string): Promise<ApiResponse> => {
   try {
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/order/cancel/${id}`,
       method: "get",
     });
     return handleResp(respData, "success");
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleResp(error, "error");
   }
 };
@@ -97,114 +118,109 @@ export const getOrderBook = async (data: any) => {
   }
 };
 
-export const getPriceHistory = async (id: string, params: any) => {
+export const getPriceHistory = async (id: string, params: PriceHistoryParams): Promise<ApiResponse<PriceHistoryPoint[]>> => {
   try {
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/events/price-history/${id}`,
       method: "get",
       params,
+      withCredentials: false,
     });
     return handleResp(respData, "success");
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleResp(error, "error");
   }
 };
 
-export const getForecastHistory = async (id: string, params: any) => {
+export const getForecastHistory = async (id: string, params: PriceHistoryParams): Promise<ApiResponse> => {
   try {
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/events/forecast-history/${id}`,
       method: "get",
       params,
+      withCredentials: false,
     });
     return handleResp(respData, "success");
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleResp(error, "error");
   }
 };
 
 //get comments
-export const getComments = async (eventId: string) => {
+export const getComments = async (eventId: string): Promise<ApiResponse<Comment[]>> => {
   try {
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/user/comments/event/${eventId}`,
       method: "get",
+      withCredentials: false,
     });
     return handleResp(respData, "success");
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleResp(error, "error");
   }
 };
 
-export const getCommentsPaginate = async (eventId: string, data: { page: number; limit: number }) => {
+export const getCommentsPaginate = async (eventId: string, data: { page: number; limit: number }): Promise<ApiResponse<PaginatedResponse<Comment>>> => {
   try {
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/user/comments/event/paginate/${eventId}`,
       method: "get",
-      params: data
+      params: data,
+      withCredentials: false,
     });
     return handleResp(respData, "success");
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleResp(error, "error");
   }
 };
 
-export const postComment = async (data: any) => {
+export const postComment = async (data: PostCommentData): Promise<ApiResponse<Comment>> => {
   try {
-    console.log("PostComment - Sending data:", data);
-
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/user/comments`,
       method: "post",
       data,
     });
-
-    console.log("PostComment - Success response:", respData.data);
     return handleResp(respData, "success");
-  } catch (error: any) {
-    console.error("PostComment - Error details:", {
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      data: error.response?.data,
-      message: error.message
-    });
+  } catch (error: unknown) {
     return handleResp(error, "error");
   }
 };
 
-export const getTagsByCategory = async (id: string) => {
+export const getTagsByCategory = async (id: string): Promise<ApiResponse<string[]>> => {
   try {
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/events/tags/${id}`,
       method: "get",
+      withCredentials: false,
     });
     return handleResp(respData, "success");
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleResp(error, "error");
   }
-}
+};
 
-
-export const getSeriesByEvent = async (id: string) => {
+export const getSeriesByEvent = async (id: string): Promise<ApiResponse> => {
   try {
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/events/series/event/${id}`,
       method: "get",
+      withCredentials: false,
     });
     return handleResp(respData, "success");
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleResp(error, "error");
   }
 }
 
-export const positionClaim = async (id: string) => {
+export const positionClaim = async (id: string): Promise<ApiResponse> => {
   try {
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/order/claim-position/${id}`,
       method: "get",
     });
     return handleResp(respData, "success");
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleResp(error, "error");
   }
 }

@@ -17,7 +17,6 @@ import {
 } from "@/app/components/ui/carousel";
 import EventListing from "@/app/components/customComponents/EventListing";
 import SlideshowListing from "@/app/components/customComponents/SlideshowListing";
-// import { infoCards } from "@/app/components/constants";
 import { getCategories, getTagsByCategory } from "@/services/market";
 import { getInfoCards } from "@/services/user";
 import { Footer } from "./components/customComponents/Footer";
@@ -27,6 +26,26 @@ import { isEmpty } from "@/lib/isEmpty";
 import DiscordLogo from "@/public/images/discordnew.png";
 
 const InfoCards = ({ infoCardCms }) => {
+
+  const sanitizeHTML = (html) => {
+    if (typeof html !== 'string') return '';
+
+    // Remove only dangerous tags and attributes, preserve safe formatting tags
+    let sanitized = html
+      // Remove script tags and their content
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      // Remove iframe tags
+      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+      .replace(/on\w+="[^"]*"/g, '')
+      .replace(/on\w+='[^']*'/g, '')
+      // Remove javascript: protocol
+      .replace(/javascript:\s*[^\s]*/gi, '')
+      // Remove potentially dangerous attributes
+      .replace(/data-\w+="[^"]*"/g, '')
+      .replace(/data-\w+='[^']*'/g, '');
+
+    return sanitized;
+  };
 
   const renderInfoCard = (emoji, title, footer) => {
     return (
@@ -38,7 +57,7 @@ const InfoCards = ({ infoCardCms }) => {
         <div>
           <p
             className="text-xs pt-2 leading-snug"
-            dangerouslySetInnerHTML={{ __html: footer }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHTML(footer) }}
           ></p>
         </div>
       </div>
@@ -123,6 +142,9 @@ const SubcategoryBar = ({
 );
 
 export default function Home({ infoCardCms, categories, tags }) {
+  const [windowSize, setWindowSize] = useState({
+    width: 0,
+  });
   const [selectCategory, setSelectedCategory] = useState("all");
   const [showClosed, setShowClosed] = useState(false);
   const [selectedSubcategory, setSelectedSubcategory] = useState("all");
@@ -131,21 +153,36 @@ export default function Home({ infoCardCms, categories, tags }) {
   const searchParams = useSearchParams();
   const categoryParam = searchParams.get("category");
 
-  const fetchTags = async () => {
-    try {
-      const { success, result } = await getTagsByCategory(selectCategory);
-      if (success) {
-        setSubcategoryList(result);
-        setSelectedSubcategory("all");
-      }
-    } catch (error) {
-      console.error("Error fetching tags:", error);
-    }
-  };
-
   useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const { success, result } = await getTagsByCategory(selectCategory);
+        if (success) {
+          setSubcategoryList(result);
+          setSelectedSubcategory("all");
+        }
+      } catch (error) {
+        console.error("Error fetching tags:", error);
+      }
+    };
+
     fetchTags();
   }, [selectCategory]);
+
+  useEffect(() => {
+    // Only run on client
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+      });
+    };
+
+    // Set initial size
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <>
@@ -165,8 +202,8 @@ export default function Home({ infoCardCms, categories, tags }) {
         <div
           className="lg:mb-4 mb-0"
           style={{
-            height: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
-            minHeight: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
+            height: windowSize.width < 1024 ? '95px' : '112px',
+            minHeight: windowSize.width < 1024 ? '95px' : '112px',
             width: '100%'
           }}
         />

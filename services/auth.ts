@@ -74,7 +74,7 @@ export const walletLogin = async (reqBody: any, dispatch: any) => {
       data: reqBody,
     });
     const { message, result } = respData.data;
-    if (!isEmpty(result?.user?.email) && result?.user?.status == "verified") {
+    if (!isEmpty(result?.user?.email) && result?.user?.status === "verified") {
       subscribe(result.user._id);
       dispatch(signIn(result?.token));
       dispatch(setUser(result?.user));
@@ -137,7 +137,7 @@ export const getLocation = async () => {
       respData = respData?.data;
       loginHistory.countryName = respData.countryName;
       loginHistory.countryCode = respData.countryCode;
-      loginHistory.ipaddress = respData.ipAddress;
+      loginHistory.ipAddress = respData.ipAddress;
       loginHistory.region = respData.regionName;
       loginHistory.country_code = respData.country_code;
       loginHistory.timezone = respData.timeZones;
@@ -179,5 +179,3 @@ export const getUser = async () => {
     return handleResp(error, "error");
   }
 };
-
-

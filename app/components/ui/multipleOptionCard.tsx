@@ -16,7 +16,6 @@ import {
 
 import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { decimalToPercentage, toTwoDecimal } from "@/utils/helpers";
-// import Polymarket from "/public/images/polymarket.png";
 import { BookmarkFilledIcon, BookmarkIcon } from "@radix-ui/react-icons";
 import SpotifyLogo from "../../../public/images/spotifylogo.png";
 
@@ -154,12 +153,11 @@ export function MultipleOptionCard({
                       {question}
                     </div>
 
-                    {status == "active" ? (
+                    {status === "active" ? (
                       <div className="flex justify-center items-center align-middle gap-1">
                         <p>
                           {option.last
                             ? // decimalToPercentage(
-                            //   JSON.parse(option.outcomePrices)[0]
                             // ) + "%"
                             `${option.last}%`
                             : ""}
@@ -229,7 +227,7 @@ export function MultipleOptionCard({
               textOverflow: "ellipsis",
             }}
           >
-            {status == "active" && (
+            {status === "active" && (
               <CardDescription>
                 $
                 {totalPool

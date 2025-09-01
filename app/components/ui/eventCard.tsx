@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/app/components/ui/button";
 import { Progress } from "@/app/components/ui/progress";
-// import Polymarket from "/public/images/polymarket.png";
 
 import {
   Card,
@@ -148,20 +147,18 @@ const EventCard: React.FC<EventCardProps> = ({
                   marginTop: 0,
                 }}
               >
-                {status == "active" && (
+                {status === "active" && (
                   <>{probability ? `${probability}%` : ""}</>
                 )}
               </span>
-              {probability && probability != 0 ? (
+              {probability && probability !== 0 ? (
                 <Progress
-                  // value={probability && decimalToPercentage(probability)}
                   value={probability}
                   className="h-1 w-full"
                   style={{ maxWidth: "3.5em", minWidth: "2em", marginTop: 0 }}
                 />
               ) : (
                 <Progress
-                  // value={probability && decimalToPercentage(probability)}
                   value={0}
                   className="h-1 w-full"
                   style={{ maxWidth: "3.5em", minWidth: "2em", marginTop: 0 }}
@@ -173,7 +170,7 @@ const EventCard: React.FC<EventCardProps> = ({
       </CardHeader>
 
       <CardContent className="pb-0 sm:pl-3 sm:pr-3 pl-3 pr-3 pt-5 sm:pt-6">
-        {status == "active" ? (
+        {status === "active" ? (
           <>
             <div
               className="pb-0 mt-3"
@@ -271,13 +268,13 @@ const EventCard: React.FC<EventCardProps> = ({
               </div>
             </div>
           </>
-        ) : status == "resolved" ? (
+        ) : status === "resolved" ? (
           <>
             <div className="pb-4 pt-1 capitalize">
               <p>Outcome</p>
               <p
                 className={
-                  outcome == "YES" ? "text-[#7dfdfe]" : "text-[#ec4899]"
+                  outcome === "YES" ? "text-[#7dfdfe]" : "text-[#ec4899]"
                 }
               >
                 {outcome}
@@ -285,7 +282,7 @@ const EventCard: React.FC<EventCardProps> = ({
             </div>
           </>
         ) : (
-          status == "closed" && <span>Closed</span>
+          status === "closed" && <span>Closed</span>
         )}
       </CardContent>
 
@@ -308,17 +305,11 @@ const EventCard: React.FC<EventCardProps> = ({
               textOverflow: "ellipsis",
             }}
           >
-            {status == "active" && totalPool && (
+            {status === "active" && totalPool && (
               <CardDescription>{totalPool} Vol</CardDescription>
             )}
           </span>
-          {/* <Button
-            className="p-1 h-6 w-6  z-10 rounded"
-            variant="ghost"
-            onClick={handleBookmarkClick}
-          >
-            {bookmarked ? <BookmarkFilledIcon /> : <BookmarkIcon />}
-          </Button> */}
+          {}
         </div>
       </CardFooter>
     </Card>

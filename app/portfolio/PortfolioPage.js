@@ -1,10 +1,8 @@
 "use client";
 import Header from "@/app/Header";
 import HeaderFixed from "@/app/HeaderFixed";
-// import { Nav as NavigationComponent } from "@/app/components/ui/navigation-menu";
-// import { navigationItems } from "@/constants";
-import React, { useState, useEffect, useCallback } from "react";
 import { getCookie } from "cookies-next";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/app/components/ui/button";
 import config from "../../config/config";
 import {
@@ -60,7 +58,6 @@ import History from "./History";
 import { Footer } from "../components/customComponents/Footer";
 import { setWalletConnect } from "@/store/slices/walletconnect/walletSlice";
 import { PnLFormatted } from "@/utils/helpers";
-import { parsePriceData } from "@pythnetwork/client";
 import { getWalletSettings, getCoinList } from "@/services/user";
 import { getAuthToken } from "@/lib/cookies";
 import depositIDL from "../../components/IDL/DEPOSITIDL.json";
@@ -88,7 +85,7 @@ export default function PortfolioPage() {
   console.log("=== PORTFOLIO PAGE COMPONENT RENDERING ===");
 
   const programID = new PublicKey(config?.programID);
-  const connection = new Connection(config?.rpcUrl, "confirmed");
+  const connection = useMemo(() => new Connection(config?.rpcUrl, "confirmed"), []);
   const PYTH_PRICE_ACCOUNT = new PublicKey(config?.PYTH_PRICE_ACCOUNT);
 
   const { isConnected, address } = useSelector(
@@ -163,7 +160,7 @@ export default function PortfolioPage() {
   const [profitAmount, setProfitAmount] = useState(0);
   const [coin, setCoin] = useState([]);
   const [walletsetting, setWalletsetting] = useState({});
-  const [interval, setInterval] = useState("1m");
+  const [chartInterval, setChartInterval] = useState("1m");
   const [copied, setCopied] = useState(false);
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
@@ -199,9 +196,9 @@ export default function PortfolioPage() {
     } else {
       console.log("Skipping getPnl - authLoaded:", authLoaded, "isAuthenticated:", isAuthenticated());
     }
-  }, [walletData, interval, data, signedIn, authLoaded]);
+  }, [walletData, chartInterval, data, signedIn, authLoaded]);
 
-  const getPnl = async () => {
+  const getPnl = useCallback(async () => {
     try {
       // Additional check to ensure user is authenticated before API call
       if (!isAuthenticated()) {
@@ -209,16 +206,27 @@ export default function PortfolioPage() {
         return;
       }
 
-      const { success, result } = await getUserPnL(interval);
-      console.log("success,result", success, result);
+      const { success, result } = await getUserPnL(chartInterval);
+
       if (success) {
         setProfitAmount(result?.totalPnl / 100);
+        console.log("success,result", success, result);
         setTodayReal(result?.totalPnl / 100);
       }
     } catch (err) {
-      console.log("error ", err);
+      console.log(err, "errr")
+      console.log(err, "errrr")
+      console.log(err, "ererrrr")
+      console.log(err, "errerr")
+      console.log("error ", err)
+      console.log(err, "err");
+
     }
-  };
+  }, [chartInterval]);
+
+  useEffect(() => {
+    getPnl();
+  }, [walletData, chartInterval, getPnl]);
 
   useEffect(() => {
     if (!wallet) return;
@@ -236,11 +244,12 @@ export default function PortfolioPage() {
     fetchProfile();
   }, [wallet]);
 
-  const balanceData = async () => {
+  const balanceData = useCallback(async () => {
     try {
       if (address) {
         const publicKey = new PublicKey(address);
         const balanceLamports = await connection.getBalance(publicKey);
+        console.log(balanceSOL, balanceLamports, "balanceSOLbalanceSOL");
         const balanceSOL = balanceLamports / LAMPORTS_PER_SOL;
         const formattedBalance = formatNumber(balanceSOL, 4);
         setBalance(formattedBalance);
@@ -252,7 +261,7 @@ export default function PortfolioPage() {
           const tokenAccount = await getAccount(connection, ata);
           if (tokenAccount) {
             const rawBalance = parseFloat(tokenAccount?.amount) / 10 ** 6;
-            console.log("✅ Token Balance:", parseFloat(rawBalance));
+
             const formattedBalance1 = formatNumber(rawBalance, 4);
             setTokenBalance(formattedBalance1);
           }
@@ -261,7 +270,7 @@ export default function PortfolioPage() {
     } catch (err) {
       console.error("Error fetching POL balance:", err);
     }
-  };
+  }, [address, connection]);
 
   async function disconnectWallet() {
     if (window.solana && window.solana.isPhantom) {
@@ -292,7 +301,7 @@ export default function PortfolioPage() {
         const publicKey = new PublicKey(response.publicKey.toString());
         const balanceLamports = await connection.getBalance(publicKey);
         const balanceSOL = balanceLamports / 1e9;
-        console.log(balanceSOL, balanceLamports, "balanceSOLbalanceSOL");
+
         const connectedAddress = response.publicKey.toString();
 
         const { result } = await addressCheck({ address: connectedAddress });
@@ -335,7 +344,7 @@ export default function PortfolioPage() {
         toastAlert("success", "Wallet Connected successfully!!", "wallet");
         setCheck(true)
       } catch (err) {
-        console.log(err, "errerr");
+
         if (err?.code === 4001) {
           toastAlert("error", "Connection request was rejected", "wallet");
         }
@@ -440,7 +449,9 @@ export default function PortfolioPage() {
     if (!isEmpty(walletsetting?.priority)) {
       const microLamports = PRIORITY_FEES[walletsetting?.priority];
       const priorityFeeSol = microLamports / 1e9;
-      console.log(priorityFeeSol, "priorityFeeSol");
+      console.log(walletsetting?.priority, "priority")
+      console.log(priorityFeeSol, "priorityFeeSol")
+
       feeInSol = feeInSol + priorityFeeSol;
     }
     const feeInUSD = feeInSol * tokenValue;
@@ -460,7 +471,7 @@ export default function PortfolioPage() {
       } else if (
         (!isEmpty(data?.walletAddress) && result === true) ||
         (!isEmpty(data?.walletAddress) &&
-          data?.walletAddress.toString() != address?.toString() &&
+          data?.walletAddress.toString() !== address?.toString() &&
           isConnected)
       ) {
         toastAlert(
@@ -482,17 +493,17 @@ export default function PortfolioPage() {
 
   useEffect(() => {
     balanceData();
-  }, [address]);
+  }, [address, balanceData]);
 
   var step2Click = () => {
     if (!isEmpty(currency)) {
       setStep("2");
       setDepositAmt();
       getSolanaTxFee();
-      if (currency == "USDC" && tokenbalance == 0) {
+      if (currency === "USDC" && tokenbalance === 0) {
         setStep("1");
         toastAlert("error", "Insufficient Balance", "wallet");
-      } else if (currency == "SOL" && balance == 0) {
+      } else if (currency === "SOL" && balance === 0) {
         setStep("1");
         toastAlert("error", "Insufficient Balance", "wallet");
       } else if (balance <= 0) {
@@ -506,7 +517,7 @@ export default function PortfolioPage() {
 
   var step3Click = () => {
     try {
-      var depositBalance = currency == "USDC" ? tokenbalance : balance;
+      var depositBalance = currency === "USDC" ? tokenbalance : balance;
       if (depositBalance > 0) {
         if (isEmpty(depsoitAmt)) {
           toastAlert("error", "Enter the amount", "deposit");
@@ -528,14 +539,14 @@ export default function PortfolioPage() {
         toastAlert("error", "Insufficient Balance", "deposit");
       }
     } catch (err) {
-      console.log(err, "ererrrr");
+
     }
   };
 
   const balanceChange = (value) => {
-    if (currency == "USDC") {
+    if (currency === "USDC") {
       setDepositAmt(formatNumber(tokenbalance * (value / 100), 4));
-    } else if (currency == "SOL" && value == 100) {
+    } else if (currency === "SOL" && value === 100) {
       setDepositAmt(
         Math.max(
           formatNumber(balance * (value / 100), 4) - 0.001,
@@ -560,7 +571,7 @@ export default function PortfolioPage() {
     if (!provider || !provider.isPhantom) {
       throw new Error("Phantom wallet not found");
     }
-    console.log(provider.publicKey, "provider");
+
     return new AnchorProvider(
       connection,
       {
@@ -575,11 +586,12 @@ export default function PortfolioPage() {
   async function buy() {
     try {
       setloader(true);
-      if (currency == "USDC") {
-        console.log("USDCUSDC");
+      if (currency === "USDC") {
+
         const provider = await getAnchorProvider();
         const program = new Program(depositIDL, programID, provider);
         const connection = provider.connection;
+        console.log("USDCUSDC")
 
         const mint = new PublicKey(config?.tokenMint);
         const receiverPubKey = new PublicKey(config?.adminAdd);
@@ -593,18 +605,10 @@ export default function PortfolioPage() {
           receiverPubKey
         );
 
-        console.log(
-          fromTokenAccount,
-          toTokenAccount,
-          provider.publicKey,
-          "toTokenAccount"
-        );
-
-        // ✅ Check and create receiver ATA if it doesn't exist
         try {
           await getAccount(connection, toTokenAccount);
         } catch (err) {
-          console.log(err, "errrr");
+
           const ataIx = createAssociatedTokenAccountInstruction(
             provider.publicKey, // payer
             toTokenAccount, // ATA to create
@@ -623,7 +627,6 @@ export default function PortfolioPage() {
             signedTx.serialize()
           );
 
-          // ✅ Use finalized commitment for reliable confirmation
           await connection.confirmTransaction(
             { signature: ataTxSig, ...blockhash },
             "finalized"
@@ -633,7 +636,7 @@ export default function PortfolioPage() {
         // Optional: small delay to avoid race condition
         await new Promise((res) => setTimeout(res, 500));
 
-        const amount = new BN(parseFloat(depsoitAmt) * 10 ** 6); // adjust decimals if needed
+        const amount = new BN(parseFloat(depsoitAmt) * 10 ** 6);
 
         const [tokenInfoPDA] = PublicKey.findProgramAddressSync(
           [Buffer.from("supported-token"), mint.toBuffer()],
@@ -689,10 +692,11 @@ export default function PortfolioPage() {
               systemProgram: web3.SystemProgram.programId,
             })
             .rpc({ skipPreflight: false });
-          console.log(tx, "dataaaaatxxxx");
+
         }
 
         settransactionHash(tx);
+        console.log("Transaction hash:", tx);
         setloader(true);
 
         const parsedTx = await connection.getParsedTransaction(tx, {
@@ -710,12 +714,7 @@ export default function PortfolioPage() {
         const preTokenBalances = meta?.preTokenBalances || [];
         const postTokenBalances = meta?.postTokenBalances || [];
         let depositdata = {};
-        console.log(
-          depositdata,
-          preTokenBalances,
-          postTokenBalances,
-          "depositdata"
-        );
+
         // Loop through and compare
         for (let i = 0; i < preTokenBalances.length; i++) {
           const pre = preTokenBalances[0];
@@ -727,13 +726,7 @@ export default function PortfolioPage() {
             Number(post.uiTokenAmount.amount) -
             Number(pre.uiTokenAmount.amount);
           if (change !== 0) {
-            console.log("✅ SPL Token Transfer Detected:");
-            console.log("📤 Owner:", pre.owner);
-            console.log("🪙 Mint:", pre.mint);
-            console.log(
-              "💰 Amount:",
-              Math.abs(change) / 10 ** pre.uiTokenAmount.decimals
-            );
+
             const tokenAmt =
               Math.abs(change) / 10 ** pre.uiTokenAmount.decimals;
             depositdata = {
@@ -744,13 +737,15 @@ export default function PortfolioPage() {
               usdAmt: tokenAmt,
               symbol: "USDC",
             };
-            console.log(depositdata, "depositdata");
+
           }
         }
-        console.log(depositdata, "depositdata");
+
+        console.log(depositdata, "depositdata")
         var { message, status } = await userDeposit(depositdata, dispatch);
         if (status) {
           toastAlert("success", message, "deposit");
+          console.log(depositdata, "depositdata")
           setDepositAmt(0);
           setStep("");
           setTxOpen(true);
@@ -758,7 +753,6 @@ export default function PortfolioPage() {
           if (button) {
             button.click();
           }
-          // await getUser();
         } else {
           toastAlert("error", "failed", "deposit");
           const button = document.querySelector(".modal_close_brn");
@@ -767,12 +761,13 @@ export default function PortfolioPage() {
           }
         }
         setloader(false);
-      } else if (currency == "SOL") {
+      } else if (currency === "SOL") {
         const provider = await getAnchorProvider();
-        console.log(provider.publicKey.toBase58(), "toTokenAccount");
+
         const program = new Program(depositIDL, programID, provider);
         const lamports = new BN(parseFloat(depsoitAmt) * web3.LAMPORTS_PER_SOL);
         const receiverPubKey = new PublicKey(config?.adminAdd);
+        console.log(provider.publicKey.toBase58());
 
         // Derive PDAs
         const [statePDA] = PublicKey.findProgramAddressSync(
@@ -808,7 +803,7 @@ export default function PortfolioPage() {
             .preInstructions([computeUnitLimitIx, priorityFeeIx]) // ✅ Add here
             .rpc({ skipPreflight: false });
         } else {
-          console.log(walletsetting?.priority, "priority");
+
           tx = await program.methods
             .transferSol(lamports)
             .accounts({
@@ -821,7 +816,6 @@ export default function PortfolioPage() {
             })
             .rpc({ skipPreflight: false });
         }
-        console.log(tx, "tx");
 
         settransactionHash(tx);
         setloader(true);
@@ -860,14 +854,11 @@ export default function PortfolioPage() {
         const solAmt = lamports / LAMPORTS_PER_SOL;
         const usdValue = formatNumber(solAmt * tokenValue, 6);
 
-        console.log("TX Hash:", tx);
-        console.log("From:", provider.publicKey.toBase58());
-        console.log("To:", receiverPubKey.toBase58());
-        console.log("Amount (lamports):", lamportsSent);
-        console.log("Amount (SOL):", solAmt);
-        console.log("USD Value ($):", usdValue);
-        console.log("Fee (lamports):", feePaid);
-        console.log("Fee (SOL):", feePaid / LAMPORTS_PER_SOL);
+
+
+
+
+
 
         let depositdata = {
           hash: tx,
@@ -887,7 +878,6 @@ export default function PortfolioPage() {
           if (button) {
             button.click();
           }
-          // await getUser();
         } else {
           toastAlert("error", message, "deposit");
           const button = document.querySelector(".modal_close_brn");
@@ -898,7 +888,7 @@ export default function PortfolioPage() {
         setloader(false);
       }
     } catch (err) {
-      console.log(err, "errr");
+
       setloader(false);
       const button = document.querySelector(".modal_close_brn");
       if (button) {
@@ -910,17 +900,12 @@ export default function PortfolioPage() {
   const handlechange = async (e) => {
     let value = e.target.value;
     setDepositAmt(parseFloat(e.target.value));
-    // let isNum = numberFloatOnly(value);
-    // if (isNum) {
-    //   setshowallowance(false);
-    //   if (value > allowance && currency == "USDC") {
-    //     setshowallowance(true);
     //   }
     // }
   };
 
   const iniDepsotClick = () => {
-    if (isConnected == true) {
+    if (isConnected === true) {
       setStep("1");
       setDepositAmt(0);
       balanceData();
@@ -931,7 +916,7 @@ export default function PortfolioPage() {
       setloader(false);
     } else if (
       !isEmpty(data?.walletAddress) &&
-      data?.walletAddress.toString() != address?.toString() &&
+      data?.walletAddress.toString() !== address?.toString() &&
       isConnected
     ) {
       toastAlert(
@@ -941,7 +926,6 @@ export default function PortfolioPage() {
       );
     } else {
       setOpen(true)
-      // toastAlert("error", "Connect Your Wallet", "deposit");
     }
   };
   const leftPNLPercent = trunc((walletData.pnl1D / (walletData?.balance + walletData?.position)) * 100, 2)
@@ -985,7 +969,7 @@ export default function PortfolioPage() {
                 onClick={() => setOpen(true)}>Connect Wallet</Button>
             )}
           </div>
-          {/* <p>Your Wallet Address : {shortValue(data?.walletAddress)}</p> */}
+          { }
           <br></br>
           {/* 2. Key metrics card area */}
           <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-4 gap-2 sm:mb-6 mb-4">
@@ -1031,7 +1015,7 @@ export default function PortfolioPage() {
                   <span className="text-sm text-gray-500 mt-0">PORTFOLIO</span>
                   <span className="sm:mt-2 mt-0 sm:text-3xl text-2xl font-semibold">
                     {walletData?.balance
-                      ? // ? PnLFormatted(formatNumber(walletData?.balance - walletData?.locked, 2))
+                      ?
                       PnLFormatted(
                         formatNumber(
                           walletData?.balance + walletData?.position,
@@ -1075,25 +1059,25 @@ export default function PortfolioPage() {
                         Deposit
                       </Button>
                     </Dialog.Trigger>
-                    {isConnected == true && txopen == false && check == false && (
+                    {isConnected === true && txopen === false && check === false && (
                       <Dialog.Portal>
                         <Dialog.Overlay className="DialogOverlay" />
                         <Dialog.Content className="DialogContent">
-                          {(step == "1" || step == "2" || step == "3") && (
+                          {(step === "1" || step === "2" || step === "3") && (
                             <Dialog.Title className="DialogTitle">
                               Deposit
                             </Dialog.Title>
                           )}
-                          {(step == "1" || step == "2" || step == "3") && (
+                          {(step === "1" || step === "2" || step === "3") && (
                             <p className="text-center text-[12px] text-gray-400 mb-0">
                               Available Balance:{" "}
                               {currency === "USDC"
                                 ? `${tokenbalance} ${currency}`
                                 : `${balance} ${currency ? currency : "SOL"}`}
-                              {/* {formatNumber(balance * usdConvt, 4)} */}
+                              { }
                             </p>
                           )}
-                          {step == "1" && (
+                          {step === "1" && (
                             <div className="deposit_step deposit_step1">
                               {/* Wallet Info Button */}
                               <Button className="mt-4 w-full google_btn flex-col items-start">
@@ -1200,7 +1184,7 @@ export default function PortfolioPage() {
                               </Button>
                             </div>
                           )}
-                          {step == "2" && (
+                          {step === "2" && (
                             <div className="deposit_step deposit_step1">
                               {/* Deposit Form Step 2 */}
                               <Button
@@ -1244,7 +1228,7 @@ export default function PortfolioPage() {
                               </div>
                               <p className="text-[12px] text-gray-400 text-center mt-8">
                                 {`${minDeposit} ${currency} minimum deposit`}
-                                {/* `${minDeposit} ${currency} minimum deposit`} */}
+                                { }
                               </p>
                               <div
                                 className="flex gap-3 items-center justify-between sm:flex-nowrap flex-wrap py-3 px-4 border border-[#3d3d3d] rounded-full sm:w-[60%] w-[100%] m-auto mt-3
@@ -1253,7 +1237,7 @@ export default function PortfolioPage() {
                                 <div className="flex items-center gap-2">
                                   <Image
                                     src={
-                                      currency == "USDC"
+                                      currency === "USDC"
                                         ? "/images/usdc.svg"
                                         : "/images/solana.png"
                                     }
@@ -1301,7 +1285,7 @@ export default function PortfolioPage() {
                               </Button>
                             </div>
                           )}
-                          {step == "3" && (
+                          {step === "3" && (
                             <div className="deposit_step deposit_step1">
                               {/* Deposit Form Step 3 */}
                               <Button
@@ -1325,8 +1309,9 @@ export default function PortfolioPage() {
                                   strokeWidth={1.5}
                                   trailStrokeWidth={1.5}
                                   onComplete={() => {
-                                    console.log("Timer completed!");
+
                                     setStep("");
+                                    console.log("Timer completed!");
                                     const button =
                                       document.querySelector(
                                         ".modal_close_brn"
@@ -1386,7 +1371,7 @@ export default function PortfolioPage() {
                                 <div className="flex gap-2 items-center">
                                   <Image
                                     src={
-                                      currency == "USDC"
+                                      currency === "USDC"
                                         ? "/images/usdc.svg"
                                         : "/images/solana.png"
                                     }
@@ -1412,7 +1397,7 @@ export default function PortfolioPage() {
                                     height={18}
                                   />
                                   <span className="text-[14px] text-gray-200">
-                                    {currency == "USDC"
+                                    {currency === "USDC"
                                       ? `${depsoitAmt} USDC`
                                       : `${formatNumber(
                                         depsoitAmt * tokenValue,
@@ -1550,9 +1535,7 @@ export default function PortfolioPage() {
                           />
                         </svg>
 
-                        {/* <div className="text-light mt-4 text-lg">
-                          You will receive: <strong>{currency == "USDC" ? `${depsoitAmt} USDC` : `${tokenAmt} USDC`}</strong>
-                        </div> */}
+                        { }
 
                         {transactionHash && (
                           <a
@@ -1606,8 +1589,8 @@ export default function PortfolioPage() {
                 </div>
                 <div className="justify-center items-center p-0 m-0 scale-90 sm:scale-100 origin-top-left sm:origin-center" style={{ minHeight: 0, minWidth: 0 }}>
                   <ChartIntervals
-                    interval={interval}
-                    setInterval={setInterval}
+                    interval={chartInterval}
+                    setInterval={setChartInterval}
                     isAllDisable={true}
                   />
                 </div>

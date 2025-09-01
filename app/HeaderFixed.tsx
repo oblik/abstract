@@ -1,0 +1,224 @@
+"use client";
+import Link from "next/link";
+import Image from "next/image";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+import {
+  HomeIcon,
+  MagnifyingGlassIcon,
+  HamburgerMenuIcon,
+  Cross1Icon,
+  PersonIcon,
+} from "@radix-ui/react-icons";
+import { Button } from "./components/ui/button";
+import SearchComponent from "./components/customComponents/SearchComponent";
+import { useSelector } from "@/store";
+import { availableBalance } from "@/lib/utils";
+import {
+  Drawer,
+  DrawerTrigger,
+  DrawerContent,
+  DrawerTitle,
+  DrawerHeader,
+} from "@/app/components/ui/drawer";
+
+export default function HeaderFixed() {
+  const router = useRouter();
+  const [activeMenu, setActiveMenu] = useState("home");
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { signedIn } = useSelector((state) => state?.auth?.session);
+  const user = useSelector((state) => state?.auth?.user);
+  const walletData = useSelector((state: any) => state?.wallet?.data);
+  const navigateToPortfolioPage = () => router.push("/portfolio");
+
+  // Lock body scroll when drawer is open
+  useEffect(() => {
+    if (isOpen || isSearchOpen) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen, isSearchOpen]);
+
+
+  return (
+    <>
+      {/* Drawer Overlay */}
+      <div
+        className={cn(
+          "fixed inset-0 bg-black z-[99999] transition-opacity duration-200",
+          isOpen || isSearchOpen
+            ? "opacity-80 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        )}
+        onClick={() => {
+          setIsOpen(false);
+          setIsSearchOpen(false);
+        }}
+      />
+
+      {/* Side Drawer */}
+      <div
+        className={cn(
+          "fixed top-0 left-0 w-[85vw] max-w-[320px] h-full bg-black z-[99999] shadow-2xl transition-transform duration-200 ease-in-out will-change-transform border-r",
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+        style={{ borderRight: '1px solid #282828' }}
+      >
+        {/* Close Button */}
+        { }
+
+        {/* Menu Items */}
+
+        {signedIn && (
+          <div className="flex flex-col items-start gap-1 mt-4 mb-0 pl-3">
+            <button
+              className="px-3 py-2 text-left w-full"
+              onClick={navigateToPortfolioPage}
+            >
+              <div className="text-xs text-gray">Cash</div>
+              <div className="text-lg text-[#33ff4c]">
+                ${Number(availableBalance(walletData)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+            </button>
+            <button
+              className="px-3 py-2 text-left w-full"
+              onClick={() => navigateToPortfolioPage()}
+            >
+              <div className="text-xs text-gray">Portfolio</div>
+              <div className="text-lg text-[#33ff4c]">
+                ${Number(walletData?.balance + walletData?.position).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+            </button>
+          </div>
+        )}
+
+        <nav className="flex flex-col items-start gap-1 mt-0 pt-0 mb-0 pl-3">
+          {signedIn && (
+            <Link
+              href="/settings"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm hover:bg-[#232b3a] transition"
+              onClick={() => setIsOpen(false)}
+            >
+              Settings
+            </Link>
+          )}
+          <Link
+            href="https://sonotrade.gitbook.io/sonotrade-docs/#overview"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm hover:bg-[#232b3a] transition"
+          >
+            Beginner’s Guide
+          </Link>
+          <Link
+            href="/about"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm hover:bg-[#232b3a] transition"
+            onClick={() => setIsOpen(false)}
+          >
+            About
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm hover:bg-[#232b3a] transition"
+            onClick={() => setIsOpen(false)}
+          >
+            Waitlist
+          </Link>
+          <Link
+            href="/terms"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-white text-sm hover:bg-[#232b3a] transition"
+            onClick={() => setIsOpen(false)}
+          >
+            Terms of Use
+          </Link>
+        </nav>
+      </div>
+
+      {/* Search Bar */}
+      <Drawer open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+        <DrawerContent className="h-[80vh] z-[9999999] rounded-t-2xl bg-black border border-grey-500 lg:hidden">
+          {/* Hidden DrawerTitle to satisfy component requirements */}
+          <div hidden>
+            <DrawerHeader>
+              <DrawerTitle>Hidden Title</DrawerTitle>
+            </DrawerHeader>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex z-[9999999] justify-between items-center px-4 py-3 border-b border-[#232b3a]">
+            <span className="text-lg font-semibold text-white">Search</span>
+            <button
+              className="text-gray-400 hover:text-white text-2xl"
+              onClick={() => setIsSearchOpen(false)}
+            >
+              &times;
+            </button>
+          </div>
+          <div className="p-4">
+            <SearchComponent />
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Bottom Nav */}
+      <div className="bottom-nav-fixed h-16 flex lg:hidden bg-black border-t border-[#1E1E1E] z-[9999] px-8 md:px-20">
+        <Link
+          href="/"
+          className={cn(
+            "w-9 h-9 flex flex-col items-center gap-1",
+            activeMenu === "home" ? "text-white" : "text-gray-500"
+          )}
+          onClick={() => setActiveMenu("home")}
+        >
+          <HomeIcon className="w-6 h-6" />
+          <span className="text-xs font-normal">Home</span>
+        </Link>
+        <button
+          className="w-9 h-9 flex flex-col items-center gap-1 text-gray-500 hover:text-white focus:text-white"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setActiveMenu("search");
+            setIsSearchOpen(true);
+            setIsOpen(false);
+          }}
+          onTouchStart={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <MagnifyingGlassIcon className="w-10 h-10" />
+          <span className="text-xs font-normal">Search</span>
+        </button>
+        <Link
+          href={"/profile/@" + user.uniqueId}
+          className={cn(
+            "w-9 h-9 flex flex-col items-center gap-1",
+            activeMenu === "profile" ? "text-white" : "text-zinc-600"
+          )}
+          onClick={() => setActiveMenu("profile")}
+        >
+          <PersonIcon className="w-6 h-6" />
+          <span className="text-xs font-normal">Profile</span>
+        </Link>
+        <button
+          onClick={() => {
+            setActiveMenu("more");
+            setIsOpen(!isOpen);
+            setIsSearchOpen(false);
+          }}
+          className="w-9 h-9 flex flex-col items-center gap-1 text-gray-500 hover:text-white focus:text-white"
+        >
+          {!isOpen ? (
+            <HamburgerMenuIcon className="w-6 h-6" />
+          ) : (
+            <Cross1Icon className="w-6 h-6" />
+          )}
+          <span className="text-xs font-normal">More</span>
+        </button>
+      </div>
+    </>
+  );
+}

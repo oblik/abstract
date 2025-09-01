@@ -215,7 +215,7 @@ export default function Home({ infoCardCms, categories, tags }) {
               selectedSubcategory={selectedSubcategory}
               setSelectedSubcategory={setSelectedSubcategory}
             />
-            <div className="hidden sm:block">
+            <div>
               {
                 isEmpty(categoryParam) && (
                   <>

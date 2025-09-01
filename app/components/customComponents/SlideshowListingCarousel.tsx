@@ -2,14 +2,15 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Divide, Loader } from "lucide-react";
+import { Loader } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, CarouselPagination } from "@/app/components/ui/carousel";
 import ChartWidget from "@/app/components/customComponents/ChartWidget";
 import MonthlyListenersChartWidget from "@/app/components/customComponents/MonthlyListenersChartWidget";
+import Chart from "@/app/components/customComponents/Chart";
+import MonthlyListenersChart2 from "@/app/components/customComponents/MonthlyListenersChart2";
 import { Button } from "@/app/components/ui/button";
 import { getEvents, getEventById } from "@/services/market";
 import { SelectSeparator } from "@/app/components/ui/select";
-
 
 interface Event {
   _id: string;
@@ -39,9 +40,7 @@ export default function SlideshowListingCarousel() {
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 640);
-    };
+    const checkIsMobile = () => setIsMobile(window.innerWidth < 640);
     checkIsMobile();
     window.addEventListener("resize", checkIsMobile);
     return () => window.removeEventListener("resize", checkIsMobile);
@@ -79,14 +78,41 @@ export default function SlideshowListingCarousel() {
   }
 
   return (
-    <div className="w-full max-w-screen overflow-hidden lg:block hidden">
-      <div className="relative w-full h-[410px]">
+    <div className="pb-3 pt-0 sm:pb-0 w-full max-w-screen overflow-hidden">
+      <div className={`relative w-full ${isMobile ? "h-auto" : "h-[410px]"} lg:block`}>
         <Carousel autoPlayInterval={12000}>
           <CarouselContent>
-            {events?.map((event, index) => {
-              if (isMobile && index % 3 === 2) return null;
-              return (
-                <CarouselItem key={event?._id}>
+            {events?.map((event) => (
+              isMobile ? (
+                <CarouselItem key={event._id}>
+                  <div className="w-full h-full px-[1.5] pt-0">
+                    {event.forecast ? (
+                      <MonthlyListenersChart2
+                        image={event.image || "/images/logo.png"}
+                        endDate={event.endDate}
+                        market={event.marketId || []}
+                        eventSlug={event.slug}
+                        interval={"all"}
+                        title={event.title}
+                        volume={event.marketId?.reduce((acc, mark) => acc + (mark.volume || 0), 0) || 0}
+                        series={""}
+                      />
+                    ) : (
+                      <Chart
+                        title={event.title}
+                        id={event.slug}
+                        image={event.image || "/images/logo.png"}
+                        endDate={event.endDate}
+                        market={event.marketId || []}
+                        interval={"all"}
+                        chance={event.marketId?.[0]?.odd || 0}
+                        volume={event.marketId?.reduce((acc, mark) => acc + (mark.volume || 0), 0) || 0}
+                      />
+                    )}
+                  </div>
+                </CarouselItem>
+              ) : (
+                <CarouselItem key={event._id}>
                   <div className="flex px-0 py-6 justify-center items-center w-full h-full">
                     {/* Left: Event Info + Options */}
                     <div className="flex flex-col justify-start w-full h-full min-w-[260px]">
@@ -97,36 +123,26 @@ export default function SlideshowListingCarousel() {
                           className="flex items-center gap-3 group"
                           style={{ textDecoration: 'none' }}
                         >
-                          <div
-                            style={{
-                              width: "70px",
-                              aspectRatio: "1/1",
-                              overflow: "hidden",
-                              borderRadius: "10px",
-                              background: "#181818",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center"
-                            }}
-                          >
+                          <div className="w-16 aspect-square overflow-hidden rounded-lg bg-[#181818] flex items-center justify-center">
                             <Image
                               src={event.image || "/images/logo.png"}
                               alt="Event"
                               width={70}
                               height={70}
-                              style={{ width: "100%", height: "100%", objectFit: "cover", aspectRatio: "1/1" }}
+                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
                             />
                           </div>
                           <div
-                            className="text-xl font-bold text-white max-w-[400px] leading-tight line-clamp-2 flex items-center"
-                            style={{ display: "flex", alignItems: "center" }}
+                            className="text-xl font-bold text-white max-w-[400px] leading-tight line-clamp-2"
                             title={event.title}
                           >
                             {event.title}
                           </div>
                         </Link>
                       </div>
-                      {Array.isArray(event.marketId) && event.marketId?.length > 0 && (
+
+                      {/* Markets */}
+                      {Array.isArray(event.marketId) && event.marketId.length > 0 && (
                         <div className="w-full flex flex-col gap-2 mt-2 relative">
                           {event.marketId
                             .slice()
@@ -139,19 +155,18 @@ export default function SlideshowListingCarousel() {
                                 className="block"
                                 style={{ textDecoration: 'none' }}
                               >
-                                <div
-                                  className="flex items-center justify-between w-full bg-black rounded-md px-2 pl-0 py-1 hover:bg-[#0f0f0f] transition-colors cursor-pointer"
-                                >
+                                <div className="flex items-center justify-between w-full bg-black rounded-md px-2 pl-0 py-1 hover:bg-[#0f0f0f] transition-colors cursor-pointer">
                                   <span className="text-sm text-gray-300 max-w-[220px]">
-                                    {event.marketId?.length === 1
+                                    {event.marketId && event.marketId.length === 1
                                       ? "Outcomes"
-                                      : (market.groupItemTitle || market.outcome?.[0]?.title || (idx === 0 ? "Yes" : "No"))}
+                                      : (market.groupItemTitle || market.outcome?.[0]?.title || (idx === 0 ? "Yes" : "No"))
+                                    }
                                   </span>
                                   <span className="flex items-center gap-2 ml-2">
                                     <span className="text-white text-sm font-bold">
                                       {market.odd !== undefined && market.odd !== null ? market.odd : "--"}%
                                     </span>
-                                    {/* Yes/No buttons */}
+
                                     <div className="ml-3 relative group" style={{ minWidth: 40 }}>
                                       <Button
                                         variant="ghost"
@@ -160,17 +175,11 @@ export default function SlideshowListingCarousel() {
                                       >
                                         {market.outcome?.[0]?.title || "Yes"}
                                       </Button>
-                                      {/* Tron blue border animation - hover only */}
                                       <div className="absolute inset-0 rounded-md z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                         <div className="absolute inset-0 rounded-md border border-[#00d4ff] animate-border-glow"></div>
-                                        <div className="absolute inset-0 rounded-md">
-                                          <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#00d4ff] to-transparent animate-line-flow" style={{ animationDelay: '0.2s' }}></div>
-                                          <div className="absolute top-0 right-0 w-0.5 h-full bg-gradient-to-b from-transparent via-[#00d4ff] to-transparent animate-line-flow-vertical" style={{ animationDelay: '0.7s' }}></div>
-                                          <div className="absolute bottom-0 right-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#00d4ff] to-transparent animate-line-flow" style={{ animationDelay: '1.2s' }}></div>
-                                          <div className="absolute bottom-0 left-0 w-0.5 h-full bg-gradient-to-b from-transparent via-[#00d4ff] to-transparent animate-line-flow-vertical" style={{ animationDelay: '1.7s' }}></div>
-                                        </div>
                                       </div>
                                     </div>
+
                                     <div className="relative group" style={{ minWidth: 40 }}>
                                       <Button
                                         variant="ghost"
@@ -179,19 +188,11 @@ export default function SlideshowListingCarousel() {
                                       >
                                         {market.outcome?.[1]?.title || "No"}
                                       </Button>
-                                      {/* Pink border animation - hover only */}
                                       <div className="absolute inset-0 rounded-md z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                         <div className="absolute inset-0 rounded-md border border-[#ec4899] animate-border-glow"></div>
-                                        <div className="absolute inset-0 rounded-md">
-                                          <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#ec4899] to-transparent animate-line-flow" style={{ animationDelay: '0.2s' }}></div>
-                                          <div className="absolute top-0 right-0 w-0.5 h-full bg-gradient-to-b from-transparent via-[#ec4899] to-transparent animate-line-flow-vertical" style={{ animationDelay: '0.7s' }}></div>
-                                          <div className="absolute bottom-0 right-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#ec4899] to-transparent animate-line-flow" style={{ animationDelay: '1.2s' }}></div>
-                                          <div className="absolute bottom-0 left-0 w-0.5 h-full bg-gradient-to-b from-transparent via-[#ec4899] to-transparent animate-line-flow-vertical" style={{ animationDelay: '1.7s' }}></div>
-                                        </div>
                                       </div>
                                     </div>
                                   </span>
-                                  <div className="pointer-events-none absolute mb-1 left-0 right-0 bottom-0 h-24 bg-gradient-to-t from-black/50 to-transparent rounded-b-md z-30" />
                                 </div>
                               </Link>
                             ))}
@@ -199,7 +200,7 @@ export default function SlideshowListingCarousel() {
                         </div>
                       )}
 
-                      {/* Event Description at the bottom */}
+                      {/* Event Description + Volume + End Date */}
                       <div className="flex w-max flex-col items-start gap-1 mb-1 mt-3">
                         {event.endDate && (
                           <div className="text-xs text-gray-400 flex mt-1 mb-1 items-center gap-1">
@@ -219,21 +220,22 @@ export default function SlideshowListingCarousel() {
                             <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                           </svg>
                           <span className="text-white">Volume </span>
-                          <span> ${((event.marketId?.reduce((acc, mark) => acc + (mark.volume || 0), 0) || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          <span>
+                            ${((event.marketId?.reduce((acc, mark) => acc + (mark.volume || 0), 0) || 0) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
                         </div>
                       </div>
 
                       {event.description && (
                         <div className="w-full pb-6 mt-1 text-xs break-words leading-relaxed" style={{ lineHeight: '1.7' }}>
-                          <div className="w-full block" style={{ wordBreak: 'break-word' }}>
-                            <p className="w-full text-gray-400 line-clamp-2">
-                              <span className="text-white">Rules </span>
-                              {event.description}
-                            </p>
-                          </div>
+                          <p className="w-full text-gray-400 line-clamp-2">
+                            <span className="text-white">Rules </span>
+                            {event.description}
+                          </p>
                         </div>
                       )}
                     </div>
+
                     {/* Right: Chart */}
                     <div className="pl-6 flex-1 w-full h-full">
                       {event.forecast ? (
@@ -260,8 +262,8 @@ export default function SlideshowListingCarousel() {
                     </div>
                   </div>
                 </CarouselItem>
-              );
-            })}
+              )
+            ))}
           </CarouselContent>
           <CarouselPagination />
           <CarouselPrevious />

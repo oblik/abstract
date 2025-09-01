@@ -327,7 +327,7 @@ const MultiListenersChart2: React.FC<MultiListenersChart2Props> = ({
       >
         <div>
           <CardHeader className="space-y-0 p-0">
-            <CardTitle style={{ lineHeight: "1.5" }} className="pt-3 sm:pb-1 pb-2 sm:pt-0">
+            <CardTitle style={{ lineHeight: "1.5" }} className="pt-0 sm:pb-1 pb-2 sm:pt-0">
               <div style={{ display: "flex", alignItems: "center" }}>
                 <div
                   style={{

@@ -362,7 +362,7 @@ export default function EventPage({ categories }) {
               <Loader className="w-26 h-26 animate-spin bg-blend-overlay" />
             </div>
           ) : (
-            <div className="px-1.5 sm:px-0 sm:mx-auto mx-0 sm:pt-4 pt-0">
+            <div className="px-1.5 sm:px-0 sm:mx-auto mx-0 sm:pt-4 pt-3">
               {/* Preview Card Section */}
               <div className="flex justify-center items-center">
                 <div className="flex justify-center sm:max-w-8xl mb-0 w-full gap-5">
@@ -737,7 +737,7 @@ export default function EventPage({ categories }) {
                           {/* Hidden DrawerTitle to satisfy component requirements */}
                           <div hidden>
                             <DrawerHeader>
-                              <DrawerTitle>Hidden Title</DrawerTitle>
+                              <DrawerTitle></DrawerTitle>
                             </DrawerHeader>
                           </div>
 
@@ -774,7 +774,7 @@ export default function EventPage({ categories }) {
                           {/* Hidden DrawerTitle to satisfy component requirements */}
                           <div hidden>
                             <DrawerHeader>
-                              <DrawerTitle>Hidden Title</DrawerTitle>
+                              <DrawerTitle></DrawerTitle>
                             </DrawerHeader>
                           </div>
 

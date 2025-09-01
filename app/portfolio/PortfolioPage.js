@@ -207,11 +207,14 @@ export default function PortfolioPage() {
       }
 
       const { success, result } = await getUserPnL(chartInterval);
+      const { success: success1, result: result1 } = await getUserPnL("1d");
 
       if (success) {
         setProfitAmount(result?.totalPnl / 100);
         console.log("success,result", success, result);
-        setTodayReal(result?.totalPnl / 100);
+      }
+      if (success1) {
+        setTodayReal(result1?.totalPnl / 100);
       }
     } catch (err) {
       console.log(err, "errr")
@@ -928,8 +931,8 @@ export default function PortfolioPage() {
       setOpen(true)
     }
   };
-  const leftPNLPercent = trunc((walletData.pnl1D / (walletData?.balance + walletData?.position)) * 100, 2)
-  const todayRealPercent = trunc((todayReal / profitAmount) * 100, 2)
+  const leftPNLPercent = trunc(((walletData?.position + walletData?.locked) / (walletData?.balance + walletData?.position)) * 100, 2)
+  const todayRealPercent = profitAmount === 0 ? 100 : trunc((todayReal / profitAmount) * 100, 2)
   return (
     <>
       <div className="px-0 pb-20 sm:px-0 text-white bg-black h-auto items-center justify-items-center p-0 m-0">
@@ -990,12 +993,10 @@ export default function PortfolioPage() {
                     <TooltipTrigger asChild>
                       <span className="cursor-pointer">
                         {walletData?.balance
-                          ? PnLFormatted(
-                            formatNumber(
-                              walletData?.balance - walletData?.locked,
-                              2
-                            )
-                          )
+                          ?
+                          Number(walletData?.balance - walletData?.locked).toLocaleString('en-US', {
+                            style: 'currency', currency: 'USD', minimumFractionDigits: 2
+                          })
                           : 0}
                       </span>
                     </TooltipTrigger>
@@ -1014,21 +1015,25 @@ export default function PortfolioPage() {
                 <div className="flex flex-col items-left">
                   <span className="text-sm text-gray-500 mt-0">PORTFOLIO</span>
                   <span className="sm:mt-2 mt-0 sm:text-3xl text-2xl font-semibold">
-                    {walletData?.balance
+                    {walletData?.balance && walletData?.position !== undefined
                       ?
-                      PnLFormatted(
-                        formatNumber(
-                          walletData?.balance + walletData?.position,
-                          2
-                        )
-                      )
-                      : 0}
+                      Number(walletData?.balance + walletData?.position).toLocaleString('en-US', {
+                        style: 'currency', currency: 'USD', minimumFractionDigits: 2
+                      })
+
+                      : '$0.00'}
                   </span>
                   <span className="text-sm text-gray-500 mt-1">
-                    <span className={walletData.pnl1D >= 0 ? "text-green-500" : "text-red-500"}>{walletData.pnl1D < 0 && "-"}${Math.abs(trunc(walletData.pnl1D, 2))}
-                      {" "}
-                      <span className={leftPNLPercent >= 0 ? "text-green-500" : "text-red-500"}>({trunc(leftPNLPercent, 2)}%)</span>
-                    </span> Today
+                    <span className={(walletData?.position + walletData?.locked) >= 0 ? "text-green-500" : "text-red-500"}>
+                      {Number(walletData?.position + walletData?.locked).toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 2
+                      })}{" "}
+                      <span className={((walletData?.position + walletData?.locked) >= 0 ? "text-green-500" : "text-red-500")}>
+                        ({trunc(leftPNLPercent, 2)}%)
+                      </span>
+                    </span> Positions
                   </span>
                 </div>
               </div>
@@ -1578,11 +1583,14 @@ export default function PortfolioPage() {
                     className={`sm:mt-2 mt-0 sm:text-3xl text-2xl font-semibold ${profitAmount >= 0 ? "text-green-400" : "text-red-400"
                       }`}
                   >
-                    {PnLFormatted(formatNumber(profitAmount, 2))}
+                    {Number(profitAmount).toLocaleString('en-US', {
+                      style: 'currency', currency: 'USD', minimumFractionDigits: 2
+                    })}
                   </span>
                   <span className="text-sm text-gray-500 mt-1">
-                    <span className={todayReal >= 0 ? "text-green-500" : "text-red-500"}>{todayReal < 0 && "-"}${Math.abs(trunc(todayReal, 2))}
-                      {" "}
+                    <span className={todayReal >= 0 ? "text-green-500" : "text-red-500"}>{todayReal < 0 && "-"}{Number(todayReal).toLocaleString('en-US', {
+                      style: 'currency', currency: 'USD', minimumFractionDigits: 2
+                    })} {" "}
                       <span className={todayRealPercent >= 0 ? "text-green-500" : "text-red-500"}>({trunc(todayRealPercent, 2)}%)</span>
                     </span> Today
                   </span>

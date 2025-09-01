@@ -19,7 +19,7 @@ interface MarketOrderProps {
     bids: [string, number][];
     asks: [string, number][];
   };
-takerFee?: number;
+  takerFee?: number;
 }
 
 const initialFormValue = {
@@ -96,6 +96,39 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
     setErrors({});
   }, [activeView, buyorsell, marketId]);
 
+  // Auto-scroll when input values change to show updated stats
+  useEffect(() => {
+    if ((buyorsell === "buy" && ordVal) || (buyorsell === "sell" && amount)) {
+      // Small delay to ensure DOM has updated
+      setTimeout(() => {
+        const drawerContent = document.querySelector('.drawer-content, [data-vaul-drawer-wrapper]');
+        const tradingCard = document.querySelector('.drawer-content .trading_card');
+
+        if (drawerContent && tradingCard) {
+          // Add auto-scroll class for CSS behavior
+          tradingCard.classList.add('auto-scroll-bottom');
+
+          // Programmatically scroll to bottom
+          drawerContent.scrollTo({
+            top: drawerContent.scrollHeight,
+            behavior: 'smooth'
+          });
+
+          // Also scroll the trading card container itself
+          tradingCard.scrollTo({
+            top: tradingCard.scrollHeight,
+            behavior: 'smooth'
+          });
+
+          // Remove class after animation
+          setTimeout(() => {
+            tradingCard.classList.remove('auto-scroll-bottom');
+          }, 500);
+        }
+      }, 100);
+    }
+  }, [ordVal, amount, buyorsell]);
+
   const handlePlaceOrder = useCallback(async (action: any) => {
     if (!marketOrderValidation()) return;
 
@@ -142,7 +175,7 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
   let totalCost = 0;
   let avgPrice = "-";
   let payout = "-";
-  
+
 
   if (activeView === "Yes" && isBuy) {
     priceLevels = [...orderBook.asks].sort((a, b) => Number(b[0]) - Number(a[0]))
@@ -157,7 +190,7 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
   }
 
   if (isBuy) {
-let remaining = feeAdjustedOrdVal * 100;
+    let remaining = feeAdjustedOrdVal * 100;
     for (const [price, qty] of priceLevels) {
       let priceNum = Number(price);
       const maxContracts = Math.min(Math.floor(remaining / priceNum), qty);
@@ -181,7 +214,7 @@ let remaining = feeAdjustedOrdVal * 100;
       if (remaining <= 0) break;
     }
     contracts = contractsFilled;
-    payout = "$" + toFixedDown((totalRevenue / 100) * (1 - (takerFee || 0)/100), 2);
+    payout = "$" + toFixedDown((totalRevenue / 100) * (1 - (takerFee || 0) / 100), 2);
 
   }
 
@@ -192,11 +225,14 @@ let remaining = feeAdjustedOrdVal * 100;
           <div className="w-full flex items-center border border-input rounded-md bg-background px-0 py-0 h-12 overflow-hidden">
             <Input
               type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               value={buyorsell === "buy" ? ordVal : amount}
               name={buyorsell === "buy" ? "ordVal" : "amount"}
               placeholder="Amount"
               onChange={handleChange}
-              className="border-0 text-left bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+              className="border-0 text-left bg-transparent text-base focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+              style={{ fontSize: '16px' }}
             />
             <span className="cursor-default text-[16px] p-3">
               {buyorsell === "buy" ? "USD" : "Contracts"}
@@ -227,28 +263,32 @@ let remaining = feeAdjustedOrdVal * 100;
               <span className="text-muted-foreground"> wins</span>
             </div>
           ) : (
-            <span className="text-muted-foreground">Total return</span>
+            <div>
+              <span className="text-white">Total return</span>
+              <span className="text-muted-foreground"> (incl. {Number(takerFee || 0)}% fee)</span>
+            </div>
           )}
           <span className="text-green-500">{payout}</span>
         </div>
       </div>
 
       <div className="pt-4">
-        {signedIn ? (
-          <Button
-            className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300"
-            onClick={() => handlePlaceOrder(buyorsell)}
-            disabled={orderBtn ? false : true}
-          >
-            {`${buyorsell === "buy" ? "Buy" : "Sell"} ${
-              activeView === "Yes" ? firstLetterCase(outcomes?.[0]?.title || "yes") : firstLetterCase(outcomes?.[1]?.title || "no")
-            }`}
-          </Button>
-        ) : (
-          <Button className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300">
-            Login
-          </Button>
-        )}
+        <div className="trade-button-container">
+          {signedIn ? (
+            <Button
+              className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300"
+              onClick={() => handlePlaceOrder(buyorsell)}
+              disabled={orderBtn ? false : true}
+            >
+              {`${buyorsell === "buy" ? "Buy" : "Sell"} ${activeView === "Yes" ? firstLetterCase(outcomes?.[0]?.title || "yes") : firstLetterCase(outcomes?.[1]?.title || "no")
+                }`}
+            </Button>
+          ) : (
+            <Button className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300">
+              Login
+            </Button>
+          )}
+        </div>
       </div>
     </>
   );

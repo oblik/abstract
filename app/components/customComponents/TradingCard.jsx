@@ -122,7 +122,7 @@ export function TradingCard({
 
   return (
     <Card
-      className="w-[100%] trading_card border border-[#282828] min-h-[480px] pb-6 sm:min-h-[unset] sm:pb-0"
+      className="w-[100%] trading_card border border-[#282828] h-auto pb-0 sm:min-h-[unset] sm:pb-0"
       style={{
         backgroundColor: "#000000",
         boxShadow: "0 2px 6px 0 rgba(220,220,255,0.13)",
@@ -181,7 +181,7 @@ export function TradingCard({
             </div>
             <div className="w-full h-px bg-gray-600"></div>
             <TabsContent value="buy">
-              <h1 className="pb-1 flex justify-between items-center min-h-[40px]">
+              <h1 className="pb-1 flex justify-between items-center h-auto">
                 <span className="flex items-center gap-1">
                   Pick side{" "}
                   <TooltipProvider>
@@ -209,7 +209,7 @@ export function TradingCard({
               </h1>
             </TabsContent>
             <TabsContent value="sell">
-              <h1 className="pb-1 flex justify-between items-center min-h-[40px]">
+              <h1 className="pb-1 flex justify-between items-center h-auto">
                 <span className="flex items-center gap-1">
                   Your position{" "}
                   <TooltipProvider>

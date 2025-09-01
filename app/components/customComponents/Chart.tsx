@@ -228,138 +228,67 @@ const Chart: React.FC<ChartProps> = ({
 
     const fetchData = useCallback(async () => {
         try {
-            console.log('Chart fetchData called with:', { selectedYes, interval });
+            console.log('Chart fetchData called with:', { selectedYes, interval, id, market });
             // Request all available data by setting interval to "all"
-            const data = {
-                market: selectedYes ? "yes" : "no",
-                interval: "all",
-                fidelity: 30,
+            const payload = {
+                start_ts: getIntervalDate("all"),
+                end_ts: new Date().getTime(),
             };
 
-            const response = await getPriceHistory(id, data as any);
+            console.log('Chart: Making API call to getForecastHistory with payload:', payload);
+            const response = await getForecastHistory(id, payload as any);
+            console.log('Chart: Raw API response:', response);
 
             if (checkApiSuccess(response)) {
                 console.log('Chart API response success');
                 const result = getResponseResult(response) || [];
-                let assetKeysData = result.map((item: any, index: any) => {
-                    return {
-                        label: item.groupItemTitle,
-                        color: ChartColors[index],
-                        asset: `${index + 1}`,
-                    };
-                });
-                if (market.length > 1) {
-                    // Sort markets by odds to get the top 4 with highest odds
-                    const sortedMarkets = [...market].sort((a, b) => {
-                        const aOdd = selectedYes ? a.odd : 100 - a.odd;
-                        const bOdd = selectedYes ? b.odd : 100 - b.odd;
-                        return bOdd - aOdd;
-                    });
+                console.log('Chart: Processed result:', result);
 
-                    // Take only the top 4 markets with highest odds
-                    const top4Markets = sortedMarkets.slice(0, 4);
-
-
-                    // Update assetKeysData to match the top 4 markets
-                    const top4AssetKeys = top4Markets.map((marketItem: any, index: any) => {
-                        return {
-                            label: marketItem.groupItemTitle,
-                            color: ChartColors[index],
-                            asset: `asset${index + 1}`,
-                            odd: selectedYes ? marketItem.odd : 100 - marketItem.odd,
-                            fullLabel: `${marketItem.groupItemTitle} ${selectedYes ? 'Yes' : 'No'}` // Add full label with Yes/No
-                        };
-                    });
-
-                    setChartConfig(top4AssetKeys);
-
-                    // Filter and reorder result data to match the top 4 markets
-                    const orderedResultData: (any | null)[] = [];
-                    for (const marketItem of top4Markets) {
-                        const matchingResult: any | undefined = result.find((resultItem: any) =>
-                            resultItem.groupItemTitle === marketItem.groupItemTitle
-                        );
-                        if (matchingResult) {
-                            orderedResultData.push(matchingResult);
-                        } else {
-
-                            // Push null to maintain array structure
-                            orderedResultData.push(null);
-                        }
-                        console.warn(`No data found for market: ${marketItem.groupItemTitle}`)
-                    }
-
-                    let t = orderedResultData.map((item) => item ? item.data : []);
-                    let formattedData = t.map((innerArray) => {
-                        if (!innerArray || innerArray.length === 0) return [];
-                        return innerArray.map((item) => {
-                            let formattedTime = Math.floor(new Date(item.t).getTime() / 1000);
-                            return { t: formattedTime, p: item.p / 100 };
-                        });
-                    });
-
-                    if (selectedYes) {
-                        setAllChartDataYes(formattedData);
-                    } else {
-                        setAllChartDataNo(formattedData);
-                    }
-
-                    // Process data with current interval
-                    let processedData = processMultiChartData(
-                        formattedData[0] || [],
-                        formattedData[1] || [],
-                        formattedData[2] || [],
-                        formattedData[3] || [],
-                        interval
-                    );
-                    if (selectedYes) {
-                        setChartDataYes(processedData);
-                    } else {
-                        setChartDataNo(processedData);
-                    }
-                } else {
-                    setChartConfig([
-                        {
-                            label: capitalize(
-                                selectedYes
-                                    ? market?.[0]?.outcome?.[0]?.title || "yes"
-                                    : market?.[0]?.outcome?.[1]?.title || "no"
-                            ),
-                            color: selectedYes ? "#7dfdfe" : "#ec4899",
-                            asset: "asset1",
-                        },
-                    ]);
-                    const t = (result as any)[0]?.data;
-                    let formattedData = t.map((item: any) => {
-                        let formattedTime: any = Math.floor(new Date(item.t).getTime() / 1000);
-                        return {
-                            t: formattedTime,
-                            p: item.p / 100, // Divide by 100 to get proper percentage
-                        };
-                    });
-
-                    if (selectedYes) {
-                        setAllChartDataYes(formattedData);
-                    } else {
-                        setAllChartDataNo(formattedData);
-                    }
-
-                    // Process data with current interval
-                    let processedData = processSingleChartData(formattedData, interval);
-                    if (selectedYes) {
-                        setChartDataYes(processedData);
-                    } else {
-                        setChartDataNo(processedData);
-                    }
+                if (!result || !Array.isArray(result)) {
+                    console.error('Chart: Invalid API response structure:', result);
+                    return;
                 }
+
+                // Process the forecast data similar to MonthlyListenersChart2
+                const formattedData = result.map((item: any) => ({
+                    t: Math.floor(new Date(item.createdAt).getTime() / 1000),
+                    p: item.forecast / 100,
+                }));
+
+                console.log('Chart: Formatted forecast data:', formattedData);
+
+                // Set chart config for single forecast line
+                setChartConfig([
+                    {
+                        label: "Forecast",
+                        color: selectedYes ? "#7dfdfe" : "#ec4899",
+                        asset: "asset1",
+                    },
+                ]);
+
+                // Store all data
+                if (selectedYes) {
+                    setAllChartDataYes(formattedData);
+                } else {
+                    setAllChartDataNo(formattedData);
+                }
+
+                // Process data with current interval
+                let processedData = processSingleChartData(formattedData, interval);
+                console.log('Chart: Processed chart data:', processedData);
+
+                if (selectedYes) {
+                    setChartDataYes(processedData);
+                } else {
+                    setChartDataNo(processedData);
+                }
+            } else {
+                console.error('Chart: API call failed:', response.message || 'Unknown error');
             }
         } catch (error) {
-            console.log('error', error)
-            console.log(error)
-            console.log(error, "err");
-
+            console.error('Chart: Error in fetchData:', error);
         }
-    }, [id, market, selectedYes, interval, ChartColors]);
+    }, [id, selectedYes, interval]); // Removed market and ChartColors dependencies
 
     useEffect(() => {
         fetchData();
@@ -367,39 +296,15 @@ const Chart: React.FC<ChartProps> = ({
 
     useEffect(() => {
         if (selectedYes && allChartDataYes.length > 0) {
-            if (market.length > 1 && Array.isArray(allChartDataYes[0])) {
-                // Multi-chart data processing - allChartDataYes is an array of arrays
-                let processedData = processMultiChartData(
-                    allChartDataYes[0] || [],
-                    allChartDataYes[1] || [],
-                    allChartDataYes[2] || [],
-                    allChartDataYes[3] || [],
-                    interval
-                );
-                setChartDataYes(processedData);
-            } else if (market.length <= 1) {
-                // Single chart data processing - allChartDataYes is a single array
-                let processedData = processSingleChartData(allChartDataYes, interval);
-                setChartDataYes(processedData);
-            }
+            // Single forecast data processing - allChartDataYes is a single array
+            let processedData = processSingleChartData(allChartDataYes, interval);
+            setChartDataYes(processedData);
         } else if (!selectedYes && allChartDataNo.length > 0) {
-            if (market.length > 1 && Array.isArray(allChartDataNo[0])) {
-                // Multi-chart data processing - allChartDataNo is an array of arrays
-                let processedData = processMultiChartData(
-                    allChartDataNo[0] || [],
-                    allChartDataNo[1] || [],
-                    allChartDataNo[2] || [],
-                    allChartDataNo[3] || [],
-                    interval
-                );
-                setChartDataNo(processedData);
-            } else if (market.length <= 1) {
-                // Single chart data processing - allChartDataNo is a single array
-                let processedData = processSingleChartData(allChartDataNo, interval);
-                setChartDataNo(processedData);
-            }
+            // Single forecast data processing - allChartDataNo is a single array
+            let processedData = processSingleChartData(allChartDataNo, interval);
+            setChartDataNo(processedData);
         }
-    }, [interval, allChartDataYes, allChartDataNo, selectedYes, market]);
+    }, [interval, allChartDataYes, allChartDataNo, selectedYes]);
 
     useEffect(() => {
         const socket = socketContext?.socket;
@@ -450,37 +355,10 @@ const Chart: React.FC<ChartProps> = ({
     const [activeDate, setActiveDate] = useState("Jun 18");
     const [multiDisplayChance, setMultiDisplayChance] = useState<any>([]);
     useEffect(() => {
-        if (market?.length > 1) {
-            const sortedMarkets = [...market].sort((a, b) => {
-                const aOdd = selectedYes ? a.odd : 100 - a.odd;
-                const bOdd = selectedYes ? b.odd : 100 - b.odd;
-                return bOdd - aOdd;
-            });
-            const top4Markets = sortedMarkets.slice(0, 4);
-
-            if (multiHoveredChance.length > 0) {
-                setMultiDisplayChance(top4Markets.map((item: any, index: any) => {
-                    return {
-                        label: item.groupItemTitle,
-                        color: ChartColors[index],
-                        asset: `asset${index + 1}`,
-                        fullLabel: `${item.groupItemTitle} ${selectedYes ? 'Yes' : 'No'}`, // Add full label with Yes/No
-                        last: (multiHoveredChance[index] !== undefined ? multiHoveredChance[index] : (selectedYes ? item.odd : 100 - item.odd))
-                    }
-                }));
-            } else {
-                setMultiDisplayChance(top4Markets.map((item: any, index: any) => {
-                    return {
-                        label: item.groupItemTitle,
-                        color: ChartColors[index],
-                        asset: `asset${index + 1}`,
-                        fullLabel: `${item.groupItemTitle} ${selectedYes ? 'Yes' : 'No'}`, // Add full label with Yes/No
-                        last: selectedYes ? item.odd : 100 - item.odd
-                    }
-                }));
-            }
-        }
-    }, [market, multiHoveredChance, selectedYes, ChartColors]);
+        // Since we're now using forecast data, we don't need multi-market display logic
+        // This effect can be simplified or removed
+        setMultiDisplayChance([]);
+    }, [selectedYes]);
 
 
     const CustomDot = (props: any) => {
@@ -543,7 +421,7 @@ const Chart: React.FC<ChartProps> = ({
             <div>
                 <CardHeader className="space-y-0 p-0">
                     {/* 先显示标题 */}
-                    <CardTitle style={{ lineHeight: "1.5" }} className="pt-3 sm:pb-1 pb-2 sm:pt-0">
+                    <CardTitle style={{ lineHeight: "1.5" }} className="pt-0 sm:pb-1 pb-2 sm:pt-0">
                         <div style={{ display: "flex", alignItems: "center" }}>
                             <div
                                 style={{
@@ -593,28 +471,15 @@ const Chart: React.FC<ChartProps> = ({
                                     })}
                                 </p>
                             )}
-                            { }
-                            {market?.length <= 1 && (
-                                <Button
-                                    variant="ghost"
-                                    onClick={() => setSelectedYes(!selectedYes)}
-                                    size="sm"
-                                    className="h-1 px-0 sm:h-9 sm:px-3"
-                                >
-                                    <ArrowRightLeft />
-                                </Button>
-                            )}
-                            { }
-                            {market?.length > 1 && (
-                                <Button
-                                    variant="ghost"
-                                    onClick={() => setSelectedYes(!selectedYes)}
-                                    size="sm"
-                                    className="h-1 px-0 sm:h-9 sm:px-3"
-                                >
-                                    <ArrowRightLeft />
-                                </Button>
-                            )}
+                            {/* Forecast toggle button - simpler since we're using forecast data */}
+                            <Button
+                                variant="ghost"
+                                onClick={() => setSelectedYes(!selectedYes)}
+                                size="sm"
+                                className="h-1 px-0 sm:h-9 sm:px-3"
+                            >
+                                <ArrowRightLeft />
+                            </Button>
                         </div>
                         <div className="flex items-center gap-2 pl-2 mt-0">
                             {seriesData?.length > 0 && (
@@ -660,15 +525,15 @@ const Chart: React.FC<ChartProps> = ({
                         </div>
 
                     </CardDescription>
-                    {/* Single market chance display - inside CardHeader like MonthlyListenersChart2 */}
-                    {market?.length <= 1 && displayChance !== undefined && (
+                    {/* Forecast chance display */}
+                    {displayChance !== undefined && (
                         <div className="flex flex-wrap gap-3 items-center w-full">
                             <div className="flex items-center">
                                 <span className="text-3xl lg:text-4xl font-semibold" style={{ color: chanceColor }}>
                                     {typeof displayChance === 'number' ? displayChance.toFixed(1) : '0.0'}%
                                 </span>
                                 <span className="text-lg font-light ml-2" style={{ color: chanceColor }}>
-                                    chance
+                                    forecast
                                 </span>
                             </div>
                         </div>
@@ -680,18 +545,13 @@ const Chart: React.FC<ChartProps> = ({
                         <CardHeader className="p-0 sm:pb-4">
                             {displayChance !== undefined && isEmpty(displayChance) && (
                                 <div className="flex justify-start mb-4">
-                                    {" "}
-                                    {/* Changed from justify-center to justify-start */}
-                                    {market?.length <= 1 && (
-                                        <CardTitle
-                                            className="text-4xl"
-                                            style={{ color: chanceColor }}
-                                        >
-                                            <span>{typeof displayChance === 'number' ? displayChance.toFixed(1) : ''}%</span>
-                                            <span className="text-2xl font-light"> chance</span>
-                                        </CardTitle>
-                                    )}
-
+                                    <CardTitle
+                                        className="text-4xl"
+                                        style={{ color: chanceColor }}
+                                    >
+                                        <span>{typeof displayChance === 'number' ? displayChance.toFixed(1) : ''}%</span>
+                                        <span className="text-2xl font-light"> forecast</span>
+                                    </CardTitle>
                                 </div>
                             )}
                             { }
@@ -711,14 +571,8 @@ const Chart: React.FC<ChartProps> = ({
                                     syncMethod="value"
                                     onMouseMove={(e) => {
                                         if (e && e.activePayload && e.activePayload.length > 0) {
-                                            // For single market charts
-                                            if (market.length <= 1) {
-                                                setHoveredChance(e.activePayload[0].value);
-                                            } else {
-                                                // For multi-market charts
-                                                const values = e.activePayload.map(payload => payload.value);
-                                                setMultiHoveredChance(values);
-                                            }
+                                            // For forecast charts, always set single hovered value
+                                            setHoveredChance(e.activePayload[0].value);
                                         }
                                     }}
                                 >

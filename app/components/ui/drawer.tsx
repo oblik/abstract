@@ -45,18 +45,26 @@ const DrawerContent = React.forwardRef<
     <DrawerPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-[999999] mt-24 h-auto rounded-t-[10px] bg-transparent",
+        "fixed inset-x-0 z-[999999] mt-12 sm:mt-24 h-auto rounded-t-[10px] bg-transparent drawer-content",
         className
       )}
+      style={{
+        bottom: '0px',
+        position: 'fixed',
+        transform: 'translate3d(0, 0, 0)',
+        WebkitTransform: 'translate3d(0, 0, 0)',
+        WebkitBackfaceVisibility: 'hidden',
+        backfaceVisibility: 'hidden',
+      }}
       {...props}>
-      <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
+      <div className="mx-auto mt-2 sm:mt-4 h-2 w-[100px] rounded-full bg-muted" />
       {children}
     </DrawerPrimitive.Content>
   </DrawerPortal>
 ))
 DrawerContent.displayName = "DrawerContent"
 
-interface DrawerHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface DrawerHeaderProps extends React.HTMLAttributes<HTMLDivElement> { }
 
 const DrawerHeader = React.forwardRef<HTMLDivElement, DrawerHeaderProps>(
   ({ className, ...props }, ref) => (
@@ -68,11 +76,11 @@ const DrawerHeader = React.forwardRef<HTMLDivElement, DrawerHeaderProps>(
 )
 DrawerHeader.displayName = "DrawerHeader"
 
-interface DrawerFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface DrawerFooterProps extends React.HTMLAttributes<HTMLDivElement> { }
 
 const DrawerFooter = React.forwardRef<HTMLDivElement, DrawerFooterProps>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("mt-auto flex flex-col gap-2 p-4", className)} {...props} />
+    <div ref={ref} className={cn("mt-auto flex flex-col gap-2 p-0", className)} {...props} />
   )
 )
 DrawerFooter.displayName = "DrawerFooter"

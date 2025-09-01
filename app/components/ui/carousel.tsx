@@ -36,8 +36,8 @@ const CarouselContext = React.createContext<CarouselContextProps>({
   selectedIndex: 0,
   totalSlides: 0,
   orientation: "horizontal",
-  scrollPrev: () => {},
-  scrollNext: () => {},
+  scrollPrev: () => { },
+  scrollNext: () => { },
   canScrollPrev: false,
   canScrollNext: false,
   scrollTo: undefined
@@ -195,7 +195,7 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
 );
 Carousel.displayName = "Carousel";
 
-export interface CarouselContentProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface CarouselContentProps extends React.HTMLAttributes<HTMLDivElement> { }
 
 const CarouselContent = React.forwardRef<HTMLDivElement, CarouselContentProps>(({ className, ...props }, ref) => {
   const { carouselRef, orientation } = useCarousel();
@@ -206,7 +206,7 @@ const CarouselContent = React.forwardRef<HTMLDivElement, CarouselContentProps>((
         ref={ref}
         className={cn(
           "flex",
-          orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
+          orientation === "horizontal" ? "-ml-4" : "-mt-0 flex-col",
           className
         )}
         {...props}
@@ -216,7 +216,7 @@ const CarouselContent = React.forwardRef<HTMLDivElement, CarouselContentProps>((
 });
 CarouselContent.displayName = "CarouselContent";
 
-export interface CarouselItemProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface CarouselItemProps extends React.HTMLAttributes<HTMLDivElement> { }
 
 const CarouselItem = React.forwardRef<HTMLDivElement, CarouselItemProps>(({ className, ...props }, ref) => {
   const { orientation } = useCarousel();
@@ -228,7 +228,7 @@ const CarouselItem = React.forwardRef<HTMLDivElement, CarouselItemProps>(({ clas
       aria-roledescription="slide"
       className={cn(
         "min-w-0 shrink-0 grow-0 basis-full",
-        orientation === "horizontal" ? "pl-4" : "pt-4",
+        orientation === "horizontal" ? "pl-4" : "pt-0",
         className
       )}
       {...props}
@@ -303,12 +303,12 @@ const CarouselNext = React.forwardRef<HTMLButtonElement, CarouselNextProps>(
 );
 CarouselNext.displayName = "CarouselNext";
 
-export interface CarouselPaginationProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface CarouselPaginationProps extends React.HTMLAttributes<HTMLDivElement> { }
 
 const CarouselPagination = React.forwardRef<HTMLDivElement, CarouselPaginationProps>((props, ref) => {
   const { selectedIndex, totalSlides, scrollTo } = useCarousel();
   return (
-    <div ref={ref} className="mt-4 flex justify-center" {...props}>
+    <div ref={ref} className="mt-0 flex justify-center" {...props}>
       <div className="flex space-x-2">
         {Array.from({ length: totalSlides }).map((_, index) => (
           <button
@@ -320,13 +320,13 @@ const CarouselPagination = React.forwardRef<HTMLDivElement, CarouselPaginationPr
             onClick={() => scrollTo!(index)}
             aria-label={`Navigate to slide ${index + 1}`}
           >
-            <span 
+            <span
               className={cn(
                 'h-2 w-2 rounded-full transition-colors',
                 'hover:scale-125 hover:opacity-80', // Add hover effect
-                index === selectedIndex 
-? 'bg-[#7dfdfe] shadow-sm shadow-[#7dfdfe]/50'
-: 'bg-gray-500/50 hover:bg-gray-400/70'
+                index === selectedIndex
+                  ? 'bg-[#7dfdfe] shadow-sm shadow-[#7dfdfe]/50'
+                  : 'bg-gray-500/50 hover:bg-gray-400/70'
               )}
             />
           </button>

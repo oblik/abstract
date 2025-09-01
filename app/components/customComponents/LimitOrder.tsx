@@ -13,7 +13,7 @@ import { Switch } from "radix-ui";
 import CustomDateComponent from "./CustomDate";
 import { isEmpty } from "@/lib/isEmpty";
 import { firstLetterCase } from "@/lib/stringCase";
-import { Edit } from "lucide-react";
+import { Divide, Edit } from "lucide-react";
 
 interface LimitOrderProps {
   activeView: string;
@@ -159,41 +159,41 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
   };
 
   const handlePlaceOrder = async (action: any) => {
-    try{
+    try {
       setOrderBtn(false);
-    let activeTab = activeView?.toLowerCase();
-    if (!limitOrderValidation()) {
-      return;
-    }
-    let data = {
-      price: action === "sell" ? 100 - Number(price) : price,
-      side: action === "buy" ? activeTab : activeTab === "yes" ? "no" : "yes",
-      userSide: activeTab,
-      action: action,
-      capped: action === "sell" ? true : false,
-      marketId,
-      userId: user?.userId,
-      quantity: amount,
-      type: "limit",
-      timeInForce: isExpirationEnabled ? "GTD" : "GTC",
-    };
-    if (isExpirationEnabled) {
-      data["expiration"] = expirationSeconds;
-    }
-    const { success, message } = await placeOrder(data as any);
-    if (success) {
-      toastAlert("success", "Order placed successfully!", "order-success");
-      setFormValue({ ...formValue, price: "", amount: "" });
-      setIsExpirationEnabled(false);
-      setCustomDate("");
-    } else {
-      toastAlert("error", message, "order-failed");
-      setOrderFailed(true);
-      setTimeout(() => setOrderFailed(false), 2000);
-    }
-  }catch (error) {
+      let activeTab = activeView?.toLowerCase();
+      if (!limitOrderValidation()) {
+        return;
+      }
+      let data = {
+        price: action === "sell" ? 100 - Number(price) : price,
+        side: action === "buy" ? activeTab : activeTab === "yes" ? "no" : "yes",
+        userSide: activeTab,
+        action: action,
+        capped: action === "sell" ? true : false,
+        marketId,
+        userId: user?.userId,
+        quantity: amount,
+        type: "limit",
+        timeInForce: isExpirationEnabled ? "GTD" : "GTC",
+      };
+      if (isExpirationEnabled) {
+        data["expiration"] = expirationSeconds;
+      }
+      const { success, message } = await placeOrder(data as any);
+      if (success) {
+        toastAlert("success", "Order placed successfully!", "order-success");
+        setFormValue({ ...formValue, price: "", amount: "" });
+        setIsExpirationEnabled(false);
+        setCustomDate("");
+      } else {
+        toastAlert("error", message, "order-failed");
+        setOrderFailed(true);
+        setTimeout(() => setOrderFailed(false), 2000);
+      }
+    } catch (error) {
       console.error("Error placing order:", error);
-  }finally {
+    } finally {
       setOrderBtn(true);
     }
   }
@@ -239,6 +239,39 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
     setErrors({});
   }, [activeView, buyorsell, marketId]);
 
+  // Auto-scroll when stats are rendered
+  useEffect(() => {
+    if (!isEmpty(price) && !isEmpty(amount)) {
+      // Small delay to ensure DOM has updated
+      setTimeout(() => {
+        const drawerContent = document.querySelector('.drawer-content, [data-vaul-drawer-wrapper]');
+        const tradingCard = document.querySelector('.drawer-content .trading_card');
+
+        if (drawerContent && tradingCard) {
+          // Add auto-scroll class for CSS behavior
+          tradingCard.classList.add('auto-scroll-bottom');
+
+          // Programmatically scroll to bottom
+          drawerContent.scrollTo({
+            top: drawerContent.scrollHeight,
+            behavior: 'smooth'
+          });
+
+          // Also scroll the trading card container itself
+          tradingCard.scrollTo({
+            top: tradingCard.scrollHeight,
+            behavior: 'smooth'
+          });
+
+          // Remove class after animation
+          setTimeout(() => {
+            tradingCard.classList.remove('auto-scroll-bottom');
+          }, 500);
+        }
+      }, 100);
+    }
+  }, [price, amount]);
+
   useEffect(() => {
     if (isEmpty(selectedOrder)) {
       return;
@@ -268,11 +301,14 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
         <div className="w-full flex items-center border border-input rounded-md bg-background px-0 py-0 sm:h-12 h-11 overflow-hidden">
           <Input
             type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             name="amount"
             placeholder="Amount"
             value={amount}
             onChange={handleChange}
-            className="border-0 text-left bg-transparent text-[14px] sm:text-[16px] focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+            className="border-0 text-left bg-transparent text-base focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+            style={{ fontSize: '16px' }}
           />
           <span className="cursor-default text-[14px] sm:text-[16px] p-3">Contracts</span>
         </div>
@@ -283,11 +319,14 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
         <div className="w-full flex items-center border border-input rounded-md bg-background px-0 py-0 sm:h-12 h-11 overflow-hidden">
           <Input
             type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             value={price}
             name="price"
             placeholder="Limit Price"
             onChange={handleChange}
-            className="border-0 text-left text-[14px] sm:text-[16px] bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+            className="border-0 text-left bg-transparent text-base focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+            style={{ fontSize: '16px' }}
           />
           <span className="cursor-default text-[14px] sm:text-[16px] p-3">¢</span>
         </div>
@@ -295,7 +334,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
       <span className="text-red-500 text-sm">{errors?.price}</span>
 
 
-    <div className="hidden sm:flex items-center justify-between mt-3">
+      <div className="hidden sm:flex items-center justify-between mt-3">
         <label className="Label" htmlFor="expiry" style={{ paddingRight: 15 }}>
           Set Expiration
         </label>
@@ -338,7 +377,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
             {daysLeft !== null &&
               `Expires in ${daysLeft} day${daysLeft === 1 ? "" : "s"}`}
           </div>
-          <button onClick={()=>setShowCustomDialog(true)}><Edit size={16} /></button>
+          <button onClick={() => setShowCustomDialog(true)}><Edit size={16} /></button>
         </div>
       )}
 
@@ -363,96 +402,99 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
             </div>
 
             <div className="flex justify-between text-sm">
-  <div>
-    <span className="text-white">
-      Total paid
-    </span>
-    <span className="text-muted-foreground"> (incl. fee)</span>
-  </div>
-  <span className="text-green-500">
-    {(() => {
-      const amt = Number(amount || 0);
-      const prc = Number(price || 0);
-      const fee = Number(makerFee || 0);
-      const base = (amt * prc) / 100;
-      const feePaid = (fee / 100) * base;
-      const total = base + feePaid;
-      return `$ ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    })()}
-  </span>
-</div>
-
-<div className="flex justify-between text-sm">
-  <div>
-    <span className="text-muted-foreground">Total return if</span>
-    <span className="text-white">
-      {` ${
-        activeView === "Yes"
-          ? firstLetterCase(outcomes?.[0]?.title || "yes")
-          : firstLetterCase(outcomes?.[1]?.title || "no")
-      }`}
-    </span>
-    <span className="text-muted-foreground"> wins</span>
-  </div>
-  <span className="text-green-500">
-    {(() => {
-      const amt = Number(amount || 0);
-      const totalReturn = amt * 1; // $1 per contract
-      return `$ ${totalReturn.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    })()}
-  </span>
-</div>
-
-
-   
-          </div>
-        </>
-      ) : (
-          <div className="pt-1 pb-1 mt-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">
-                Estimated amount to receive
-              </span>
-              <span className="text-foreground text-green-500">
+              <div>
+                <span className="text-white">
+                  Total paid
+                </span>
+                <span className="text-muted-foreground"> (incl. {Number(makerFee || 0)}% fee)</span>
+              </div>
+              <span className="text-green-500">
                 {(() => {
                   const amt = Number(amount || 0);
                   const prc = Number(price || 0);
-                  const base = (amt * prc) / 100;
                   const fee = Number(makerFee || 0);
-                  const feeDeducted = base - (fee / 100) * base;
-                  return `$ ${feeDeducted.toFixed(2)}`;
+                  const base = (amt * prc) / 100;
+                  const feePaid = (fee / 100) * base;
+                  const total = base + feePaid;
+                  return `$ ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                 })()}
               </span>
             </div>
+
+            <div className="flex justify-between text-sm">
+              <div>
+                <span className="text-muted-foreground">Total return if</span>
+                <span className="text-white">
+                  {` ${activeView === "Yes"
+                    ? firstLetterCase(outcomes?.[0]?.title || "yes")
+                    : firstLetterCase(outcomes?.[1]?.title || "no")
+                    }`}
+                </span>
+                <span className="text-muted-foreground"> wins</span>
+              </div>
+              <span className="text-green-500">
+                {(() => {
+                  const amt = Number(amount || 0);
+                  const totalReturn = amt * 1; // $1 per contract
+                  return `$ ${totalReturn.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                })()}
+              </span>
+            </div>
+
+
+
           </div>
+        </>
+      ) : (
+        <div className="pt-1 pb-1 mt-2">
+          <div className="flex justify-between text-sm">
+            <div className="text-muted-foreground">
+              <span className="text-white">Total return</span>
+              <span className="text-muted-foreground"> (incl. {Number(makerFee || 0)}% fee)</span>
+            </div>
+
+            <span className="text-foreground text-green-500">
+              {(() => {
+                const amt = Number(amount || 0);
+                const prc = Number(price || 0);
+                const base = (amt * prc) / 100;
+                const fee = Number(makerFee || 0);
+                const feeDeducted = base - (fee / 100) * base;
+                return `$${feeDeducted.toFixed(2)}`;
+              })()}
+            </span>
+
+          </div>
+        </div>
       )}
 
       <div className="sm:pt-4 pt-3">
-        {signedIn ? (
-          <Button
-            className={`w-full border transition-colors duration-300 
-              ${orderSuccess ? 'bg-green-600 text-white hover:text-white border-green-600 cursor-default' : ''}
-              ${orderFailed ? 'bg-red-600 text-white hover:text-white border-red-600 cursor-default' : ''}
-              ${!orderSuccess && !orderFailed ? 'border-white bg-transparent text-white hover:bg-white hover:text-black' : ''}
-            `}
-            onClick={() => !orderSuccess && !orderFailed && handlePlaceOrder(buyorsell)}
-            disabled={orderSuccess || orderFailed}
-          >
-            {orderSuccess
-              ? 'Order placed'
-              : orderFailed
-                ? 'Insufficient balance'
-                : `${buyorsell === "buy" ? "Buy" : "Sell"} ${
-                    activeView === "Yes"
-                      ? firstLetterCase(outcomes?.[0]?.title || "yes")
-                      : firstLetterCase(outcomes?.[1]?.title || "no")
+        <div className="trade-button-container">
+          {signedIn ? (
+            <Button
+              className={`w-full border transition-colors duration-300 
+                ${orderSuccess ? 'bg-green-600 text-white hover:text-white border-green-600 cursor-default' : ''}
+                ${orderFailed ? 'bg-red-600 text-white hover:text-white border-red-600 cursor-default' : ''}
+                ${!orderSuccess && !orderFailed ? 'border-white bg-transparent text-white hover:bg-white hover:text-black' : ''}
+              `}
+              onClick={() => !orderSuccess && !orderFailed && handlePlaceOrder(buyorsell)}
+              disabled={orderSuccess || orderFailed}
+            >
+              {orderSuccess
+                ? 'Order placed'
+                : orderFailed
+                  ? 'Insufficient balance'
+                  : `${buyorsell === "buy" ? "Buy" : "Sell"} ${activeView === "Yes"
+                    ? firstLetterCase(outcomes?.[0]?.title || "yes")
+                    : firstLetterCase(outcomes?.[1]?.title || "no")
                   }`}
-          </Button>
-        ) : (
-          <Button className="w-full border border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300">
-            Login
-          </Button>
-        )}
+            </Button>
+          ) : (
+            <Button className="w-full border pr-0 pl-0 border-white bg-transparent text-white hover:bg-white hover:text-black transition-colors duration-300">
+              Login
+            </Button>
+          )}
+        </div>
       </div>
       <CustomDateComponent
         showCustomDialog={showCustomDialog}

@@ -46,6 +46,69 @@ body {
   position: relative;
 }
 
+/* iOS Safari specific fixes for drawer keyboard behavior */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari only - prevent excessive drawer movement */
+  .drawer-content {
+    position: fixed !important;
+    bottom: 0 !important;
+    transform: translateZ(0) !important;
+    -webkit-transform: translateZ(0) !important;
+  }
+}
+
+/* Mobile keyboard handling - button as bottom reference */
+@media (max-width: 640px) {
+  /* When keyboard appears, make button container stick to visible bottom */
+  .trade-button-container {
+    position: sticky;
+    bottom: 0;
+    background: #000000;
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
+    z-index: 1000;
+    border-top: 1px solid transparent;
+  }
+  
+  /* Add subtle background to distinguish from content */
+  .drawer-content .trade-button-container {
+    background: linear-gradient(to top, #000000 80%, rgba(0,0,0,0.8) 100%);
+  }
+  
+  /* Ensure trading card content has proper spacing above button */
+  .trading_card {
+    padding-bottom: 60px;
+  }
+  
+  /* Event page specific drawer fixes */
+  .drawer-content .trading_card {
+    position: sticky;
+    bottom: 0;
+    background: #000000;
+    z-index: 1000;
+    margin: 0;
+    padding: 0px 4px 4px 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Ensure event page drawer content scrolls properly */
+  .drawer-content .trading_card {
+    max-height: calc(80vh - 80px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  /* Auto-scroll class for triggering scroll to bottom */
+  .drawer-content .trading_card.auto-scroll-bottom {
+    scroll-snap-type: y mandatory;
+  }
+  
+  .drawer-content .trading_card.auto-scroll-bottom > *:last-child {
+    scroll-snap-align: end;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

@@ -106,14 +106,7 @@ export default function ProfilePage(props: ProfilePageProps) {
         />
       </div>
       {/* Spacer to prevent content from being hidden behind the fixed header/navbar */}
-      <div
-        className="lg:mb-4 mb-0"
-        style={{
-          height: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
-          minHeight: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
-          width: '100%'
-        }}
-      />
+      <div className="lg:mb-4 mb-0 h-[95px] lg:h-[112px] w-full" />
       
       <div className="px-1.5 sm:px-0 container mx-auto px-0 py-5 container-sm">
         {/* 1. User information area */}

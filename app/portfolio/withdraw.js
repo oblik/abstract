@@ -98,7 +98,7 @@ export default function Withdraw() {
                 let { success, message } = await withdrawRequest(withdraw, dispatch);
                 if (success) {
                     setLoader(false)
-                    console.log(withdraw, coin, feeAmt, "withdrawaaaa")
+                    console.log(withdraw, coin, feeAmt, "withdraw")
                     setWithdraw(initialValue)
                     setError({})
                     setOpen(false)
@@ -109,7 +109,7 @@ export default function Withdraw() {
                 }
             }
         } catch (err) {
-          console.log(err, "errr")
+          console.log(err, "error")
 
         }
     };

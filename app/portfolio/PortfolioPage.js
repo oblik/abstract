@@ -141,10 +141,10 @@ export default function PortfolioPage({ categories }) {
         setTodayReal(result?.totalPnl / 100);
       }
     } catch (err) {
-      console.log(err, "errr")
-      console.log(err, "errrr")
-      console.log(err, "ererrrr")
-      console.log(err, "errerr")
+      console.log(err, "error")
+      console.log(err, "error")
+      console.log(err, "error")
+      console.log(err, "error")
       console.log("error ", err)
       console.log(err, "err");
 
@@ -176,7 +176,7 @@ export default function PortfolioPage({ categories }) {
       if (address) {
         const publicKey = new PublicKey(address);
         const balanceLamports = await connection.getBalance(publicKey);
-        console.log(balanceSOL, balanceLamports, "balanceSOLbalanceSOL");
+        console.log(balanceSOL, balanceLamports, "balanceSOL");
         const balanceSOL = balanceLamports / LAMPORTS_PER_SOL;
         const formattedBalance = formatNumber(balanceSOL, 4);
         setBalance(formattedBalance);
@@ -483,7 +483,7 @@ export default function PortfolioPage({ categories }) {
         const provider = await getAnchorProvider();
         const program = new Program(depositIDL, programID, provider);
         const connection = provider.connection;
-        console.log("USDCUSDC")
+        console.log("USDC")
 
         const mint = new PublicKey(config?.tokenMint);
         const receiverPubKey = new PublicKey(config?.adminAdd);
@@ -835,7 +835,7 @@ const amount = new BN(parseFloat(depsoitAmt) * 10 ** 6);
         />
       </div>
       {/* Spacer to prevent content from being hidden behind the fixed header/navbar */}
-      <div className="lg:mb-4 mb-0 h-[112px] lg:h-[112px] w-full" />
+      <div className="lg:mb-4 mb-0 h-[95px] lg:h-[112px] w-full" />
         <div className="px-1.5 sm:px-0 container mx-auto pb-0 sm:pb-4 container-sm">
           <div className="flex justify-end sm:mb-2 mb-0 sm:mt-2 mt-4">
             {isConnected ? (

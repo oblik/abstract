@@ -45,15 +45,11 @@ export default function ClientLayoutEffect() {
       try {
         const { success } = await getUserData(dispatch);
         if (success) {
-          // Check if we have a token in cookies
-          if (typeof window !== 'undefined') {
-            const { getCookie } = await import("cookies-next");
-            const token = getCookie("user-token");
-            if (token) {
-              dispatch(signIn(token));
-            } else {
-              dispatch(signIn(''));
-            }
+          // Check if we have a token in cookies (client-side only)
+          const { getCookie } = await import("cookies-next");
+          const token = getCookie("user-token");
+          if (token) {
+            dispatch(signIn(token));
           } else {
             dispatch(signIn(''));
           }

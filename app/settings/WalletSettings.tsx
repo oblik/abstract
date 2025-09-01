@@ -45,7 +45,7 @@ export default function WalletSettings() {
   return (
     <>
         <h1 className="sm:text-2xl text-xl font-bold sm:mb-8 sm:mt-0 mt-3 mb-4">Wallet Settings</h1>
-        {console.log(priority,"prioritypriority")}
+        {console.log(priority,"priority")}
         <div className="sm:space-y-6 space-y-5 rounded-lg border bg-[#131212] sm:p-8 p-3">
             <div className="flex items-center space-x-3">
                 <Image

@@ -11,7 +11,7 @@ export const getUserData = async (dispatch:any) => {
         method: "get",
       });
       const { result } = respData.data;
-      console.log("result>>>>>>>>>>.",result)
+      console.log("result:", result)
       dispatch(setUser(result));
       return handleResp(respData, "success");
     } catch (error: any) {

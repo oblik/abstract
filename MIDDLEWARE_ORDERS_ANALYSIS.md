@@ -1,4 +1,5 @@
 # 🔍 **MIDDLEWARE & ACTIVE ORDERS ANALYSIS**
+
 ## Understanding the Correct Implementation Patterns
 
 ---
@@ -12,6 +13,7 @@ After analyzing the orderbook accordion implementation, **active orders ARE show
 ## **📖 ORDERBOOK ACTIVE ORDERS - CORRECT IMPLEMENTATION:**
 
 ### **How Active Orders Display in Orderbook:**
+
 ```tsx
 // app/components/ui/orderbookAccordion.tsx
 
@@ -21,49 +23,61 @@ const getOpenOrders = async () => {
     id: selectedMarket?._id,
   });
   if (respData.success) {
-    setOpenOrders(respData.result);  // ✅ Working correctly
+    setOpenOrders(respData.result); // ✅ Working correctly
   }
 };
 
 // 2. Filter orders by price for each orderbook row:
 // For ASK orders (selling):
-const openOrder = openOrders?.filter((order: any) => 
-  (100 - Number(order.price)) == row[0]  // Price conversion for asks
+const openOrder = openOrders?.filter(
+  (order: any) => 100 - Number(order.price) == row[0] // Price conversion for asks
 );
 
 // For BID orders (buying):
-const openOrder = openOrders?.filter((order: any) => 
-  (order.price == row[0] && order.side == activeView?.toLowerCase())
+const openOrder = openOrders?.filter(
+  (order: any) =>
+    order.price == row[0] && order.side == activeView?.toLowerCase()
 );
 
 // 3. Display orders inline with orderbook:
-{openOrder?.length > 0 && (
-  <div className="flex items-center gap-2" onClick={() => { 
-    setOpenOrderDialog(true); 
-    setSelectedOpenOrder(openOrder) 
-  }}>
-    <Clock5 className="w-4 h-4" />  {/* Clock icon indicates pending order */}
-    {toFixedDown(openOrder.reduce((acc, curr) => 
-      acc + (curr.quantity - curr.execQty), 0), 2)}  {/* Remaining quantity */}
-  </div>
-)}
+{
+  openOrder?.length > 0 && (
+    <div
+      className="flex items-center gap-2"
+      onClick={() => {
+        setOpenOrderDialog(true);
+        setSelectedOpenOrder(openOrder);
+      }}
+    >
+      <Clock5 className="w-4 h-4" /> {/* Clock icon indicates pending order */}
+      {toFixedDown(
+        openOrder.reduce(
+          (acc, curr) => acc + (curr.quantity - curr.execQty),
+          0
+        ),
+        2
+      )} {/* Remaining quantity */}
+    </div>
+  );
+}
 ```
 
 ### **Real-time Order Updates via Socket:**
+
 ```tsx
 // Socket listener for order updates:
 const handleOpenOrders = (result: any) => {
   setOpenOrders((prev: any) => {
     if (resData.status === "filled" || resData.status === "cancelled") {
       // Remove completed/cancelled orders
-      let updatedOpenOrders = prev.filter(order => order._id !== resData._id)
-      return updatedOpenOrders
+      let updatedOpenOrders = prev.filter((order) => order._id !== resData._id);
+      return updatedOpenOrders;
     }
     // Handle other order status updates...
   });
 };
 
-socket.on("order-update", handleOpenOrders);  // ✅ Real-time updates
+socket.on("order-update", handleOpenOrders); // ✅ Real-time updates
 ```
 
 ---
@@ -71,51 +85,51 @@ socket.on("order-update", handleOpenOrders);  // ✅ Real-time updates
 ## **🛡️ MIDDLEWARE RELEVANCE ANALYSIS:**
 
 ### **Current Middleware Configuration:**
+
 ```typescript
 // middleware.ts
 
 export const config = {
-    matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
 
 // Protected routes:
-const protectedRoutes: string[] = [
-    "/settings",
-    "/portfolio", 
-    "/profile",
-]
+const protectedRoutes: string[] = ["/settings", "/portfolio", "/profile"];
 
 // Key middleware logic:
 if (protectedPathnameRegex.test(pathname) && !currentUser?.value) {
-    // Redirect to home if accessing protected route without token
-    request.cookies.delete("user-token");
-    return NextResponse.redirect(new URL("/", request.url));
+  // Redirect to home if accessing protected route without token
+  request.cookies.delete("user-token");
+  return NextResponse.redirect(new URL("/", request.url));
 }
 ```
 
 ### **🚨 CRITICAL MIDDLEWARE IMPACT:**
 
 #### **1. Event Pages (Orderbook) - NOT Protected:**
+
 ```typescript
 // ✅ Event pages like /event-page/[id] are NOT in protectedRoutes
 // This means users can view events and orderbooks WITHOUT being logged in
 // But they can't see THEIR open orders unless authenticated
 
-pathname: "/event-page/123"  // ✅ Allowed for everyone
+pathname: "/event-page/123"; // ✅ Allowed for everyone
 // User can see: orderbook, prices, general market data
 // User CANNOT see: their personal open orders (requires auth)
 ```
 
 #### **2. Portfolio Page - Protected:**
+
 ```typescript
-pathname: "/portfolio"  // ❌ Requires authentication
+pathname: "/portfolio"; // ❌ Requires authentication
 // If no user-token cookie → redirect to "/"
 // This protects: wallet balance, P&L charts, deposit/withdraw
 ```
 
 #### **3. Profile Pages - Protected:**
+
 ```typescript
-pathname: "/profile/user123"  // ❌ Requires authentication  
+pathname: "/profile/user123"; // ❌ Requires authentication
 // Protects: trade history, personal stats, user data
 ```
 
@@ -124,11 +138,12 @@ pathname: "/profile/user123"  // ❌ Requires authentication
 ## **🔐 AUTHENTICATION FLOW IN ORDERBOOK:**
 
 ### **Smart Authentication Detection:**
+
 ```tsx
 // The orderbook component intelligently handles auth:
 
 // 1. Always loads orderbook data (public)
-await getOrderBook({ id: id });  // ✅ Public data
+await getOrderBook({ id: id }); // ✅ Public data
 
 // 2. Only loads user orders if authenticated
 await getOpenOrdersByEvtId({ id: selectedMarket?._id });
@@ -137,10 +152,11 @@ await getOpenOrdersByEvtId({ id: selectedMarket?._id });
 ```
 
 ### **Axios Interceptor Authentication:**
+
 ```typescript
 // config/axios.ts (automatically adds auth to requests)
 axios.interceptors.request.use((config) => {
-  const token = getAuthToken();  // Our improved function
+  const token = getAuthToken(); // Our improved function
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -157,15 +173,18 @@ axios.interceptors.request.use((config) => {
 ## **💡 WHY THIS IMPLEMENTATION IS SMART:**
 
 ### **1. Graceful Degradation:**
+
 - **Unauthenticated users:** Can browse events, see orderbooks, view prices
 - **Authenticated users:** See everything + their personal orders and balances
 
 ### **2. No Middleware Interference:**
+
 - Event pages are **not protected** by middleware
 - Users can view trading data without forced login
 - Authentication is handled at the **component level** for personal data
 
 ### **3. Real-time Updates:**
+
 - Socket connections work for both auth and unauth users
 - Personal order updates only sent to authenticated users
 - Public orderbook updates sent to everyone
@@ -175,6 +194,7 @@ axios.interceptors.request.use((config) => {
 ## **🔧 ENVIRONMENT IMPACT ON THIS PATTERN:**
 
 ### **Working Correctly (Client-side):**
+
 ```typescript
 // When getOpenOrdersByEvtId() is called from browser:
 // ✅ Uses proxy correctly → /api/v1/user/open-orders/event/${id}
@@ -183,6 +203,7 @@ axios.interceptors.request.use((config) => {
 ```
 
 ### **Potential Issues (SSR):**
+
 ```typescript
 // If getOpenOrdersByEvtId() were called during SSR:
 // ❌ services/user.ts bypasses proxy → direct API call
@@ -197,14 +218,16 @@ axios.interceptors.request.use((config) => {
 ## **🎯 CORRECTED ENVIRONMENT ANALYSIS:**
 
 ### **✅ WORKING COMPONENTS (No SSR Issues):**
+
 1. **Orderbook Active Orders** - Client-side only calls ✅
-2. **Trading Cards** - Uses market.ts (proxy works) ✅  
+2. **Trading Cards** - Uses market.ts (proxy works) ✅
 3. **Charts** - Uses market.ts (proxy works) ✅
 4. **Authentication** - Has separate IP API config ✅
 
 ### **❌ POTENTIALLY AFFECTED (SSR Issues):**
+
 1. **Portfolio Page** - Server-side data fetching for wallet settings
-2. **Profile Pages** - Server-side user data loading  
+2. **Profile Pages** - Server-side user data loading
 3. **Settings Page** - Server-side configuration loading
 
 ---
@@ -212,6 +235,7 @@ axios.interceptors.request.use((config) => {
 ## **📋 REVISED RECOMMENDATIONS:**
 
 ### **1. Environment Fix Still Needed:**
+
 ```typescript
 // services/user.ts - Remove SSR bypass
 function getApiBaseUrl() {
@@ -220,11 +244,13 @@ function getApiBaseUrl() {
 ```
 
 ### **2. But Lower Priority Because:**
+
 - Orderbook orders ARE working (client-side calls)
 - Most critical user interactions work
 - Only affects SSR scenarios in portfolio/profile
 
 ### **3. Middleware is Correctly Configured:**
+
 - Event pages accessible to everyone ✅
 - Personal features protected ✅
 - No changes needed to middleware ✅

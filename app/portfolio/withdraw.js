@@ -9,6 +9,7 @@ import { formatNumber } from "../helper/custommath";
 import { toastAlert } from "../../lib/toast"
 import { useDispatch } from "react-redux";
 import { useSelector } from "@/store";
+import { useWallet } from "@/app/walletconnect/walletContext";
 import isEmpty from "@/app/helper/isEmpty";
 import {
     Cross2Icon,
@@ -32,13 +33,22 @@ let initialValue = {
 export default function Withdraw() {
     const dispatch = useDispatch()
     const walletData = useSelector(state => state?.wallet?.data);
-    const { isConnected, address } = useSelector((state) => state?.walletconnect?.walletconnect);
+    // Use the wallet context instead of Redux state
+    const { isConnected, address } = useWallet();
 
     const [withdraw, setWithdraw] = useState(initialValue);
     const [error, setError] = useState({})
     const [loader, setLoader] = useState(false)
     const [open, setOpen] = useState(false)
     const [coin, setCoin] = useState({})
+
+    // Debug wallet context
+    console.log("=== WITHDRAW COMPONENT MOUNTED ===");
+    console.log("Wallet context - isConnected:", isConnected);
+    console.log("Wallet context - address:", address);
+    console.log("Redux wallet state:", walletData);
+    console.log("================================");
+
     const availableBalance = walletData?.balance
         ? formatNumber(walletData?.balance - walletData?.locked, 2)
         : 0
@@ -109,7 +119,7 @@ export default function Withdraw() {
                 }
             }
         } catch (err) {
-          console.log(err, "error")
+            console.log(err, "error")
 
         }
     };
@@ -157,7 +167,7 @@ export default function Withdraw() {
                             setLoader(false)
                             await getCoinData()
                         }}>
-                        <span className="mr-1 text-lg">-</span>Withdraw
+                        <span className="mr-1 text-xl">-</span>Withdraw
                     </Button>
                 </Dialog.Trigger>
                 <Dialog.Portal>
@@ -166,23 +176,31 @@ export default function Withdraw() {
                         <Dialog.Title className="DialogTitle">
                             Withdraw
                         </Dialog.Title>
-                        <div className="flex gap-2 items-center bg-[#eff4fe] p-3 rounded-lg mt-4">
-                            <InfoCircledIcon className="text-[#1652f0]" />
-                            <span className="text-[14px] text-gray-700">
+                        <div className="flex gap-2 items-center bg-gray-700 sm:p-3 sm:pl-3 sm:pr-3 pr-2 pl-2 p-1 rounded-lg mt-4">
+                            <InfoCircledIcon className="text-white" />
+                            <span className="sm:text-[14px] text-[12px] text-gray-100">
                                 Only send to a USDC address on the Solana network.
                             </span>
                         </div>
                         <form className="mt-4">
                             <fieldset className="Fieldset mb-4">
                                 <div className="flex gap-2 items-center justify-between mb-1">
-                                    <label className="Label" htmlFor="Address">
+                                    <label className="sm:text-[14px] text-[12px]" htmlFor="Address">
                                         Address
                                     </label>
-                                    <span className="text-[14px] text-gray-400 cursor-pointer underline underline-offset-4"
+                                    <span className="sm:text-[14px] text-[12px] text-gray-400 cursor-pointer underline underline-offset-4"
                                         onClick={() => {
+                                            console.log("=== USE CONNECTED BUTTON CLICKED ===");
+                                            console.log("Wallet context - isConnected:", isConnected);
+                                            console.log("Wallet context - address:", address);
+                                            console.log("Current userAddress value:", userAddress);
+
                                             setWithdraw({ ...withdraw, ...{ userAddress: address ? address : "" } })
                                             if (!isEmpty(address)) {
                                                 setError({ ...error, ...{ userAddress: "" } })
+                                                console.log("✅ Address set successfully:", address);
+                                            } else {
+                                                console.log("❌ No address available");
                                             }
                                         }}>
                                         Use connected
@@ -190,8 +208,8 @@ export default function Withdraw() {
                                 </div>
                                 <Input
                                     type="text"
-                                    placeholder="0x..."
-                                    className="Input h-12 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+                                    placeholder="AV..."
+                                    className="Input sm:h-11 h-10 focus-visible:ring-0 placeholder:text-[13px] sm:placeholder:text-[15px] focus-visible:ring-offset-0 focus-visible:outline-none"
                                     id="userAddress"
                                     name="userAddress"
                                     onChange={handleChange}
@@ -204,17 +222,17 @@ export default function Withdraw() {
 
                             <fieldset className="Fieldset mt-4">
                                 <div className="flex gap-2 items-center justify-between mb-1">
-                                    <label className="Label" htmlFor="Amount">
+                                    <label className="sm:text-[14px] text-[12px]" htmlFor="Amount">
                                         Amount{" "}
-                                        <span className="text-[14px] text-gray-400">
+                                        <span className="sm:text-[14px] text-[12px] text-gray-400">
                                             (${coin?.minWithdraw} min) ({coin?.withdrawFee}% Fee)
                                         </span>
                                     </label>
-                                    <div className="flex gap-2">
-                                        <span className="text-[14px] text-gray-400 cursor-pointer">
+                                    <div className="flex gap-1">
+                                        <span className="sm:text-[14px] text-[12px] text-gray-400 cursor-pointer">
                                             {PnLFormatted(availableBalance)} available
                                         </span>
-                                        <span className="text-[14px] text-gray-400 cursor-pointer underline underline-offset-4"
+                                        <span className="sm:text-[14px] text-[12px] text-gray-400 cursor-pointer underline underline-offset-4"
                                             onClick={() => {
                                                 setWithdraw({ ...withdraw, ...{ amount: availableBalance ? availableBalance : "" } })
                                                 if (!isEmpty(availableBalance)) {
@@ -228,7 +246,7 @@ export default function Withdraw() {
                                 <Input
                                     type="text"
                                     placeholder="$0.00"
-                                    className="Input h-12 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
+                                    className="Input sm:h-11 h-10 focus-visible:ring-0 placeholder:text-[13px] sm:placeholder:text-[15px] focus-visible:ring-offset-0 focus-visible:outline-none"
                                     id="amount"
                                     name="amount"
                                     onChange={handleChange}
@@ -250,9 +268,9 @@ export default function Withdraw() {
                                 }
 
                             </fieldset>
-{}
+                            { }
 
-                            <Button type="button" disabled={loader} className="mt-4 w-full" onClick={handleClick}>Withdraw
+                            <Button type="button" disabled={loader} className="mt-4 sm:h-13 h-10 w-full" onClick={handleClick}>Withdraw
                                 {loader && (
                                     <i
                                         className="fas fa-spinner fa-spin ml-2"

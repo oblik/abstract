@@ -1,7 +1,7 @@
 "use client";
 import Header from "@/app/Header";
 import HeaderFixed from "@/app/HeaderFixed";
-import { getCookie } from "cookies-next";
+import { getAuthToken } from "@/lib/cookies";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/app/components/ui/button";
 import config from "../../config/config";
@@ -33,6 +33,7 @@ import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import { Input } from "../components/ui/input";
 import { useSelector } from "@/store";
 import { useDispatch } from "react-redux";
+import { setWalletConnect } from "@/store/slices/walletconnect/walletSlice";
 import { userDeposit, addressCheck } from "@/services/wallet";
 import { formatNumber } from "../helper/custommath";
 import {
@@ -59,7 +60,6 @@ import History from "./History";
 import { Footer } from "../components/customComponents/Footer";
 import { PnLFormatted } from "@/utils/helpers";
 import { getWalletSettings, getCoinList } from "@/services/user";
-import { getAuthToken } from "@/lib/cookies";
 import depositIDL from "../../components/IDL/DEPOSITIDL.json";
 import Withdraw from "./withdraw";
 import { getUserPnL } from "@/services/portfolio";
@@ -88,9 +88,13 @@ export default function PortfolioPage() {
   const connection = useMemo(() => new Connection(config?.rpcUrl, "confirmed"), []);
   const PYTH_PRICE_ACCOUNT = new PublicKey(config?.PYTH_PRICE_ACCOUNT);
 
-  // Use wallet context only
+  // Use wallet context and Redux state
   const walletContext = useWallet();
-  const { isConnected, address } = walletContext;
+  const reduxWalletState = useSelector((state) => state?.walletconnect);
+
+  // Prefer Redux state for connection info (more reliable after our updates)
+  const isConnected = reduxWalletState?.isConnected || walletContext?.isConnected;
+  const address = reduxWalletState?.address || walletContext?.address;
 
   const walletData = useSelector((state) => state?.wallet?.data);
   const data = useSelector((state) => state?.auth?.user);
@@ -104,8 +108,18 @@ export default function PortfolioPage() {
   console.log("data:", data);
   console.log("walletData:", walletData);
   console.log("=== WALLET CONNECTION STATE ===");
-  console.log("isConnected:", isConnected);
-  console.log("address from Phantom wallet context:", address);
+  console.log("Redux wallet state:", reduxWalletState);
+  console.log("Redux wallet state keys:", reduxWalletState ? Object.keys(reduxWalletState) : 'null');
+
+  // Fix: Check if wallet data is nested under walletconnect
+  const actualWalletData = reduxWalletState?.walletconnect || reduxWalletState;
+  console.log("Actual wallet data:", actualWalletData);
+  console.log("Redux wallet address:", actualWalletData?.address);
+  console.log("Redux wallet isConnected:", actualWalletData?.isConnected);
+
+  console.log("Wallet context state:", walletContext);
+  console.log("Final isConnected:", isConnected);
+  console.log("Final address:", address);
   console.log("=== WALLET CONTEXT STATE ===");
   console.log("walletContext:", walletContext);
 
@@ -119,7 +133,7 @@ export default function PortfolioPage() {
 
     // Additional debugging
     const allCookies = typeof document !== 'undefined' ? document.cookie : 'N/A';
-    const cookiesNextToken = getCookie("user-token");
+    const cookiesNextToken = getAuthToken();
 
     console.log("=== AUTHENTICATION CHECK ===");
     console.log("signedIn:", signedIn);
@@ -178,12 +192,7 @@ export default function PortfolioPage() {
   const handleConnectWallet = async () => {
     try {
       console.log("=== ATTEMPTING WALLET CONNECTION ===");
-
-      // Use wallet context connection
-      if (walletContext?.connectWallet) {
-        console.log("Connecting via wallet context...");
-        await walletContext.connectWallet();
-      }
+      await connectWallet();
     } catch (error) {
       console.error("Error connecting wallet:", error);
     }
@@ -344,16 +353,18 @@ export default function PortfolioPage() {
 
   async function ConnectPhantomWallet() {
     try {
-      console.log("=== CONNECTING VIA WALLET CONTEXT ===");
+      console.log("=== CONNECTING VIA REDUX-INTEGRATED FUNCTION ===");
 
-      // Use wallet context connect function
-      if (walletContext?.connectWallet) {
-        await walletContext.connectWallet();
+      const result = await connectWallet();
+      if (result) {
         setOpen(false);
         toastAlert("success", "Wallet Connected successfully!!", "wallet");
         setCheck(true);
-      } else {
-        throw new Error("Wallet context not available");
+
+        // Force a small delay to ensure Redux state has updated
+        setTimeout(() => {
+          console.log("✅ Wallet connection UI should now be updated");
+        }, 100);
       }
     } catch (err) {
       console.error("Connection error:", err);
@@ -498,7 +509,7 @@ export default function PortfolioPage() {
   var step2Click = () => {
     if (!isEmpty(currency)) {
       setStep("2");
-      setDepositAmt();
+      setDepositAmt(0);
       getSolanaTxFee();
       if (currency === "USDC" && tokenbalance === 0) {
         setStep("1");
@@ -561,29 +572,121 @@ export default function PortfolioPage() {
     }
   };
 
-  async function disconnect() {
-    console.log("=== PORTFOLIO PAGE DISCONNECT TRIGGERED ===");
+  // Phantom wallet connect function with Redux integration
+  const connectWallet = useCallback(async () => {
+    console.log("=== CONNECTING PHANTOM WALLET ===");
 
     try {
-      // Call wallet context disconnect (Phantom only)
-      if (walletContext?.disconnectWallet) {
-        await walletContext.disconnectWallet();
-        console.log("Phantom wallet disconnect completed");
+      if (window.solana && window.solana.isPhantom) {
+        // Clear manual disconnect flag when connecting
+        localStorage.removeItem('wallet_manually_disconnected');
+
+        const response = await window.solana.connect();
+
+        if (response.publicKey) {
+          const publicKey = response.publicKey.toString();
+          console.log("✅ Phantom connected:", publicKey);
+
+          // Get SOL balance
+          let balance = 0;
+          try {
+            const balanceInLamports = await connection.getBalance(response.publicKey);
+            balance = balanceInLamports / 1000000000; // Convert lamports to SOL
+          } catch (error) {
+            console.error("Error fetching balance:", error);
+          }
+
+          // Update Redux store
+          dispatch(setWalletConnect({
+            isConnected: true,
+            address: publicKey,
+            network: "solana-devnet",
+            type: "phantom",
+            rpc: "https://api.devnet.solana.com",
+            balance: balance
+          }));
+
+          // Update wallet context as well (it should sync via Redux, but ensure it's immediate)
+          if (walletContext.connectWallet) {
+            try {
+              // This will update the wallet context state directly
+              walletContext.setAddress?.(publicKey);
+              walletContext.setIsConnected?.(true);
+            } catch (contextError) {
+              console.log("Context update not needed - Redux sync will handle it");
+            }
+          }
+
+          console.log("✅ Redux store updated with wallet data");
+          return publicKey;
+        }
+      } else {
+        throw new Error("Phantom wallet not found. Please install Phantom wallet extension.");
+      }
+    } catch (error) {
+      console.error("❌ Error connecting wallet:", error);
+      toastAlert("error", "Failed to connect wallet", error.message);
+    }
+  }, [dispatch, connection]);
+
+  // Phantom wallet disconnect function with Redux integration
+  const disconnectWallet = useCallback(async () => {
+    console.log("=== DISCONNECTING PHANTOM WALLET ===");
+
+    try {
+      // Set manual disconnect flag to prevent auto-reconnection
+      localStorage.setItem('wallet_manually_disconnected', 'true');
+      console.log("✅ Manual disconnect flag set");
+
+      if (window.solana && window.solana.isPhantom) {
+        // Disconnect from Phantom
+        await window.solana.disconnect();
+        console.log("✅ Phantom wallet disconnected");
+        
+        // Additional step: Try to revoke permissions if available
+        try {
+          if (window.solana.disconnect) {
+            await window.solana.disconnect();
+          }
+        } catch (revokeError) {
+          console.log("Note: Could not revoke permissions, but disconnect successful");
+        }
       }
 
-      // Clear local state
-      setPortfolioData({});
-      setOrders([]);
-      setOrderHistory([]);
-      console.log("Local state cleared");
+      // Clear Redux store
+      dispatch(setWalletConnect({
+        isConnected: false,
+        address: "",
+        network: "",
+        type: "",
+        rpc: "",
+        balance: 0
+      }));
 
-      // Force component re-render
-      window.location.reload();
+      console.log("✅ Redux store cleared");
+      toastAlert("success", "Wallet disconnected", "Phantom wallet has been disconnected");
 
     } catch (error) {
-      console.error("Error during disconnect:", error);
+      console.error("❌ Error disconnecting wallet:", error);
+      // Still clear Redux state and set disconnect flag even if disconnect fails
+      localStorage.setItem('wallet_manually_disconnected', 'true');
+      dispatch(setWalletConnect({
+        isConnected: false,
+        address: "",
+        network: "",
+        type: "",
+        rpc: "",
+        balance: 0
+      }));
     }
-  } const getAnchorProvider = async () => {
+  }, [dispatch]);
+
+  // Legacy disconnect function (keeping for compatibility)
+  async function disconnect() {
+    await disconnectWallet();
+  }
+  
+  const getAnchorProvider = async () => {
     const provider = window.solana;
 
     if (!provider || !provider.isPhantom) {
@@ -917,7 +1020,9 @@ export default function PortfolioPage() {
 
   const handlechange = async (e) => {
     let value = e.target.value;
-    setDepositAmt(parseFloat(e.target.value));
+    // Ensure the value is always a valid number for controlled input
+    const numericValue = value === '' ? 0 : parseFloat(value);
+    setDepositAmt(isNaN(numericValue) ? 0 : numericValue);
     //   }
     // }
   };
@@ -977,14 +1082,14 @@ export default function PortfolioPage() {
                 <Button className="mr-2">{shortText(address)}</Button>
                 <Button
                   variant="outline"
-                  className="ml-auto min-w-[95px] text-sm max-h-12 px-4"
+                  className="ml-auto min-w-[95px] text-[14px] h-13 px-4"
                   onClick={() => disconnect()}>Disconnect</Button>
 
               </>
             ) : (
               <Button
                 variant='default'
-                className="ml-auto min-w-[95px] text-sm max-h-12 px-4"
+                className="ml-auto min-w-[95px] text-[14px] h-13 px-4"
                 onClick={() => setOpen(true)}>Connect Wallet</Button>
             )}
           </div>
@@ -1102,19 +1207,19 @@ export default function PortfolioPage() {
                             <div className="deposit_step deposit_step1">
                               {/* Wallet Info Button */}
                               <Button className="mt-4 w-full google_btn flex-col items-start">
-                                <p className="text-[12px] text-gray-400 mb-0">
+                                <p className="text-[12px] text-gray-400 mb-0 pb-0">
                                   Deposit from
                                 </p>
                                 <div className="flex items-center gap-2">
                                   <Image
                                     src="/images/wallet_icon_02.png"
                                     alt="Profile Icon"
-                                    width={16}
-                                    height={16}
+                                    width={24}
+                                    height={24}
                                     className="rounded-full"
                                   />
                                   <span
-                                    className="text-[14px] text-gray-200"
+                                    className="sm:text-[14px] text-[13px] text-gray-200"
                                     onClick={async () => {
                                       await navigator.clipboard.writeText(
                                         address
@@ -1125,7 +1230,7 @@ export default function PortfolioPage() {
                                   >
                                     Wallet {shortText(address)}
                                     {copied && (
-                                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs text-white bg-black px-2 py-0.5 rounded shadow">
+                                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 text-xs text-white bg-black px-2 py-0.5 shadow">
                                         Copied!
                                       </span>
                                     )}
@@ -1157,8 +1262,8 @@ export default function PortfolioPage() {
                                   return (
                                     <div key={i} className="wallet_coin_list">
                                       <div
-                                        className={`flex items-center justify-between my-3 border px-3 py-1 rounded cursor-pointer transition ${isSelected
-                                          ? "border-[#4f99ff] bg-[#1a1a1a]"
+                                        className={`flex items-center justify-between my-3 border px-2 py-1 rounded-[5px] cursor-pointer transition ${isSelected
+                                          ? "border-[#3d3d3d] bg-[#1a1a1a]"
                                           : "border-[#3d3d3d] hover:bg-[#1e1e1e]"
                                           }`}
                                         onClick={() =>
@@ -1198,7 +1303,7 @@ export default function PortfolioPage() {
                                   );
                                 })}
                               <Button
-                                className="mt-4 w-full"
+                                className="mt-3 sm:h-13 h-10 w-full"
                                 onClick={() => step2Click()}
                               >
                                 Continue
@@ -1218,36 +1323,36 @@ export default function PortfolioPage() {
                                 className="wallet_inp focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none"
                                 type="number"
                                 onChange={handlechange}
-                                value={depsoitAmt}
+                                value={depsoitAmt || 0}
                                 placeholder="0"
                               />
-                              <div className="flex gap-3 justify-between mt-4 sm:flex-nowrap flex-wrap">
+                              <div className="flex sm:gap-3 gap-2 justify-between sm:mt-4 mt-2 pb-0 flex-nowrap">
                                 <Button
-                                  className="w-full h-13 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333] text-[#efefef]"
+                                  className="w-full sm:h-13 h-9 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333] text-[#efefef]"
                                   onClick={() => balanceChange(25)}
                                 >
                                   25%
                                 </Button>
                                 <Button
-                                  className="w-full h-13 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333] text-[#efefef]"
+                                  className="w-full sm:h-13 h-9 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333] text-[#efefef]"
                                   onClick={() => balanceChange(50)}
                                 >
                                   50%
                                 </Button>
                                 <Button
-                                  className="w-full h-13 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333] text-[#efefef]"
+                                  className="w-full sm:h-13 h-9 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333] text-[#efefef]"
                                   onClick={() => balanceChange(75)}
                                 >
                                   75%
                                 </Button>
                                 <Button
-                                  className="w-full h-13 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333] text-[#efefef]"
+                                  className="w-full sm:h-13 h-9 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333] text-[#efefef]"
                                   onClick={() => balanceChange(100)}
                                 >
                                   Max
                                 </Button>
                               </div>
-                              <p className="text-[12px] text-gray-400 text-center mt-8">
+                              <p className="text-[12px] text-gray-400 text-center sm:mt-8 mt-4">
                                 {`${minDeposit} ${currency} minimum deposit`}
                                 { }
                               </p>
@@ -1268,7 +1373,7 @@ export default function PortfolioPage() {
                                     className="rounded-full"
                                   />
                                   <div className="flex flex-col">
-                                    <span className="text-[12px] text-gray-400">
+                                    <span className="sm:text-[12px] text-[10px] text-gray-400">
                                       You Sent
                                     </span>
                                     <span className="text-[14px]">
@@ -1291,7 +1396,7 @@ export default function PortfolioPage() {
                                     className="rounded-full"
                                   />
                                   <div className="flex flex-col">
-                                    <span className="text-[12px] text-gray-400">
+                                    <span className="sm:text-[12px] text-[10px] text-gray-400">
                                       You Receive
                                     </span>
                                     <span className="text-[14px]">USDC</span>
@@ -1661,7 +1766,7 @@ export default function PortfolioPage() {
               <div className="flex gap-3 justify-between mt-4 sm:flex-nowrap flex-wrap">
                 <Button
                   onClick={() => ConnectPhantomWallet()}
-                  className="rounded-[6px] w-full sm:h-13 h-10 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]"
+                  className="rounded-[6px] w-full sm:h-13 h-11758 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]"
                 >
                   <Image
                     src={"/images/wallet_icon_02.png"}

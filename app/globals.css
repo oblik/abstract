@@ -656,9 +656,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  border-radius: 6px;
-  padding: 0 15px;
+  gap: 5px;
+  border-radius: 5px;
+  padding: 0 8px;
   font-size: 16px;
   line-height: 1;
   font-weight: 500;

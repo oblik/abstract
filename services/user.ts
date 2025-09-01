@@ -1,120 +1,31 @@
 import config from "@/config/config";
 import axios, { handleResp } from "@/config/axios";
 import { setUser } from "@/store/slices/auth/userSlice";
-
-
-function getApiBaseUrl() {
-  // For server-side rendering, we need to use the full backend URL
-  // even in development, because SSR can't use relative URLs
-  if (typeof window === "undefined") {
-    // Server-side: always use full backend URL
-    return process.env.NODE_ENV === "production"
-      ? config.backendURL
-      : "https://sonotradesdemo.wearedev.team"; // Use production URL in development for SSR
-  }
-
-  // Client-side: use Next.js proxy in development, full URL in production
-  if (process.env.NODE_ENV === "production") {
-    return config.backendURL;
-  }
-  return ""; // Use Next.js proxy routes in development
-}
+import { getApiBaseUrl, apiGet, apiPost } from "@/lib/apiHelpers";
 
 export const getUserData = async () => {
-  try {
-    let respData = await axios({
-      url: `${getApiBaseUrl()}/api/v1/user/get-user`,
-      method: "get",
-    });
-    return handleResp(respData, "success");
-  } catch (error: any) {
-    return handleResp(error, "error");
-  }
+  return apiGet(`${getApiBaseUrl()}/api/v1/user/get-user`);
 };
 
 export const getUserById = async (id: string) => {
-  console.log("=== getUserById service called ===");
-  console.log("Raw ID parameter:", id);
-
   // Clean the ID by removing @ symbol
   const cleanId = id.replace("@", "");
-  console.log("Cleaned ID:", cleanId);
-
-  const url = `${getApiBaseUrl()}/api/v1/user/get-user/id/${cleanId}`;
-  console.log("API URL:", url);
-
-  try {
-    let respData = await axios({
-      url: url,
-      method: "get",
-    });
-    console.log("getUserById response:", respData);
-    return handleResp(respData, "success");
-  } catch (error: any) {
-    console.error("getUserById error:", error);
-    console.error("Error status:", error?.response?.status);
-    console.error("Error data:", error?.response?.data);
-    return handleResp(error, "error");
-  }
+  return apiGet(`${getApiBaseUrl()}/api/v1/user/get-user/id/${cleanId}`);
 };
 export const getTradeOverviewById = async (id: string) => {
-  console.log("=== getTradeOverviewById service called ===");
-  console.log("ID parameter:", id);
-
-  const url = `${getApiBaseUrl()}/api/v1/user/user-trade-overview/id/${id}`;
-  console.log("Trade overview API URL:", url);
-
-  try {
-    let respData = await axios({
-      url: url,
-      method: "get",
-    });
-    console.log("getTradeOverviewById response:", respData);
-    return handleResp(respData, "success");
-  } catch (error: any) {
-    console.error("getTradeOverviewById error:", error);
-    console.error("Error status:", error?.response?.status);
-    console.error("Error data:", error?.response?.data);
-    return handleResp(error, "error");
-  }
+  return apiGet(`${getApiBaseUrl()}/api/v1/user/user-trade-overview/id/${id}`);
 };
 
 export const getTradeOverview = async () => {
-
-  try {
-    let respData = await axios({
-      url: `${getApiBaseUrl()}/api/v1/user/user-trade-overview`,
-      method: "get",
-    });
-    return handleResp(respData, "success");
-  } catch (error: any) {
-    return handleResp(error, "error");
-  }
+  return apiGet(`${getApiBaseUrl()}/api/v1/user/user-trade-overview`);
 };
 
 export const updateUserData = async (data: object) => {
-  try {
-    let respData = await axios({
-      url: `${getApiBaseUrl()}/api/v1/user/update-user`,
-      method: "post",
-      data: data
-    });
-    return handleResp(respData, "success");
-  } catch (error: any) {
-    return handleResp(error, "error");
-  }
+  return apiPost(`${getApiBaseUrl()}/api/v1/user/update-user`, data);
 };
 
 export const getPositions = async () => {
-  try {
-    let respData = await axios({
-      url: `${getApiBaseUrl()}/api/v1/user/position-history`,
-      method: "post",
-    });
-    return handleResp(respData, "success");
-  } catch (error: any) {
-    return handleResp(error, "error");
-  }
+  return apiPost(`${getApiBaseUrl()}/api/v1/user/position-history`);
 };
 
 export const getTradeHistory = async (data: any) => {
@@ -141,7 +52,7 @@ export const getUserTradeHistory = async (data: any) => {
   }
 };
 
-export const getInfoCards = async (data: any) => {
+export const getInfoCards = async () => {
   try {
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/user/info-cards`,

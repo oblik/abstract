@@ -11,7 +11,7 @@ import store from "@/store/index";
 import { toFixedDown } from '@/lib/roundOf'
 import { isEmpty } from '@/lib/isEmpty'
 import { useSelector } from 'react-redux'
-import { getCookie } from 'cookies-next'
+import { getAuthToken } from '@/lib/cookies'
 
 interface Order {
     _id: string;
@@ -85,9 +85,8 @@ const OpenOrders = (props: OpenOrdersProps) => {
         console.log("data.id:", data?.id);
         console.log("data._id:", data?._id);
 
-        const token = getCookie("user-token");
-        console.log("token exists (getCookie):", !!token);
-        console.log("token value:", token);
+        const token = getAuthToken();
+        console.log("token exists:", !!token);
 
         // Standard authentication check
         const standardAuth = signedIn && data && (data.id || data._id) && token;

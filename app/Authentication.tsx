@@ -164,7 +164,6 @@ export default function Authentication() {
 
 
         const signedMessage = await window.solana.signMessage(encodedMessage, "utf8");
-        console.log("Signature:", signedMessage);
 
         if (signedMessage) {
           const connection = new Connection(config?.rpcUrl || "");
@@ -188,11 +187,6 @@ export default function Authentication() {
           walletAdd(response.publicKey.toString());
         }
       } catch (err: any) {
-        console.log(err, "error")
-        console.log(err, "err")
-        console.log(err, "err")
-        console.log(err, "error")
-
         if (err?.code === 4001) {
           toastAlert("error", "Connection request was rejected", "wallet");
         }
@@ -322,7 +316,6 @@ export default function Authentication() {
       if (success) {
         setOpen(false);
         toastAlert("success", message, "login");
-        console.log(message, success, "message")
       } else {
         toastAlert("error", message, "login");
       }
@@ -451,13 +444,15 @@ export default function Authentication() {
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        if (signedIn && window.solana) {
+        // Check if user manually disconnected (stored in localStorage)
+        const manuallyDisconnected = localStorage.getItem('wallet_manually_disconnected') === 'true';
+
+        if (signedIn && window.solana && !manuallyDisconnected) {
           const res = await window.solana.connect({ onlyIfTrusted: true });
           const newPublicKey = res?.publicKey?.toString()?.toLowerCase();
           const savedAddress = data?.walletAddress?.toLowerCase();
 
           if (!previousWalletRef.current) {
-            console.log("🔁 Wallet switched from", previousWalletRef.current, "to", newPublicKey);
             previousWalletRef.current = newPublicKey;
           }
 
@@ -467,7 +462,6 @@ export default function Authentication() {
             newPublicKey !== previousWalletRef.current &&
             newPublicKey !== savedAddress
           ) {
-            console.log("🔁 Wallet switched from", previousWalletRef.current, "to", newPublicKey);
 
             if (isConnected) {
               disconnectWallet();
@@ -487,6 +481,8 @@ export default function Authentication() {
           }
 
           previousWalletRef.current = newPublicKey;
+        } else if (manuallyDisconnected) {
+          console.log("🚫 Skipping auto-connect - user manually disconnected");
         }
       } catch (err) {
       }
@@ -552,7 +548,7 @@ export default function Authentication() {
                 <GoogleLogin
                   theme="filled_black"
                   onSuccess={handleGoogleLogin}
-                  onError={() => console.log("Login Failed")}
+                  onError={() => toastAlert("error", "Google login failed", "login")}
                 />
               </div>
             </GoogleOAuthProvider>

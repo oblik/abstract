@@ -21,7 +21,7 @@ import { toastAlert } from "@/lib/toast";
 import html2canvas from "html2canvas";
 import { copyImageToClipboard } from "copy-image-clipboard";
 import { useSelector } from 'react-redux'
-import { getCookie } from 'cookies-next'
+import { getAuthToken } from '@/lib/cookies'
 
 const Positions = (props) => {
   const [positionHistory, setPositionHistory] = useState([]);
@@ -48,9 +48,8 @@ const Positions = (props) => {
     console.log("data.id:", data?.id);
     console.log("data._id:", data?._id);
 
-    const token = getCookie("user-token");
-    console.log("token exists (getCookie):", !!token);
-    console.log("token value:", token);
+    const token = getAuthToken();
+    console.log("token exists:", !!token);
 
     // Standard authentication check
     const standardAuth = signedIn && data && (data.id || data._id) && token;

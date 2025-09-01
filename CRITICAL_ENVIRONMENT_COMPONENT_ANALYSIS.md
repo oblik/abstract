@@ -1,4 +1,5 @@
 # 🔍 **CRITICAL COMPONENT ENVIRONMENT ANALYSIS**
+
 ## Which Environment Configurations Each Key Page Actually Requires
 
 ---
@@ -6,6 +7,7 @@
 ## **🏠 HOME PAGE (app/Home.js)**
 
 ### **API Dependencies:**
+
 ```javascript
 // HOME PAGE SERVICE IMPORTS:
 import { getCategories, getTagsByCategory } from "@/services/market";
@@ -21,20 +23,22 @@ useEffect(() => {
 }, [selectCategory]);
 
 // Initial data loading (likely in parent component)
-await getCategories();    // /api/v1/events/category
-await getInfoCards();     // /api/v1/user/info-cards
+await getCategories(); // /api/v1/events/category
+await getInfoCards(); // /api/v1/user/info-cards
 ```
 
 ### **Environment Requirements:**
+
 - ✅ **CRITICAL:** services/market.ts needs getApiBaseUrl() for categories and tags
 - ✅ **CRITICAL:** services/user.ts needs getApiBaseUrl() for info cards
 - ❌ **ISSUE:** user.ts has SSR proxy bypass problem
 
 ---
 
-## **📊 EVENT PAGE (app/event-page/[id]/_components/EventPage.jsx)**
+## **📊 EVENT PAGE (app/event-page/[id]/\_components/EventPage.jsx)**
 
 ### **API Dependencies:**
+
 ```jsx
 // EVENT PAGE SERVICE IMPORTS:
 import { getOrderBook, getEventById, getCategories } from "@/services/market";
@@ -61,6 +65,7 @@ const getOpenOrders = async (id) => {
 ```
 
 ### **Environment Requirements:**
+
 - ✅ **CRITICAL:** services/market.ts for event data, orderbook, categories
 - ✅ **CRITICAL:** services/user.ts for open orders
 - ❌ **ISSUE:** user.ts SSR proxy bypass affects open orders
@@ -70,6 +75,7 @@ const getOpenOrders = async (id) => {
 ## **💼 PORTFOLIO PAGE (app/portfolio/PortfolioPage.js)**
 
 ### **API Dependencies:**
+
 ```javascript
 // PORTFOLIO PAGE SERVICE IMPORTS:
 import { userDeposit, addressCheck } from "@/services/wallet";
@@ -100,6 +106,7 @@ const { success, result } = await getCategories();
 ```
 
 ### **Environment Requirements:**
+
 - ✅ **CRITICAL:** services/user.ts for wallet settings, coin list (AFFECTED BY SSR ISSUE)
 - ✅ **CRITICAL:** services/portfolio.ts for P&L data
 - ✅ **CRITICAL:** services/market.ts for categories
@@ -111,6 +118,7 @@ const { success, result } = await getCategories();
 ## **👤 PROFILE PAGE (app/profile/[slug]/Profile.tsx)**
 
 ### **API Dependencies:**
+
 ```tsx
 // PROFILE PAGE SERVICE IMPORTS:
 import { getTradeOverviewById, getUserById } from "@/services/user";
@@ -121,7 +129,7 @@ useEffect(() => {
     const response = await getTradeOverviewById(id);
     // Uses services/user.ts → /api/v1/user/user-trade-overview/id/${id}
   };
-  
+
   if (currentUser?.uniqueId) {
     fetchTradeOverview(currentUser?.uniqueId);
   }
@@ -131,6 +139,7 @@ useEffect(() => {
 ```
 
 ### **Environment Requirements:**
+
 - ✅ **CRITICAL:** services/user.ts for trade overview
 - ❌ **ISSUE:** user.ts SSR proxy bypass affects profile loading
 
@@ -139,6 +148,7 @@ useEffect(() => {
 ## **📖 ORDERBOOK ACCORDION (app/components/ui/orderbookAccordion.tsx)**
 
 ### **API Dependencies:**
+
 ```tsx
 // ORDERBOOK SERVICE IMPORTS:
 import { getOpenOrdersByEvtId } from "@/services/user";
@@ -148,7 +158,7 @@ import { getEventById } from "@/services/market";
 useEffect(() => {
   const getOpenOrders = async () => {
     const respData = await getOpenOrdersByEvtId({
-      id: eventId
+      id: eventId,
     });
     // Uses services/user.ts → /api/v1/user/open-orders/event/${id}
   };
@@ -163,6 +173,7 @@ useEffect(() => {
 ```
 
 ### **Environment Requirements:**
+
 - ✅ **CRITICAL:** services/user.ts for open orders
 - ✅ **CRITICAL:** services/market.ts for event data
 - ❌ **ISSUE:** user.ts SSR proxy bypass affects order loading
@@ -172,9 +183,14 @@ useEffect(() => {
 ## **📈 CHART COMPONENT (app/components/customComponents/Chart.tsx)**
 
 ### **API Dependencies:**
+
 ```tsx
 // CHART SERVICE IMPORTS:
-import { getPriceHistory, getSeriesByEvent, getForecastHistory } from "@/services/market";
+import {
+  getPriceHistory,
+  getSeriesByEvent,
+  getForecastHistory,
+} from "@/services/market";
 
 // ACTUAL API CALLS:
 useEffect(() => {
@@ -196,6 +212,7 @@ useEffect(() => {
 ```
 
 ### **Environment Requirements:**
+
 - ✅ **CRITICAL:** services/market.ts for all chart data
 - ✅ **OK:** market.ts proxy configuration works correctly
 
@@ -206,29 +223,35 @@ useEffect(() => {
 ### **🔥 HIGH IMPACT COMPONENTS (Broken by user.ts SSR issue):**
 
 #### **1. Portfolio Page:**
+
 - **Wallet settings** → services/user.ts → getWalletSettings()
 - **Coin list** → services/user.ts → getCoinList()
 - **Impact:** Deposit/withdraw functionality may fail in development
 
 #### **2. Event Page:**
+
 - **Open orders** → services/user.ts → getOpenOrdersByEvtId()
 - **Impact:** Users can't see their active orders on event pages
 
 #### **3. Profile Page:**
+
 - **Trade overview** → services/user.ts → getTradeOverviewById()
 - **Impact:** Profile stats don't load (total value, P&L, volume)
 
 #### **4. Orderbook Accordion:**
+
 - **Open orders** → services/user.ts → getOpenOrdersByEvtId()
 - **Impact:** Order management features broken
 
 ### **✅ LOW IMPACT COMPONENTS (Working correctly):**
 
 #### **1. Chart Component:**
+
 - **All chart data** → services/market.ts → Working ✅
 - **Price history, series, forecasts** → No issues
 
 #### **2. Home Page:**
+
 - **Categories, tags** → services/market.ts → Working ✅
 - **Info cards** → services/user.ts → Affected but not critical for basic browsing
 
@@ -237,6 +260,7 @@ useEffect(() => {
 ## **💡 RECOMMENDED ENVIRONMENT FIX PRIORITY:**
 
 ### **🚨 URGENT FIX (HIGH IMPACT):**
+
 ```typescript
 // services/user.ts - Line 6-16
 // ❌ CURRENT (bypasses proxy in SSR):
@@ -256,6 +280,7 @@ function getApiBaseUrl() {
 ```
 
 ### **🔧 MEDIUM PRIORITY:**
+
 ```typescript
 // services/auth.ts - getFreeIpApiBaseUrl()
 // ❌ CURRENT:
@@ -268,6 +293,7 @@ return "/freeipapi/api/json";
 ### **🎯 IMPACT SUMMARY:**
 
 **BEFORE FIX:**
+
 - ❌ Portfolio wallet features broken in dev
 - ❌ Event page order management broken
 - ❌ Profile stats don't load
@@ -276,8 +302,9 @@ return "/freeipapi/api/json";
 - ✅ Basic browsing works
 
 **AFTER FIX:**
+
 - ✅ All portfolio features working
-- ✅ Order management fully functional  
+- ✅ Order management fully functional
 - ✅ Profile stats loading properly
 - ✅ Complete orderbook functionality
 - ✅ Charts continue working

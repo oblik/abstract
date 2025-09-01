@@ -1,8 +1,8 @@
-import axios from "axios";
 import browser from "browser-detect";
 import isEmpty from "@/app/helper/isEmpty";
 
 import config from "@/config/config";
+import { getApiBaseUrl, getThirdPartyApiBaseUrl } from "@/lib/apiHelpers";
 
 // Helper to get freeipapi base URL (use proxy in dev, full URL in prod)
 function getFreeIpApiBaseUrl() {
@@ -12,14 +12,7 @@ function getFreeIpApiBaseUrl() {
   return "/freeipapi"; // Use Next.js proxy in development
 }
 
-function getApiBaseUrl() {
-  if (process.env.NODE_ENV === "production") {
-    return config.backendURL;
-  }
-  return ""; // Use Next.js proxy in development
-}
-
-import { handleResp, setAuthorization } from "@/config/axios";
+import axios, { handleResp, setAuthorization } from "@/config/axios";
 import { signIn } from "@/store/slices/auth/sessionSlice";
 import { setUser } from "@/store/slices/auth/userSlice";
 import { setWallet } from "@/store/slices/wallet/dataSlice";

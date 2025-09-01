@@ -1,4 +1,5 @@
 # 🔍 **API ENDPOINT USAGE ANALYSIS**
+
 ## Which Environment Settings Each Component Actually Needs
 
 ---
@@ -25,6 +26,7 @@ onClick={() => {
 ```
 
 **The withdraw component is CORRECTLY designed:**
+
 1. **Platform Balance** (`state.wallet.data`) - Shows available funds to withdraw
 2. **External Wallet Address** (`state.walletconnect.walletconnect.address`) - Destination for withdrawal
 3. **"Use Connected Wallet" button** - Convenience feature to auto-fill the user's Phantom wallet address
@@ -38,6 +40,7 @@ onClick={() => {
 ### **🏆 SERVICES THAT USE getApiBaseUrl() (Need Environment Config):**
 
 #### **1. services/user.ts - 22 Endpoints:**
+
 ```typescript
 /api/v1/user/get-user
 /api/v1/user/get-user/id/${cleanId}
@@ -64,6 +67,7 @@ onClick={() => {
 ```
 
 #### **2. services/market.ts - 15 Endpoints:**
+
 ```typescript
 /api/v1/events/paginate/${id}
 /api/v1/events/search
@@ -84,6 +88,7 @@ onClick={() => {
 ```
 
 #### **3. services/auth.ts - 6 Endpoints:**
+
 ```typescript
 /api/v1/user/register
 /api/v1/user/google-sign
@@ -95,14 +100,18 @@ getFreeIpApiBaseUrl() → /api/json  // Uses separate IP API
 ```
 
 #### **4. services/wallet.ts - 3 Endpoints:**
+
 ```typescript
-/api/v1/user/user-deposit
-/api/v1/user/address-check
-/api/v1/user/withdraw-request
-/api/v1/user/save-wallet-email
+/api/1v / user / user -
+  deposit / api / v1 / user / address -
+  check / api / v1 / user / withdraw -
+  request / api / v1 / user / save -
+  wallet -
+  email;
 ```
 
 #### **5. services/portfolio.ts - 3 Endpoints:**
+
 ```typescript
 /api/v1/user/positions/${id}
 /api/v1/user/open-orders/${id}
@@ -114,6 +123,7 @@ getFreeIpApiBaseUrl() → /api/json  // Uses separate IP API
 ## **🌐 EXTERNAL API ENDPOINTS (No Environment Config Needed):**
 
 ### **Next.js API Routes (Internal):**
+
 ```typescript
 // These use Next.js internal routing, no environment config needed:
 /api/profile?wallet=${wallet}           // app/api/profile/route.ts
@@ -125,6 +135,7 @@ getFreeIpApiBaseUrl() → /api/json  // Uses separate IP API
 ```
 
 ### **Direct External APIs:**
+
 ```typescript
 // These bypass all environment configs:
 https://clob.polymarket.com/books      // Polymarket API
@@ -137,20 +148,22 @@ https://api.spotify.com/v1/me/top/artists // Spotify User Data
 ## **⚙️ CURRENT ENVIRONMENT CONFIG STATUS:**
 
 ### **✅ SERVICES WITH CORRECT PROXY USAGE:**
+
 - **services/market.ts** ✅
-- **services/wallet.ts** ✅ 
+- **services/wallet.ts** ✅
 - **services/portfolio.ts** ✅
 
 ```typescript
 function getApiBaseUrl() {
   if (process.env.NODE_ENV === "production") {
-    return config.backendURL;  // Direct URL in production
+    return config.backendURL; // Direct URL in production
   }
-  return "";  // Proxy in development
+  return ""; // Proxy in development
 }
 ```
 
 ### **❌ SERVICE WITH PROXY BYPASS ISSUE:**
+
 - **services/user.ts** ❌
 
 ```typescript
@@ -165,13 +178,14 @@ function getApiBaseUrl() {
 ```
 
 ### **✅ SERVICE WITH SEPARATE API CONFIG:**
+
 - **services/auth.ts** ✅
 
 ```typescript
 function getFreeIpApiBaseUrl() {
   return process.env.NODE_ENV === "production"
-    ? config.getLoginInfo  // "https://freeipapi.com/api/json"
-    : "/freeipapi";        // Uses Next.js proxy
+    ? config.getLoginInfo // "https://freeipapi.com/api/json"
+    : "/freeipapi"; // Uses Next.js proxy
 }
 ```
 
@@ -180,6 +194,7 @@ function getFreeIpApiBaseUrl() {
 ## **🔧 WHAT ACTUALLY NEEDS TO BE FIXED:**
 
 ### **1. user.ts Proxy Bypass (HIGH PRIORITY):**
+
 ```typescript
 // ❌ CURRENT - Bypasses proxy in SSR:
 function getApiBaseUrl() {
@@ -198,12 +213,13 @@ function getApiBaseUrl() {
 ```
 
 ### **2. auth.ts getFreeIpApiBaseUrl() Issue:**
+
 ```typescript
 // ❌ CURRENT - Wrong dev path:
 function getFreeIpApiBaseUrl() {
   return process.env.NODE_ENV === "production"
-    ? config.getLoginInfo    // "https://freeipapi.com/api/json"
-    : "/freeipapi";          // ❌ Should be "/freeipapi/api/json"
+    ? config.getLoginInfo // "https://freeipapi.com/api/json"
+    : "/freeipapi"; // ❌ Should be "/freeipapi/api/json"
 }
 ```
 
@@ -212,17 +228,20 @@ function getFreeIpApiBaseUrl() {
 ## **💡 ENVIRONMENT REQUIREMENTS BY COMPONENT:**
 
 ### **🚨 CRITICAL COMPONENTS (Need Backend API):**
+
 1. **Authentication** → services/auth.ts → needs getApiBaseUrl() + getFreeIpApiBaseUrl()
 2. **Trading Orders** → services/market.ts → needs getApiBaseUrl()
 3. **Portfolio/Balance** → services/user.ts → needs getApiBaseUrl()
 4. **Withdraw/Deposit** → services/wallet.ts → needs getApiBaseUrl()
 
 ### **🔄 MODERATE COMPONENTS (Next.js APIs):**
+
 1. **Profile pages** → /api/profile → Internal Next.js routing
 2. **Event data** → /api/event-data → Proxies to external services
 3. **Spotify integration** → /api/spotify → External OAuth flow
 
 ### **🌐 LOW IMPACT (External APIs):**
+
 1. **Polymarket data** → Direct API calls
 2. **Spotify OAuth** → Direct API calls
 
@@ -231,16 +250,19 @@ function getFreeIpApiBaseUrl() {
 ## **🎯 FINAL RECOMMENDATIONS:**
 
 ### **✅ KEEP AS IS:**
+
 - **Withdraw component** wallet logic (platform balance + external address)
 - **market.ts, wallet.ts, portfolio.ts** proxy configurations
 - **Next.js API routes** and external API calls
 
 ### **🔧 FIX ONLY:**
+
 1. **services/user.ts** - Remove SSR proxy bypass
 2. **services/auth.ts** - Fix getFreeIpApiBaseUrl() path
 3. **config.ts** - Clean up redundant baseUrl property
 
 ### **🚫 DON'T CHANGE:**
+
 - Withdraw component wallet access patterns (CORRECT as designed!)
 - Next.js proxy configuration (works perfectly)
 - External wallet integration (needed for crypto withdrawals)

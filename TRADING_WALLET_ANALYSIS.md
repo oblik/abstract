@@ -7,6 +7,7 @@
 ## **✅ CURRENT WALLET USAGE:**
 
 ### **LimitOrder.tsx:**
+
 ```tsx
 // ✅ CORRECT: Only uses auth data from Redux
 const { signedIn } = useSelector((state) => state?.auth.session);
@@ -18,14 +19,16 @@ import { availableBalance } from "@/lib/utils";
 ```
 
 ### **MarketOrder.tsx:**
+
 ```tsx
-// ✅ CORRECT: Only uses auth data from Redux  
+// ✅ CORRECT: Only uses auth data from Redux
 const { signedIn } = useSelector((state) => state?.auth.session);
 const user = useSelector((state) => state?.auth.user);
 // Note: asset is imported but not used in this component
 ```
 
 ### **TradingCard.jsx (Parent Component):**
+
 ```jsx
 // ✅ CORRECT: Uses platform wallet data from Redux
 const asset = useSelector((state) => state?.wallet?.data);
@@ -51,6 +54,7 @@ const asset = useSelector((state) => state?.wallet?.data);
 ## **🎯 CONCLUSION:**
 
 **Both LimitOrder.tsx and MarketOrder.tsx are CORRECTLY implemented:**
+
 - ✅ They only access `auth` data from Redux (user info, session)
 - ✅ They don't directly access wallet balance data
 - ✅ They focus purely on order placement logic
@@ -74,7 +78,7 @@ Redux is a **state management library** that provides a centralized store for yo
     user: { _id: "user123", email: "user@example.com" }
   },
   wallet: {                    // 💰 PLATFORM WALLET
-    data: { 
+    data: {
       balance: 1250.50,        // USD trading balance
       inOrder: 500.00,         // Money tied up in orders
       locked: 100.00,          // Locked funds
@@ -95,13 +99,15 @@ Redux is a **state management library** that provides a centralized store for yo
 ### **How Redux Works:**
 
 #### **1. Reading Data (useSelector):**
+
 ```typescript
 // Any component can read from the store:
-const userBalance = useSelector(state => state.wallet.data.balance);
-const isLoggedIn = useSelector(state => state.auth.session.signedIn);
+const userBalance = useSelector((state) => state.wallet.data.balance);
+const isLoggedIn = useSelector((state) => state.auth.session.signedIn);
 ```
 
 #### **2. Writing Data (dispatch):**
+
 ```typescript
 // Components can update the store:
 dispatch(setWallet({ balance: 1500, inOrder: 200 }));
@@ -109,9 +115,10 @@ dispatch(signIn("new-token"));
 ```
 
 #### **3. Persistence:**
+
 ```typescript
 // Redux-persist saves data to localStorage:
-whitelist: ["wallet", "walletconnect", "auth"]  // These survive page refresh
+whitelist: ["wallet", "walletconnect", "auth"]; // These survive page refresh
 ```
 
 ---
@@ -121,13 +128,14 @@ whitelist: ["wallet", "walletconnect", "auth"]  // These survive page refresh
 ### **Two Independent Wallet Systems:**
 
 #### **1. Platform Wallet (Redux) - CORRECT**
+
 ```typescript
 // Purpose: Track USD trading balance & positions
 const walletData = useSelector(state => state.wallet.data);
 
 // Contains:
 - balance: $1,250.50      // Available USD for trading
-- inOrder: $500.00        // Money tied up in active orders  
+- inOrder: $500.00        // Money tied up in active orders
 - locked: $100.00         // Temporarily locked funds
 - position: $750.25       // Current position value
 - pnl1D: -$25.50         // Today's profit/loss
@@ -136,6 +144,7 @@ const walletData = useSelector(state => state.wallet.data);
 ```
 
 #### **2. External Wallet (WalletContext) - CORRECT**
+
 ```typescript
 // Purpose: Connect to Phantom wallet for blockchain operations
 const { address, isConnected } = useWallet();  // From walletContext.js
@@ -148,13 +157,14 @@ const { address, isConnected } = useWallet();  // From walletContext.js
 ```
 
 #### **3. ❌ PROBLEMATIC: Redux External Wallet**
+
 ```typescript
 // ❌ WRONG: Phantom wallet data stored in Redux (duplicates WalletContext)
 const { address } = useSelector(state => state.walletconnect.walletconnect);
 
 // Problems:
 - Duplicates WalletContext functionality
-- Persisted when it shouldn't be  
+- Persisted when it shouldn't be
 - Creates confusion about which source to use
 - Not synchronized with actual Phantom wallet state
 ```
@@ -168,7 +178,7 @@ const { address } = useSelector(state => state.walletconnect.walletconnect);
 ```typescript
 // Platform wallet works independently:
 function placeTrade() {
-  const platformBalance = useSelector(state => state.wallet.data.balance);
+  const platformBalance = useSelector((state) => state.wallet.data.balance);
   if (platformBalance >= orderAmount) {
     // Execute trade using platform balance
     return placeOrder({ amount: orderAmount, userId: user.id });
@@ -201,13 +211,13 @@ User Journey:
 ```typescript
 // Only interaction: Withdrawal process
 function withdrawToPhantom() {
-  const platformBalance = useSelector(state => state.wallet.data.balance);  // Redux
-  const { address } = useWallet();                                          // Context
-  
+  const platformBalance = useSelector((state) => state.wallet.data.balance); // Redux
+  const { address } = useWallet(); // Context
+
   // Transfer from platform balance to Phantom address
-  return withdrawFunds({ 
-    amount: platformBalance, 
-    toAddress: address 
+  return withdrawFunds({
+    amount: platformBalance,
+    toAddress: address,
   });
 }
 ```
@@ -216,11 +226,11 @@ function withdrawToPhantom() {
 
 ## **📊 DEPENDENCY SUMMARY:**
 
-| System | Purpose | Storage | Dependencies |
-|--------|---------|---------|--------------|
-| **Platform Wallet (Redux)** | Trading balance & positions | LocalStorage (persisted) | ❌ None - Independent |
-| **External Wallet (WalletContext)** | Phantom connection & address | Memory (session-only) | ❌ None - Independent |
-| **❌ Redux External Wallet** | Duplicate Phantom data | LocalStorage (wrong!) | ⚠️ Conflicts with WalletContext |
+| System                              | Purpose                      | Storage                  | Dependencies                    |
+| ----------------------------------- | ---------------------------- | ------------------------ | ------------------------------- |
+| **Platform Wallet (Redux)**         | Trading balance & positions  | LocalStorage (persisted) | ❌ None - Independent           |
+| **External Wallet (WalletContext)** | Phantom connection & address | Memory (session-only)    | ❌ None - Independent           |
+| **❌ Redux External Wallet**        | Duplicate Phantom data       | LocalStorage (wrong!)    | ⚠️ Conflicts with WalletContext |
 
 ---
 

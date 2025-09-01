@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { useSelector } from "@/store";
 import { getCurrentValue, getUserData } from "@/services/user";
 import { signIn } from "@/store/slices/auth/sessionSlice";
-import { removeAuthToken } from "@/lib/cookies";
+import { removeAuthToken, getAuthToken } from "@/lib/cookies";
 
 interface WalletData {
   balance: number;
@@ -35,27 +35,38 @@ export default function ClientLayoutEffect() {
         } as WalletData));
       }
     } catch (error) {
-      console.log("error on getWalletData", error)
-      console.log("error on getWalletData", error)
+      console.log("error on getWalletData", error);
     }
   }, [dispatch]);
 
   useEffect(() => {
+    // Initialize authentication and wallet data
     (async () => {
       try {
         const { success } = await getUserData();
         if (success) {
-          // Check if we have a token in cookies
-          if (typeof window !== 'undefined') {
-            const { getCookie } = await import("cookies-next");
-            const token = getCookie("user-token");
-            if (token) {
-              dispatch(signIn(token));
-            } else {
-              dispatch(signIn(''));
-            }
+          // Use centralized cookie function instead of dynamic import
+          const token = getAuthToken();
+          if (token) {
+            dispatch(signIn(token));
           } else {
             dispatch(signIn(''));
+          }
+
+          // Fetch wallet data after successful authentication
+          try {
+            const { success: walletSuccess, result } = await getCurrentValue();
+            if (walletSuccess) {
+              dispatch(setWallet({
+                balance: result.balance,
+                inOrder: result.inOrder,
+                locked: result.locked,
+                position: result.position / 100,
+                pnl1D: result.pnl1D / 100
+              } as WalletData));
+            }
+          } catch (walletError) {
+            console.log("error on getWalletData", walletError);
           }
         } else {
           await removeAuthToken();
@@ -64,27 +75,9 @@ export default function ClientLayoutEffect() {
         await removeAuthToken();
       }
     })();
-  }, [dispatch]);
+  }, [dispatch]); // Only dispatch in dependencies
 
   useEffect(() => {
-    const getWalletDataAsync = async () => {
-      try {
-        const { success, result } = await getCurrentValue();
-        if (success) {
-          dispatch(setWallet({
-            balance: result.balance,
-            inOrder: result.inOrder,
-            locked: result.locked,
-            position: result.position / 100,
-            pnl1D: result.pnl1D / 100
-          } as WalletData));
-        }
-      } catch (error) {
-        // Handle error silently
-      }
-    };
-
-    getWalletDataAsync();
     const socket = socketContext?.socket;
     if (!socket) return;
 

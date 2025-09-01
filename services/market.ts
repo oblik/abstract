@@ -1,4 +1,5 @@
 import config from "@/config/config";
+import { getApiBaseUrl } from "@/lib/apiHelpers";
 import axios, { handleResp } from "@/config/axios";
 import {
   EventsQueryParams,
@@ -14,15 +15,6 @@ import {
   ApiResponse,
   PaginatedResponse,
 } from "@/types";
-
-// Helper to get API base URL
-function getApiBaseUrl() {
-  // Use Next.js proxy in development, full URL in production
-  if (process.env.NODE_ENV === "production") {
-    return config.backendURL;
-  }
-  return ""; // Use Next.js proxy routes in development
-}
 
 export const getEvents = async (data: any) => {
   try {

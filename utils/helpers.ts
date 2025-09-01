@@ -70,7 +70,15 @@ interface BuyResult {
   averagePrice: number;
 }
 
-export function buyFunction(data: OrderData[] | null | undefined, amountInUSD: number): BuyResult {
+/**
+ * Calculate total shares and average price when buying with a given USD amount
+ * Accounts for trading fees to ensure accurate share calculation
+ * @param data - Order book data with price and size
+ * @param amountInUSD - Amount in USD to spend
+ * @param fee - Trading fee percentage (e.g., 2 for 2%)
+ * @returns Object with total shares and average price
+ */
+export function buyFunction(data: OrderData[] | null | undefined, amountInUSD: number, fee: number = 0): BuyResult {
   if (!data) return { totalShares: 0, averagePrice: 0 };
   if (data?.length === 0) return { totalShares: 0, averagePrice: 0 };
   // Sort data by price in ascending order
@@ -81,6 +89,9 @@ export function buyFunction(data: OrderData[] | null | undefined, amountInUSD: n
   let remainingAmount = amountInUSD;
   let totalShares = 0;
   let totalCost = 0;
+  
+  // Adjust for fees - fee is a percentage (e.g., 2 for 2%)
+  const feeFactor = fee > 0 ? 1 - (fee / 100) : 1;
 
   for (const order of sortedData) {
     const price = parseFloat(order.price as string);
@@ -91,13 +102,15 @@ export function buyFunction(data: OrderData[] | null | undefined, amountInUSD: n
     }
 
     // Calculate the maximum number of shares we can buy with the remaining amount
-    const maxSharesForPrice = Math.min(size, remainingAmount / price);
+    // Adjust price for fees to ensure we don't overestimate shares
+    const adjustedPrice = price / feeFactor;
+    const maxSharesForPrice = Math.min(size, remainingAmount / adjustedPrice);
 
     if (maxSharesForPrice > 0) {
       // Buy the shares
       totalShares += maxSharesForPrice;
       totalCost += maxSharesForPrice * price;
-      remainingAmount -= maxSharesForPrice * price;
+      remainingAmount -= maxSharesForPrice * adjustedPrice;
     }
   }
 

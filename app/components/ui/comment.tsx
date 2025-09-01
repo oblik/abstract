@@ -13,12 +13,12 @@ import { setUser } from "@/store/slices/auth/userSlice";
 import { Trash2, Reply } from "lucide-react";
 import CommentForm from "./CommentForm";
 import { CommentProps, PostCommentRequestData } from "@/types/comments";
+import { PaginatedResponse } from "@/types";
 import CommentList from "./CommentList";
-import { getComments, getCommentsPaginate, postComment } from "@/services/market";
+import { getComments, getCommentsPaginate, postComment, deleteComment } from "@/services/market";
 import { toastAlert } from "@/lib/toast";
 import { useSelector, useDispatch } from "react-redux";
 import { SocketContext } from "@/config/socketConnectivity";
-import { deleteComment } from "@/services/user";
 import PopupModal from "./usernameModal";
 import { isEmpty } from "@/lib/isEmpty";
 import { addUserName } from "@/services/user";
@@ -230,15 +230,13 @@ export function ReplyForm({
   onCancel,
   comments,
 }: ReplyFormProps) {
-  const { address } = useSelector(
-    (state: any) => state?.walletconnect?.walletconnect
-  );
+  const user = useSelector((state: any) => state?.auth?.user || {});
+  const userId = (user as any)._id || (user as any).userId;
   const [reply, setReply] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modelError, setModelError] = useState("");
   const [account, setaccount] = useState("");
-  const user = useSelector((state: any) => state?.auth?.user || {});
   const formRef = useRef<HTMLFormElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -246,9 +244,9 @@ export function ReplyForm({
 
   useEffect(() => {
     try {
-      setaccount(address ? address : "");
+      setaccount(userId ? userId : "");
     } catch (err) {}
-  }, [address]);
+  }, [userId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -264,15 +262,32 @@ export function ReplyForm({
     try {
       setIsSubmitting(true);
       const reqData = {
-        userId: user._id,
+        userId: userId,
         eventId: eventId,
         content: contentToSubmit,
         parentId: parentId,
       };
-      const { success, message } = await postComment(reqData);
+      const { success, message, comments, comment } = await postComment(reqData);
       if (!success) {
         toastAlert("error",message || "Failed to post comment. Please try again later.");
         return;
+      }
+      
+      // Backend returns comment in 'comment' property for POST requests
+      const result = comment || comments?.[0];
+      if (result) {
+        const commentResult = result as any;
+        const adaptedReply = {
+          _id: commentResult._id,
+          content: commentResult.content,
+          createdAt: commentResult.createdAt,
+          userId: commentResult.userId, // Backend includes userId object directly
+          wallet_address: commentResult.userId?.uniqueId || commentResult.userId?._id, // Use userId.uniqueId as wallet_address
+          parentId: commentResult.parentId,
+          reply_count: 0,
+          positions: []
+        };
+        onReplyAdded(adaptedReply);
       }
 
       setReply("");
@@ -395,6 +410,20 @@ interface CommentSectionProps {
   eventId: string;
 }
 
+// Helper function to adapt API response to expected component format
+const adaptCommentData = (comment: any, positionsMap: Map<string, any[]>): CommentProps["comment"] => {
+  return {
+    _id: comment._id,
+    content: comment.content,
+    createdAt: comment.createdAt,
+    userId: comment.userId, // Backend includes userId object directly
+    wallet_address: (comment.userId as any)?.uniqueId || (comment.userId as any)?._id, // Use userId.uniqueId as wallet_address
+    parentId: comment.parentId,
+    reply_count: comment.replies?.length || 0, // Use replies array length for reply_count
+    positions: positionsMap.get((comment.userId as any)?._id || comment.userId) || []
+  };
+};
+
 export function CommentSection({ eventId }: CommentSectionProps) {
   const socketContext = useContext(SocketContext);
 
@@ -424,55 +453,51 @@ export function CommentSection({ eventId }: CommentSectionProps) {
         return;
       }
   
-      const { comments, positions, count } = (response.result as any) || {};
-      setTotal(count || 0);
+      // Backend API returns response with success, comments, positions, count
+      const responseData = response.success ? response : response.result || {};
+      const commentsData = (responseData as any).comments || [];
+      setTotal((responseData as any).count || 0);
 
+      // Backend provides positions data in the response
+      const positionsData = (responseData as any).positions || [];
       const positionsMap = new Map();
-        (positions || []).forEach(item => {
-          const userId = item.userId.toString();
-          if (!positionsMap.has(userId)) {
-            positionsMap.set(userId, []);
-          }
-          
-          positionsMap.get(userId).push({
-            quantity: item.quantity,
-            side: item.side,
-            label: !isEmpty(item?.marketId?.groupItemTitle) 
-              ? item?.marketId?.groupItemTitle 
-              : (item.side === "yes" ? item.marketId.outcome[0].title : item.marketId.outcome[1].title)
+      
+      // Create a map of user IDs to their positions
+      positionsData.forEach((position: any) => {
+        if (position.userId && !positionsMap.has(position.userId)) {
+          positionsMap.set(position.userId, [position]);
+        } else if (position.userId) {
+          positionsMap.get(position.userId).push(position);
+        }
+      });
+
+      // Flatten comments and replies
+      const allComments: any[] = [];
+      
+      commentsData.forEach((comment: any) => {
+        // Add the main comment
+        allComments.push(comment);
+        
+        // Add all replies to the flat array
+        if (comment.replies && Array.isArray(comment.replies)) {
+          comment.replies.forEach((reply: any) => {
+            allComments.push(reply);
           });
-        });
-
-        const addPositionsToComment = (comment) => {
-          const userId = comment.userId._id?.toString() || comment.userId.toString();
-          return {
-            ...comment,
-            positions: positionsMap.get(userId) || []
-          };
-        };
-
-        const flatComments = (comments || []).reduce((acc, comment) => {
-          const { replies, ...parentComment } = comment;
-          acc.push(addPositionsToComment(parentComment));
-          
-          if (replies?.length > 0) {
-            replies.forEach(reply => {
-              acc.push(addPositionsToComment(reply));
-            });
-          }
-          
-          return acc;
-        }, []);
+        }
+      });
+      
+      // Adapt all comments to the expected format
+      const adaptedComments = allComments.map((comment: any) => adaptCommentData(comment, positionsMap));
   
       setComments(prevComments => {
         if (isInitialLoad) {
-          return flatComments;
+          return adaptedComments;
         }
-        return [...prevComments, ...flatComments]; // Append new comments
+        return [...prevComments, ...adaptedComments]; // Append new comments
       });
   
       setPage(pageToFetch);
-      setHasMore((comments || []).length === limit);
+      setHasMore(commentsData.length === limit);
   
     } catch (error) {
       console.error("Error loading comments:", error);
@@ -494,7 +519,8 @@ export function CommentSection({ eventId }: CommentSectionProps) {
 
   const handleDelete = async (commentId: string) => {
     try {
-      const { success, message } = await deleteComment({ id: commentId });
+      // Use the deleteComment from market service instead of user service
+      const { success, message } = await deleteComment(commentId);
       if (!success) {
         toastAlert(
           "error",
@@ -537,17 +563,18 @@ export function CommentSection({ eventId }: CommentSectionProps) {
     fetchComments(1, true);
   }, [fetchComments]);
 
-  useEffect(() => {
-    const socket = socketContext?.socket;
-    if (!socket) {
-      return;
-    }
+  // Temporarily disable Socket.io real-time updates as the backend service is not running
+  // useEffect(() => {
+  //   const socket = socketContext?.socket;
+  //   if (!socket) {
+  //     return;
+  //   }
 
-    socket.on("comment", handleCommentAdded);
-    return () => {
-      socket.off("comment", handleCommentAdded);
-    };
-  }, [socketContext?.socket, handleCommentAdded]);
+  //   socket.on("comment", handleCommentAdded);
+  //   return () => {
+  //     socket.off("comment", handleCommentAdded);
+  //   };
+  // }, [socketContext?.socket, handleCommentAdded]);
 
   return (
     <div className="mt-6">

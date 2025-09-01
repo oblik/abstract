@@ -10,16 +10,14 @@ import {
   PriceHistoryParams,
   Comment,
   PostCommentData,
+  PostCommentResponse,
   ApiResponse,
   PaginatedResponse,
 } from "@/types";
 
-// Helper to get API base URL (use proxy in dev, full URL in prod)
+// Helper to get API base URL
 function getApiBaseUrl() {
-  if (process.env.NODE_ENV === "production") {
-    return config.backendURL;
-  }
-  return ""; // Use Next.js proxy in development
+  return config.backendURL;
 }
 
 export const getEvents = async (data: any) => {
@@ -155,9 +153,8 @@ export const getComments = async (eventId: string): Promise<ApiResponse<Comment[
 export const getCommentsPaginate = async (eventId: string, data: { page: number; limit: number }): Promise<ApiResponse<PaginatedResponse<Comment>>> => {
   try {
     let respData = await axios({
-      url: `${getApiBaseUrl()}/api/v1/user/comments/event/paginate/${eventId}`,
+      url: `${getApiBaseUrl()}/api/v1/user/comments/event/paginate/${eventId}?page=${data.page}&limit=${data.limit}`,
       method: "get",
-      params: data,
       withCredentials: false,
     });
     return handleResp(respData, "success");
@@ -166,12 +163,29 @@ export const getCommentsPaginate = async (eventId: string, data: { page: number;
   }
 };
 
-export const postComment = async (data: PostCommentData): Promise<ApiResponse<Comment>> => {
+export const postComment = async (data: PostCommentData): Promise<PostCommentResponse> => {
   try {
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/user/comments`,
       method: "post",
-      data,
+      data: {
+        userId: data.userId,
+        eventId: data.eventId,
+        content: data.content,
+        parentId: data.parentId
+      },
+    });
+    return handleResp(respData, "success");
+  } catch (error: unknown) {
+    return handleResp(error, "error");
+  }
+};
+
+export const deleteComment = async (commentId: string): Promise<ApiResponse> => {
+  try {
+    let respData = await axios({
+      url: `${getApiBaseUrl()}/api/v1/user/comments/${commentId}`,
+      method: "delete",
     });
     return handleResp(respData, "success");
   } catch (error: unknown) {

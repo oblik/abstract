@@ -32,7 +32,7 @@ export interface User {
   walletAddress: string;
   profileImg?: string;
   loginType: 'email' | 'google' | 'wallet';
-  userId: string;
+  userId?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -271,8 +271,29 @@ export interface CommentParams {
 }
 
 export interface PostCommentData {
+  userId?: string;
   eventId: string;
   content: string;
+  parentId?: string | null;
+}
+
+export interface PostCommentResponse {
+  success: boolean;
+  message: string;
+  comment?: {
+    _id: string;
+    userId: {
+      _id: string;
+      name: string;
+      userName: string;
+      profileImg: string;
+    };
+    eventId: string;
+    content: string;
+    parentId: string | null;
+    createdAt: string;
+  };
+  comments?: Comment[];
 }
 
 // Transaction types

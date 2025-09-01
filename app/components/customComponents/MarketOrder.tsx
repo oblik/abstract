@@ -160,11 +160,13 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
 let remaining = feeAdjustedOrdVal * 100;
     for (const [price, qty] of priceLevels) {
       let priceNum = Number(price);
-      const maxContracts = Math.min(Math.floor(remaining / priceNum), qty);
+      // Adjust price for fee calculation to get actual contracts user will receive
+      const adjustedPrice = priceNum / feeFactor;
+      const maxContracts = Math.min(Math.floor(remaining / adjustedPrice), qty);
       contracts += maxContracts;
       totalCost += maxContracts * priceNum;
-      remaining -= maxContracts * priceNum;
-      if (remaining < priceNum) break;
+      remaining -= maxContracts * adjustedPrice;
+      if (remaining < adjustedPrice) break;
     }
     avgPrice = contracts > 0 ? toFixedDown(totalCost / contracts, 2) + "¢" : "-";
     payout = "$" + toFixedDown(contracts, 2);

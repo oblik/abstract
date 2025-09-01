@@ -362,6 +362,27 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
               {/* Replace with actual number */}
             </div>
 
+            {/* Add reference comparison with market order */}
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">
+                Reference: Market order would get
+              </span>
+              <span className="text-foreground">
+                {(() => {
+                  const shares = Number(amount || 0);
+                  const prc = Number(price || 0);
+                  const fee = Number(takerFee || makerFee || 0);
+                  if (prc <= 0) return "-";
+                  // Calculate how many contracts user would get with same amount via market order
+                  const feeFactor = 1 - (fee / 100);
+                  const adjustedPrice = prc / feeFactor;
+                  const totalCost = (shares * prc) / 100;
+                  const marketContracts = Math.floor((totalCost * 100) / adjustedPrice);
+                  return `${marketContracts.toLocaleString()} contracts`;
+                })()}
+              </span>
+            </div>
+
             <div className="flex justify-between text-sm">
   <div>
     <span className="text-white">
@@ -371,12 +392,13 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
   </div>
   <span className="text-green-500">
     {(() => {
-      const amt = Number(amount || 0);
+      const shares = Number(amount || 0);
       const prc = Number(price || 0);
       const fee = Number(makerFee || 0);
-      const base = (amt * prc) / 100;
-      const feePaid = (fee / 100) * base;
-      const total = base + feePaid;
+      // For buy orders: total cost including fees
+      const feeFactor = 1 - (fee / 100);
+      const adjustedPrice = prc / feeFactor;
+      const total = (shares * adjustedPrice) / 100;
       return `$ ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     })()}
   </span>
@@ -396,9 +418,16 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
   </div>
   <span className="text-green-500">
     {(() => {
-      const amt = Number(amount || 0);
-      const totalReturn = amt * 1; // $1 per contract
-      return `$ ${totalReturn.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      const shares = Number(amount || 0);
+      const prc = Number(price || 0);
+      const fee = Number(makerFee || 0);
+      // For buy orders: net return = potential payout ($1 per contract) - total cost including fees
+      const feeFactor = 1 - (fee / 100);
+      const adjustedPrice = prc / feeFactor;
+      const totalCost = (shares * adjustedPrice) / 100;
+      const potentialPayout = shares; // $1 per contract if wins
+      const netReturn = potentialPayout - totalCost;
+      return `$ ${netReturn.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     })()}
   </span>
 </div>
@@ -415,12 +444,14 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
               </span>
               <span className="text-foreground text-green-500">
                 {(() => {
-                  const amt = Number(amount || 0);
+                  const shares = Number(amount || 0);
                   const prc = Number(price || 0);
-                  const base = (amt * prc) / 100;
                   const fee = Number(makerFee || 0);
-                  const feeDeducted = base - (fee / 100) * base;
-                  return `$ ${feeDeducted.toFixed(2)}`;
+                  // For sell orders: amount received after fees
+                  const feeFactor = 1 - (fee / 100);
+                  const grossAmount = (shares * prc) / 100;
+                  const netAmount = grossAmount * feeFactor;
+                  return `$ ${netAmount.toFixed(2)}`;
                 })()}
               </span>
             </div>

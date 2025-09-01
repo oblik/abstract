@@ -1,4 +1,12 @@
 import React from "react";
+
+/*
+ * WARNING: This is a template component with placeholder values.
+ * Before using this component in production, you must implement proper fee-adjusted calculations:
+ * - Share calculations should use: adjustedPrice = price / (1 - fee/100)
+ * - All estimated returns should account for trading fees
+ * - Do not show users gross estimates without fee adjustment
+ */
 import Ye from "/public/images/Ye.png";
 import Image from "next/image";
 import { Button } from "@/app/components/ui/button";

@@ -16,6 +16,7 @@ export const userSlice = createSlice({
 
 // Types
 export interface UserSliceState {
+	_id: string,
 	name: string,
 	userName: string,
 	email: string,
@@ -24,7 +25,7 @@ export interface UserSliceState {
 	walletAddress: string,
 	profileImg: string,
 	loginType: string,
-	userId: string,
+	userId?: string,
 }
 
 export const { setUser, reset, updateSetting } = userSlice.actions;

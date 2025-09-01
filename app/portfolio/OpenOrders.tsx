@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Loader, X } from 'lucide-react'
 import { toastAlert } from '@/lib/toast'
 import { momentFormat } from '../helper/date'
-import { SocketContext } from '@/config/socketConnectivity'
+import { SocketContext, subscribe, unsubscribe } from '@/config/socketConnectivity'
 import store from "@/store/index";
 import { toFixedDown } from '@/lib/roundOf'
 import { isEmpty } from '@/lib/isEmpty'
@@ -143,86 +143,120 @@ const OpenOrders = (props: OpenOrdersProps) => {
 
     useEffect(() => {
         let socket = socketContext?.socket
-        if (!socket) return
+        if (!socket || !user?._id) return
+
+        console.log("=== Setting up order socket listeners ===");
+        console.log("User ID:", user._id);
+
+        // Subscribe to user-specific updates
+        subscribe(user._id);
+
         const handleOrders = (result: string) => {
-            const resData: SocketOrderData = JSON.parse(result)
-            if (resData.userId !== user._id) return
-            setOpenOrders(prev => {
-                const prevArray = prev as any[];
-                const findMarket = prevArray.find(market => market.eventId === resData.marketId.eventId._id)
-                const marketIndex = prevArray.findIndex(market => market.eventId === resData.marketId.eventId._id);
-                if (findMarket) {
-                    const findOrder = findMarket.orders.find(order => order._id === resData._id)
-                    if (findOrder) {
-                        if (["open", "pending"].includes(resData.status)) {
-                            findOrder.filledQuantity = resData.execQty
-                            findOrder.price = resData.price
-                            findOrder.quantity = resData.quantity
-                            findOrder.createdAt = resData.createdAt
-                            findOrder.userSide = resData.userSide
-                            findOrder.status = resData.status
-                            findOrder.currentPrice = resData.marketId.odd
-                            findOrder.timeInForce = resData.timeInForce
-                            findOrder.expiration = resData.expiration
-                            findOrder.action = resData.action
-                            return prev;
-                        } else if (["completed", "cancelled", "expired"].includes(resData.status)) {
+            console.log("=== Order update received ===", result);
+            try {
+                const resData: SocketOrderData = JSON.parse(result)
+
+                // Only process updates for the current user
+                if (resData.userId !== user._id) {
+                    console.log("Order update not for current user, ignoring");
+                    return;
+                }
+
+                setOpenOrders(prev => {
+                    const prevArray = prev as any[];
+                    const findMarket = prevArray.find(market => market.eventId === resData.marketId.eventId._id)
+                    const marketIndex = prevArray.findIndex(market => market.eventId === resData.marketId.eventId._id);
+                    if (findMarket) {
+                        const findOrder = findMarket.orders.find(order => order._id === resData._id)
+                        if (findOrder) {
+                            if (["open", "pending"].includes(resData.status)) {
+                                findOrder.filledQuantity = resData.execQty
+                                findOrder.price = resData.price
+                                findOrder.quantity = resData.quantity
+                                findOrder.createdAt = resData.createdAt
+                                findOrder.userSide = resData.userSide
+                                findOrder.status = resData.status
+                                findOrder.currentPrice = resData.marketId.odd
+                                findOrder.timeInForce = resData.timeInForce
+                                findOrder.expiration = resData.expiration
+                                findOrder.action = resData.action
+                                return prev;
+                            } else if (["completed", "cancelled", "expired"].includes(resData.status)) {
+                                const updatedMarket = {
+                                    ...findMarket,
+                                    orders: findMarket.orders?.filter(order => order._id !== resData._id) || [],
+                                };
+                                if (updatedMarket.orders.length === 0) {
+                                    return prevArray.filter(market => market.eventId !== resData.marketId.eventId._id)
+                                }
+                                const updatedData = prevArray.map(market => market.eventId === resData.marketId.eventId._id ? updatedMarket : market)
+                                return updatedData
+                            }
+                        } else {
+                            const newOrder = {
+                                ...resData,
+                                currentPrice: resData.marketId.odd,
+                                timeInForce: resData.timeInForce,
+                                expiration: resData.expiration,
+                                action: resData.action,
+                                outcomes: resData.marketId.outcome
+                            };
+
                             const updatedMarket = {
                                 ...findMarket,
-                                orders: findMarket.orders?.filter(order => order._id !== resData._id) || [],
+                                orders: [...findMarket.orders, newOrder],
                             };
-                            if (updatedMarket.orders.length === 0) {
-                                return prevArray.filter(market => market.eventId !== resData.marketId.eventId._id)
-                            }
-                            const updatedData = prevArray.map(market => market.eventId === resData.marketId.eventId._id ? updatedMarket : market)
-                            return updatedData
+
+                            const updatedMarkets = [...prevArray];
+                            updatedMarkets[marketIndex] = updatedMarket;
+
+                            return updatedMarkets as any;
                         }
                     } else {
-                        const newOrder = {
+                        let orderData = {
                             ...resData,
                             currentPrice: resData.marketId.odd,
                             timeInForce: resData.timeInForce,
                             expiration: resData.expiration,
                             action: resData.action,
                             outcomes: resData.marketId.outcome
-                        };
-
-                        const updatedMarket = {
-                            ...findMarket,
-                            orders: [...findMarket.orders, newOrder],
-                        };
-
-                        const updatedMarkets = [...prevArray];
-                        updatedMarkets[marketIndex] = updatedMarket;
-
-                        return updatedMarkets as any;
+                        }
+                        const newMarket = {
+                            eventId: resData.marketId.eventId._id,
+                            eventSlug: resData.marketId.eventId.slug,
+                            eventImage: resData.marketId.eventId.image,
+                            eventTitle: resData.marketId.eventId.title,
+                            orders: [orderData]
+                        }
+                        return [newMarket, ...prevArray] as any
                     }
-                } else {
-                    let orderData = {
-                        ...resData,
-                        currentPrice: resData.marketId.odd,
-                        timeInForce: resData.timeInForce,
-                        expiration: resData.expiration,
-                        action: resData.action,
-                        outcomes: resData.marketId.outcome
-                    }
-                    const newMarket = {
-                        eventId: resData.marketId.eventId._id,
-                        eventSlug: resData.marketId.eventId.slug,
-                        eventImage: resData.marketId.eventId.image,
-                        eventTitle: resData.marketId.eventId.title,
-                        orders: [orderData]
-                    }
-                    return [newMarket, ...prevArray] as any
-                }
-            })
+                });
+            } catch (error) {
+                console.error("Error handling order update:", error);
+            }
+        };
 
-        }
-        socket.on("order-update", handleOrders)
+        const handleTradeUpdate = (result: string) => {
+            console.log("=== Trade update received ===", result);
+            // Refresh orders when trades happen
+            getUserOpenOrders();
+        };
+
+        // Listen for various socket events
+        socket.on("order-update", handleOrders);
+        socket.on("trade-update", handleTradeUpdate);
+        socket.on("order-fill", handleOrders);
+        socket.on(`user-${user._id}`, handleOrders);
+
         return () => {
-            socket.off("order-update", handleOrders)
-        }
-    }, [socketContext?.socket, user, setOpenOrders])
+            console.log("=== Cleaning up order socket listeners ===");
+            socket.off("order-update", handleOrders);
+            socket.off("trade-update", handleTradeUpdate);
+            socket.off("order-fill", handleOrders);
+            socket.off(`user-${user._id}`, handleOrders);
+            unsubscribe(user._id);
+        };
+    }, [socketContext?.socket, user?._id]);
     return (
         <>
             { }

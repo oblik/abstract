@@ -12,20 +12,28 @@ let connectionOptions = {
   reconnectionAttempts: "Infinity",
   timeout: 10000,
 };
-const socket = io(config.backendURL, connectionOptions);
+
+// Only initialize socket if we have a valid backend URL
+const socket = config.backendURL ? io(config.backendURL, connectionOptions) : null;
 
 const subscribe = event => {
-  socket.emit("subscribe", event);
+  if (socket) {
+    socket.emit("subscribe", event);
+  }
 };
 
 const unsubscribe = event => {
-  socket.emit("unsubscribe", event);
+  if (socket) {
+    socket.emit("unsubscribe", event);
+  }
 };
 
-socket.on("disconnect", reason => {
-  const { user } = store.getState().auth;
-  if (user) subscribe(user._id);
-});
+if (socket) {
+  socket.on("disconnect", reason => {
+    const { user } = store.getState().auth;
+    if (user) subscribe(user._id);
+  });
+}
 
 const SocketContext = createContext({
   socket: socket,

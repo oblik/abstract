@@ -2,10 +2,11 @@ import config from "@/config/config";
 
 // Helper to get API base URL (use proxy in dev, full URL in prod)
 function getApiBaseUrl() {
+  // Use Next.js proxy in development, full URL in production
   if (process.env.NODE_ENV === "production") {
     return config.backendURL;
   }
-  return ""; // Use Next.js proxy in development
+  return ""; // Use Next.js proxy routes in development
 }
 import axios, { handleResp } from "@/config/axios";
 import { ApiResponse, Position } from "@/types";

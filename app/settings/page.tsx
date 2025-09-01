@@ -24,6 +24,8 @@ import WalletSettings from "./WalletSettings";
 import ProfileSettings from "./ProfileSettings";
 import { Footer } from "../components/customComponents/Footer";
 import HeaderFixed from "@/app/HeaderFixed";
+import { NavigationBar } from "@/app/components/ui/navigation-menu";
+import { getCategories } from "@/services/market";
 
 const uploadToStorage = async (file: File): Promise<string> => {
   try {
@@ -50,6 +52,20 @@ const uploadToStorage = async (file: File): Promise<string> => {
 };
 
 export default function ProfilePage() {
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getCategories();
+        setCategories(response);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   // Add notification settings handlers
   const handleNotificationToggle = async (type: string, enabled: boolean) => {
@@ -94,8 +110,16 @@ export default function ProfilePage() {
 
   return (
     <div className="text-white pb-20 bg-black h-auto items-center justify-items-center p-0 m-0">
-      <div  className="px-0 sticky top-0 z-50 w-[100%] bg-black lg:bg-transparent backdrop-blur-0 lg:backdrop-blur-md border-b border-[#222] lg:mb-4 mb-0 sm:pb-2 pb-0" style={{ borderBottomWidth: '1px' }}>
+      <div className="px-0 sticky top-0 z-50 w-[100%] bg-black lg:bg-transparent backdrop-blur-0 lg:backdrop-blur-md border-b border-[#222] lg:mb-4 mb-0 sm:pb-2 pb-0" style={{ borderBottomWidth: '1px' }}>
         <Header />
+        <div className="hidden lg:block">
+          <NavigationBar
+            menuItems={categories}
+            showLiveTag={true}
+            setSelectedCategory={setSelectedCategory}
+            selectedCategory={selectedCategory}
+          />
+        </div>
       </div>
 
       <div className="container mx-auto sm:py-10 py-4 px-1.5 sm:px-4 container-sm">
@@ -126,7 +150,9 @@ export default function ProfilePage() {
           </div>
         </Tabs.Root>
       </div>
-
+      <div className="hidden sm:block">
+        <Footer />
+      </div>
       <HeaderFixed />
     </div>
   );

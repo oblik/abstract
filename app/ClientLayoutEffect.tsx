@@ -21,7 +21,7 @@ export default function ClientLayoutEffect() {
   const socketContext = useContext(SocketContext);
   const dispatch = useDispatch();
   const user = useSelector((state: any) => state.auth.user);
-  
+
   const getWalletData = useCallback(async () => {
     try {
       const { success, result } = await getCurrentValue();
@@ -30,8 +30,8 @@ export default function ClientLayoutEffect() {
           balance: result.balance,
           inOrder: result.inOrder,
           locked: result.locked,
-          position: result.position/100,
-          pnl1D: result.pnl1D
+          position: result.position / 100,
+          pnl1D: result.pnl1D / 100
         } as WalletData));
       }
     } catch (error) {
@@ -43,7 +43,7 @@ export default function ClientLayoutEffect() {
   useEffect(() => {
     (async () => {
       try {
-        const { success } = await getUserData(dispatch);
+        const { success } = await getUserData();
         if (success) {
           // Check if we have a token in cookies
           if (typeof window !== 'undefined') {
@@ -75,8 +75,8 @@ export default function ClientLayoutEffect() {
             balance: result.balance,
             inOrder: result.inOrder,
             locked: result.locked,
-            position: result.position/100,
-            pnl1D: result.pnl1D
+            position: result.position / 100,
+            pnl1D: result.pnl1D / 100
           } as WalletData));
         }
       } catch (error) {

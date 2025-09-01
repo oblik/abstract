@@ -10,16 +10,18 @@ import {
   PriceHistoryParams,
   Comment,
   PostCommentData,
+  PostCommentResponse,
   ApiResponse,
   PaginatedResponse,
 } from "@/types";
 
-// Helper to get API base URL (use proxy in dev, full URL in prod)
+// Helper to get API base URL
 function getApiBaseUrl() {
+  // Use Next.js proxy in development, full URL in production
   if (process.env.NODE_ENV === "production") {
     return config.backendURL;
   }
-  return ""; // Use Next.js proxy in development
+  return ""; // Use Next.js proxy routes in development
 }
 
 export const getEvents = async (data: any) => {
@@ -110,10 +112,10 @@ export const getOrderBook = async (data: any) => {
   }
 };
 
-export const getPriceHistory = async (id: string, params: PriceHistoryParams): Promise<ApiResponse<PriceHistoryPoint[]>> => {
+export const getPriceHistory = async (id: string, params: PriceHistoryParams): Promise<ApiResponse> => {
   try {
     let respData = await axios({
-      url: `${getApiBaseUrl()}/api/v1/events/series/event/${id}`,
+      url: `${getApiBaseUrl()}/api/v1/events/price-history/${id}`,
       method: "get",
       params,
       withCredentials: false,
@@ -139,58 +141,68 @@ export const getForecastHistory = async (id: string, params: PriceHistoryParams)
 };
 
 //get comments
-export const getComments = async (eventId: string) => {
+export const getComments = async (eventId: string): Promise<ApiResponse<Comment[]>> => {
   try {
-    console.log("getComments called with eventId:", eventId);
 
-    // Create a new axios instance without interceptors for public API calls
-    const publicAxios = axios.create({
-      baseURL: getApiBaseUrl(),
-      timeout: 10000,
-    });
-
-    let respData = await publicAxios({
-      url: `/api/v1/user/comments/event/${eventId}`,
+    let respData = await axios({
+      url: `${getApiBaseUrl()}/api/v1/user/comments/event/${eventId}`,
       method: "get",
+      withCredentials: false,
     });
-
-    console.log("getComments raw response:", respData);
     return handleResp(respData, "success");
-  } catch (error: any) {
-    console.error("getComments error:", error);
+  } catch (error: unknown) {
     return handleResp(error, "error");
   }
 };
 
-export const getCommentsPaginate = async (eventId: string, data: { page: number; limit: number }) => {
+
+export const getCommentsPaginate = async (eventId: string, data: { page: number; limit: number }): Promise<ApiResponse<PaginatedResponse<Comment>>> => {
   try {
-    console.log("getCommentsPaginate called with:", { eventId, data });
+    console.log("=== getCommentsPaginate API Call ===");
+    console.log("EventId:", eventId);
+    console.log("Request params:", data);
 
-    // Create a new axios instance without interceptors for public API calls
-    const publicAxios = axios.create({
-      baseURL: getApiBaseUrl(),
-      timeout: 10000,
-    });
-
-    let respData = await publicAxios({
-      url: `/api/v1/user/comments/event/paginate/${eventId}`,
+    let respData = await axios({
+      url: `${getApiBaseUrl()}/api/v1/user/comments/event/paginate/${eventId}`,
       method: "get",
-      params: data
+      params: data,
+      withCredentials: false,
     });
 
-    console.log("getCommentsPaginate raw response:", respData);
+    console.log("Raw API response:", respData);
+    console.log("Response data structure:", respData.data);
+
     return handleResp(respData, "success");
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("getCommentsPaginate error:", error);
     return handleResp(error, "error");
   }
 };
-export const postComment = async (data: any) => {
+
+
+export const postComment = async (data: PostCommentData): Promise<PostCommentResponse> => {
   try {
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/user/comments`,
       method: "post",
-      data,
+      data: {
+        userId: data.userId,
+        eventId: data.eventId,
+        content: data.content,
+        parentId: data.parentId
+      },
+    });
+    return handleResp(respData, "success");
+  } catch (error: unknown) {
+    return handleResp(error, "error");
+  }
+};
+
+export const deleteComment = async (commentId: string): Promise<ApiResponse> => {
+  try {
+    let respData = await axios({
+      url: `${getApiBaseUrl()}/api/v1/user/comments/${commentId}`,
+      method: "delete",
     });
     return handleResp(respData, "success");
   } catch (error: any) {

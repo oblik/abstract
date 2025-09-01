@@ -21,8 +21,10 @@ const CommentForm = ({ eventId, onCommentAdded }: CommentFormProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modelError, setModelError] = useState("");
 
-  const { signedIn } = useSelector((state: any) => state?.auth?.session);
-  const { _id: userId, userName } = useSelector((state: any) => state?.auth?.user || {});
+  const { signedIn } = useSelector((state) => state?.auth?.session);
+  const user = useSelector((state) => state?.auth?.user || {});
+  const userId = (user as any)._id || (user as any).userId;
+  const { userName } = user;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,10 +35,14 @@ const CommentForm = ({ eventId, onCommentAdded }: CommentFormProps) => {
 
     try {
       if (!userId) {
-        toastAlert("error", "Failed to post comment. Please try again later.");
+        toastAlert("error", "Please sign in to comment.");
         return;
       }
       setIsSubmitting(true);
+
+      console.log("=== Submitting comment ===");
+      console.log("Request data:", { userId, eventId, content: newComment, parentId: null });
+
       const reqData = {
         userId: userId,
         eventId: eventId,
@@ -45,14 +51,39 @@ const CommentForm = ({ eventId, onCommentAdded }: CommentFormProps) => {
       };
       console.log("reqData: ", reqData);
 
-      const { success, message } = await postComment(reqData);
+      const { success, message, comments, comment } = await postComment(reqData);
+
+      console.log("=== Comment submission response ===");
+      console.log("Success:", success, "Message:", message, "Comments:", comments, "Comment:", comment);
+
       if (!success) {
         toastAlert("error", message || "Failed to post comment. Please try again later.");
         return;
       }
+
+      // Backend returns comment in 'comment' property for POST requests
+      const result = comment || comments?.[0];
+      if (!result) {
+        toastAlert("error", "No response data received");
+        return;
+      }
+      const commentResult = result as any;
+      const adaptedComment = {
+        _id: commentResult._id,
+        content: commentResult.content,
+        createdAt: commentResult.createdAt,
+        userId: commentResult.userId, // Backend includes userId object directly
+        wallet_address: commentResult.userId?.uniqueId || commentResult.userId?._id, // Use userId.uniqueId as wallet_address
+        parentId: commentResult.parentId,
+        reply_count: 0,
+        positions: []
+      };
+
+      onCommentAdded(adaptedComment);
       toastAlert("success", "Comment posted successfully!");
       setNewComment("");
       // Refresh the comments list
+      console.log("=== Triggering comment refresh ===");
       onCommentAdded({} as any);
     } catch (error) {
       console.error("Comment submission error:", error);

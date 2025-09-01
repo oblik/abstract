@@ -1,82 +1,108 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import {
-  WagmiProvider,
-  createConfig,
-  http,
-  useAccount,
-  useConnect,
-  useDisconnect,
-} from 'wagmi';
-import { polygon, polygonAmoy } from 'wagmi/chains';
-import { metaMask, walletConnect } from 'wagmi/connectors';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-const queryClient = new QueryClient();
-
-const walletconfig = createConfig({
-  autoConnect: true,
-  chains: [polygon, polygonAmoy],
-  transports: {
-    [polygon.id]: http('https://polygon-mainnet.g.alchemy.com/v2/demo'),
-    [polygonAmoy.id]: http('https://polygon-amoy-bor-rpc.publicnode.com'),
-  },
-  connectors: [
-    metaMask({ chains: [polygon, polygonAmoy] }),
-    walletConnect({
-      projectId: 'cb89ebb21cdccb2e1b591e189e27706a',
-      chains: ['137'],
-      showQrModal: true,
-    }),
-  ],
-});
 
 const WalletContext = createContext({
   address: null,
   isConnected: false,
   connectors: [],
-  connectWallet: () => {},
-  disconnectWallet: () => {},
+  connectWallet: () => { },
+  disconnectWallet: () => { },
 });
 
 export const WalletProvider = ({ children }) => {
   const [isMounted, setIsMounted] = useState(false);
+  const [address, setAddress] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
+
+    // Check if there's an existing Phantom wallet connection
+    if (typeof window !== 'undefined') {
+      console.log("=== CHECKING FOR EXISTING PHANTOM CONNECTION ===");
+
+      // Only check for Phantom wallet (Solana)
+      if (window.solana && window.solana.isPhantom) {
+        if (window.solana.isConnected) {
+          const publicKey = window.solana.publicKey?.toString();
+          if (publicKey) {
+            console.log("Found existing Phantom connection:", publicKey);
+            console.log("Setting wallet context state...");
+            setAddress(publicKey);
+            setIsConnected(true);
+            console.log("✅ Wallet context updated - address:", publicKey);
+          } else {
+            console.log("❌ Phantom connected but no public key");
+          }
+        } else {
+          console.log("ℹ️  Phantom wallet not connected");
+        }
+      } else {
+        console.log("❌ Phantom wallet not available");
+      }
+    }
   }, []);
 
-  return (
-    <WagmiProvider config={walletconfig}>
-      <QueryClientProvider client={queryClient}>
-        {isMounted && <WalletProviderInner>{children}</WalletProviderInner>}
-      </QueryClientProvider>
-    </WagmiProvider>
-  );
-};
+  const connectWallet = async (connectorType) => {
+    console.log("=== CONNECTING WALLET ===", connectorType);
 
-const WalletProviderInner = ({ children }) => {
-  const { address, isConnected } = useAccount();
-  const { connect, connectors } = useConnect();
-  const { disconnect } = useDisconnect();
+    if (typeof window !== 'undefined') {
+      try {
+        // Only try Phantom wallet for Sonotrade
+        if (window.solana && window.solana.isPhantom) {
+          const response = await window.solana.connect();
+          if (response.publicKey) {
+            const publicKey = response.publicKey.toString();
+            setAddress(publicKey);
+            setIsConnected(true);
+            console.log("Phantom connected:", publicKey);
+            return;
+          }
+        }
+
+        throw new Error("Phantom wallet not found");
+      } catch (error) {
+        console.error('Error connecting wallet:', error);
+      }
+    }
+  };
+
+  const disconnectWallet = async () => {
+    console.log("=== DISCONNECTING WALLET ===");
+
+    // Disconnect Phantom
+    if (window.solana && window.solana.isPhantom) {
+      try {
+        await window.solana.disconnect();
+        console.log("Phantom disconnected");
+      } catch (error) {
+        console.error("Error disconnecting Phantom:", error);
+      }
+    }
+
+    setAddress(null);
+    setIsConnected(false);
+    console.log("Wallet disconnection complete");
+  };
 
   const value = {
     address,
     isConnected,
-    connectors,
-    connectWallet: (connector) => connect({ connector }),
-    disconnectWallet: disconnect,
+    connectors: [], // Empty for now, could add connector info later
+    connectWallet,
+    disconnectWallet,
   };
 
   return (
     <WalletContext.Provider value={value}>
-      {children}
+      {isMounted ? children : null}
     </WalletContext.Provider>
   );
 };
 
 export const useWallet = () => {
   const context = useContext(WalletContext);
+  // console.log(context,"contextcontextcontextcontext")
   if (context === undefined) {
     throw new Error('useWallet must be used within a WalletProvider');
   }

@@ -4,6 +4,7 @@ import SnackbarClient from "@/app/helper/SnackbarClient";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { ToastContainer } from "react-toastify";
 import { StoreProvider } from "@/providers/store-provider";
+import { WalletProvider } from "@/app/walletconnect/walletContext";
 import ClientLayoutEffect from "./ClientLayoutEffect";
 import { ReactNode } from "react";
 
@@ -33,10 +34,12 @@ export default function RootLayout({ children }: RootLayoutProps) {
 
       <body className={`antialiased`} suppressHydrationWarning={true}>
         <StoreProvider>
-          <SnackbarClient>
-            <ClientLayoutEffect />
-            {children}
-          </SnackbarClient>
+          <WalletProvider>
+            <SnackbarClient>
+              <ClientLayoutEffect />
+              {children}
+            </SnackbarClient>
+          </WalletProvider>
         </StoreProvider>
         <ToastContainer />
       </body>

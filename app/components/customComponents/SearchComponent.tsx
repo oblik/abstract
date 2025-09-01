@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { useRouter,usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import SearchBar from "@/app/components/ui/SearchBar";
 import { getCategories, getEventsByRegex } from "@/services/market";
-import { checkApiSuccess, getResponseResult } from '@/lib/apiHelpers';
 import Image from "next/image";
-import { Event } from "@/types";
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
@@ -23,8 +21,8 @@ export default function SearchComponent() {
   const currentPath = usePathname();
 
   const [selectCategory, setSelectCategory] = useState("");
-  const [filterEvent, setFilterEvent] = useState<Event[]>([]);
-  const [categoryList, setCategoryList] = useState<string[]>([]);
+  const [filterEvent, setFilterEvent] = useState([]);
+  const [categoryList, setCategoryList] = useState([]);
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -36,6 +34,7 @@ export default function SearchComponent() {
     if (!e.target.value) {
       setFilterEvent([]);
       setIsSearchActive(true);
+      // setIsSearchActive(false);
     } else {
       setIsSearchActive(true);
     }
@@ -44,7 +43,7 @@ export default function SearchComponent() {
   const clickEvent = (event) => {
     setRecentActivity((prev) => {
       const updatedActivity = [event, ...prev];
-      if(currentPath===`/event-page/${event.slug}`){
+      if (currentPath === `/event-page/${event.slug}`) {
         setIsSearchActive(false);
       }
       const isExisting = prev.some((item) => item._id === event._id);
@@ -76,21 +75,20 @@ export default function SearchComponent() {
         limit: 10,
         category: selectCategory,
       };
-      const response = await getEventsByRegex(reqData);
-      if (checkApiSuccess(response)) {
-        const result = getResponseResult(response);
+      const { success, result } = await getEventsByRegex(reqData);
+      if (success) {
         setIsRecentActivity(false);
-        setFilterEvent((result as any)?.data || []);
+        setFilterEvent(result);
       }
     } catch (error) {
       console.error("Error fetching filter events:", error);
     }
-  }, [selectCategory]);
+  }, []);
 
   const fetchCategoryList = useCallback(async () => {
     try {
-      const response = await getCategories();
-      if (checkApiSuccess(response)) setCategoryList(getResponseResult(response) || []);
+      const { success, result } = await getCategories();
+      if (success) setCategoryList(result);
     } catch (error) {
       console.error("Error fetching category list:", error);
     }
@@ -113,7 +111,7 @@ export default function SearchComponent() {
     if (storedActivity) {
       setRecentActivity(JSON.parse(storedActivity));
     }
-  }, [fetchCategoryList]);
+  }, []);
 
   return (
     <div
@@ -127,9 +125,8 @@ export default function SearchComponent() {
       <SearchBar
         placeholder="Search markets or artists"
         onChange={handleInputChange}
-        className={`w-full transition-all duration-150 outline-none ${
-          isSearchActive ? "rounded-t-lg rounded-b-none" : "rounded-lg"
-        }`}
+        className={`w-full transition-all duration-150 outline-none ${isSearchActive ? "rounded-t-lg rounded-b-none" : "rounded-lg"
+          }`}
       />
       {isSearchActive && (
         <div className="absolute left-0 right-0 bg-[#070707] z-[156] rounded-b-lg border border-[#262626] border-t-0">
@@ -138,13 +135,13 @@ export default function SearchComponent() {
               <p className="text-sm font-medium ">Browse</p>
               <div className="flex gap-2 flex-wrap">
                 {categoryList.length !== 0 &&
-                  categoryList.map((category, index) => (
+                  categoryList.map(({ slug, title, _id }) => (
                     <p
-                      key={index}
+                      key={_id}
                       className="border cursor-pointer rounded-md px-2 text-sm"
-                      onClick={() => router.push(`/?category=${category}`)}
+                      onClick={() => router.push(`/?category=${slug}`)}
                     >
-                      {category}
+                      {title}
                     </p>
                   ))}
               </div>
@@ -163,7 +160,7 @@ export default function SearchComponent() {
                       <div
                         key={index}
                         className="py-2 rounded-lg border flex items-center justify-between gap-2 hover:bg-[#262626] pl-2 pr-3 cursor-pointer"
-                        onClick={() =>{
+                        onClick={() => {
                           if (currentPath === `/event-page/${event.slug}`) {
                             setIsSearchActive(false);
                             return;
@@ -188,7 +185,12 @@ export default function SearchComponent() {
                             {event.title || "Untitled Event"}
                           </span>
                         </div>
-                        {}
+                        {/* <button
+                                aria-label="Close"
+                                onClick={() =>ClearRecentActivity(event)}
+                              >
+                                <Cross2Icon className="h-4 w-4" />
+                              </button> */}
                       </div>
                     ))
                   )}

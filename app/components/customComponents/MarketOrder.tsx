@@ -43,7 +43,7 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
   const { activeView, marketId, buyorsell, selectedOrder, outcomes, orderBook, takerFee } = props;
   const { signedIn } = useSelector((state) => state?.auth.session);
   const user = useSelector((state) => state?.auth.user);
-  const asset = useSelector((state) => state?.walletconnect);
+  // Note: asset is imported but not used in this component
   const [orderBtn, setOrderBtn] = useState<boolean>(true);
 
   const [formValue, setFormValue] = useState<FormState>(initialFormValue);
@@ -95,39 +95,6 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
     setFormValue(initialFormValue);
     setErrors({});
   }, [activeView, buyorsell, marketId]);
-
-  // Auto-scroll when input values change to show updated stats
-  useEffect(() => {
-    if ((buyorsell === "buy" && ordVal) || (buyorsell === "sell" && amount)) {
-      // Small delay to ensure DOM has updated
-      setTimeout(() => {
-        const drawerContent = document.querySelector('.drawer-content, [data-vaul-drawer-wrapper]');
-        const tradingCard = document.querySelector('.drawer-content .trading_card');
-
-        if (drawerContent && tradingCard) {
-          // Add auto-scroll class for CSS behavior
-          tradingCard.classList.add('auto-scroll-bottom');
-
-          // Programmatically scroll to bottom
-          drawerContent.scrollTo({
-            top: drawerContent.scrollHeight,
-            behavior: 'smooth'
-          });
-
-          // Also scroll the trading card container itself
-          tradingCard.scrollTo({
-            top: tradingCard.scrollHeight,
-            behavior: 'smooth'
-          });
-
-          // Remove class after animation
-          setTimeout(() => {
-            tradingCard.classList.remove('auto-scroll-bottom');
-          }, 500);
-        }
-      }, 100);
-    }
-  }, [ordVal, amount, buyorsell]);
 
   const handlePlaceOrder = useCallback(async (action: any) => {
     if (!marketOrderValidation()) return;
@@ -217,6 +184,7 @@ const MarketOrder: React.FC<MarketOrderProps> = (props) => {
     payout = "$" + toFixedDown((totalRevenue / 100) * (1 - (takerFee || 0) / 100), 2);
 
   }
+
 
   return (
     <>

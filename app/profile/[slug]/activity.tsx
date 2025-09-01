@@ -1,5 +1,5 @@
 "use client";
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useState, useContext } from 'react';
 import Image from "next/image";
 import { formatNumber } from "@/app/helper/custommath";
 import { useSelector } from 'react-redux';
@@ -9,6 +9,7 @@ import PaginationComp from '../../components/customComponents/PaginationComp';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Loader } from 'lucide-react';
+import { SocketContext, subscribe, unsubscribe } from '@/config/socketConnectivity';
 
 interface Trade {
   time: string;
@@ -41,28 +42,75 @@ const ActivityTable: React.FC<ActivityTableProps> = (props) => {
     offset: 0,
   });
   const route = useRouter();
+  const socketContext = useContext(SocketContext);
+
+  const fetchTradeHistory = async () => {
+    try {
+      setLoading(true)
+      const response = await getTradeHistory({ id: props.uniqueId, ...pagination });
+      if (checkApiSuccess(response)) {
+        const result = getResponseResult(response);
+        setTrades((result as any).data || []);
+        setHasMore((result as any).count > pagination.page * pagination.limit);
+      }
+    } catch (error) {
+      console.error('Error fetching trade history:');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchTradeHistory = async () => {
+    if (props.uniqueId)
+      fetchTradeHistory();
+  }, [props.uniqueId, pagination]);
+
+  // Socket event listeners for real-time trade updates
+  useEffect(() => {
+    const socket = socketContext?.socket;
+    if (!socket || !props.uniqueId) return;
+
+    console.log("=== Setting up activity socket listeners ===");
+    console.log("User ID:", props.uniqueId);
+
+    // Subscribe to user-specific updates
+    subscribe(props.uniqueId);
+
+    const handleTradeUpdate = (data: any) => {
+      console.log("=== Trade update received in activity ===", data);
       try {
-        setLoading(true)
-        const response = await getTradeHistory({ id: props.uniqueId, ...pagination });
-        if (checkApiSuccess(response)) {
-          const result = getResponseResult(response);
-          setTrades((result as any).data || []);
-          setHasMore((result as any).count > pagination.page * pagination.limit);
+        const parsedData = typeof data === 'string' ? JSON.parse(data) : data;
+
+        if (parsedData.userId === props.uniqueId || parsedData.execUserId === props.uniqueId) {
+          console.log("Trade update for current user, refreshing activity");
+          fetchTradeHistory();
         }
       } catch (error) {
-        console.error('Error fetching trade history:');
-      } finally {
-        setLoading(false);
+        console.error("Error handling trade update:", error);
       }
     };
 
-    if (props.uniqueId)
+    const handleOrderFill = (data: any) => {
+      console.log("=== Order fill received in activity ===", data);
+      // Refresh activity when orders get filled
       fetchTradeHistory();
+    };
 
-  }, [props.uniqueId, pagination]);
+    // Listen for various trade-related events
+    socket.on("trade-update", handleTradeUpdate);
+    socket.on("order-fill", handleOrderFill);
+    socket.on("recent-trade", handleTradeUpdate);
+    socket.on(`user-${props.uniqueId}`, handleTradeUpdate);
+
+    return () => {
+      console.log("=== Cleaning up activity socket listeners ===");
+      socket.off("trade-update", handleTradeUpdate);
+      socket.off("order-fill", handleOrderFill);
+      socket.off("recent-trade", handleTradeUpdate);
+      socket.off(`user-${props.uniqueId}`, handleTradeUpdate);
+      unsubscribe(props.uniqueId);
+    };
+  }, [socketContext?.socket, props.uniqueId]);
 
   return (
     <div className="overflow-x-auto">

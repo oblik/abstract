@@ -58,7 +58,7 @@ const LimitOrder: React.FC<LimitOrderProps> = (props) => {
 
   const { signedIn } = useSelector((state) => state?.auth.session);
   const user = useSelector((state) => state?.auth.user);
-  const asset = useSelector((state) => state?.walletconnect);
+  // Note: asset is imported but not used in this component
 
   // state
   const [formValue, setFormValue] = useState<FormState>(initialFormValue);

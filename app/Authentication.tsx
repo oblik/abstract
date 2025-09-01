@@ -188,10 +188,10 @@ export default function Authentication() {
           walletAdd(response.publicKey.toString());
         }
       } catch (err: any) {
-        console.log(err, "errr")
+        console.log(err, "error")
         console.log(err, "err")
         console.log(err, "err")
-        console.log(err, "errerr")
+        console.log(err, "error")
 
         if (err?.code === 4001) {
           toastAlert("error", "Connection request was rejected", "wallet");
@@ -599,7 +599,7 @@ export default function Authentication() {
             <div className="flex gap-3 justify-between mt-4 sm:flex-nowrap flex-wrap">
               <Button
                 onClick={() => ConnectPhantomWallet()}
-                className="rounded-[6px] w-full sm:h-13 h-10 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]"
+                className="rounded-[6px] w-full sm:h-13 h-11758 bg-[#1e1e1e] border border-[#3d3d3d] hover:bg-[#333]"
               >
                 <Image
                   src={"/images/wallet_icon_02.png"}

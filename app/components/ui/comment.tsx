@@ -14,11 +14,10 @@ import { Trash2, Reply } from "lucide-react";
 import CommentForm from "./CommentForm";
 import { CommentProps, PostCommentRequestData } from "@/types/comments";
 import CommentList from "./CommentList";
-import { getComments, getCommentsPaginate, postComment } from "@/services/market";
+import { getComments, getCommentsPaginate, postComment, deleteComment } from "@/services/market";
 import { toastAlert } from "@/lib/toast";
 import { useSelector, useDispatch } from "react-redux";
-import { SocketContext } from "@/config/socketConnectivity";
-import { deleteComment } from "@/services/user";
+import { SocketContext, subscribe, unsubscribe } from "@/config/socketConnectivity";
 import PopupModal from "./usernameModal";
 import { isEmpty } from "@/lib/isEmpty";
 import { addUserName } from "@/services/user";
@@ -70,7 +69,6 @@ export function Comment({
     .replace(/(\d+)\s*months?/g, (_, num) => `${parseInt(num, 10) * 30}d`)
     .replace(/(\d+)\s*years?/g, "$1y");
 
-  // Check if the current user is the author of this comment
   const isAuthor =
     currentUserWallet && comment.wallet_address === currentUserWallet;
 
@@ -237,7 +235,6 @@ export function Comment({
     </div>
   );
 }
-
 interface ReplyFormProps {
   parentId: string;
   eventId: string;
@@ -286,6 +283,9 @@ export function ReplyForm({
 
     try {
       setIsSubmitting(true);
+      console.log("=== Submitting reply ===");
+      console.log("Request data:", { userId: user._id, eventId, content: contentToSubmit, parentId });
+
       const reqData = {
         userId: user._id,
         eventId: eventId,
@@ -293,18 +293,28 @@ export function ReplyForm({
         parentId: parentId,
       };
       const { success, message } = await postComment(reqData);
+
+      console.log("=== Reply submission response ===");
+      console.log("Success:", success, "Message:", message);
+
       if (!success) {
         toastAlert("error", message || "Failed to post comment. Please try again later.");
         return;
       }
-      // toastAlert("success", "Comment posted successfully!");
-      // onReplyAdded(comment);
 
       setReply("");
       onCancel();
+      // Trigger refresh to show the new reply
+      console.log("=== Triggering reply refresh ===");
+      onReplyAdded({} as any);
+
+      // Add a small delay and refresh again to ensure the reply shows up
+      setTimeout(() => {
+        console.log("=== Secondary reply refresh ===");
+        onReplyAdded({} as any);
+      }, 1000);
     } catch (error) {
       console.error("Reply submission error:", error);
-      // alert("Failed to post reply. Please try again later.");
     } finally {
       setIsSubmitting(false);
     }
@@ -342,15 +352,14 @@ export function ReplyForm({
       const reqData = {
         userName: username,
       };
-      const { status, message, result } = await addUserName(reqData);
+      const { success, message, result } = await addUserName(reqData);
 
-      if (!status) {
+      if (!success) {
         if (message) {
           toastAlert("error", message);
         }
         return false;
       }
-      console.log("result: ", result);
 
       setModelError("");
       dispatch(setUser(result));
@@ -423,11 +432,6 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ eventId }: CommentSectionProps) {
-  console.log("=== CommentSection RENDERING ===");
-  console.log("Received eventId:", eventId);
-  console.log("eventId type:", typeof eventId);
-  console.log("eventId truthy:", !!eventId);
-
   const socketContext = useContext(SocketContext);
 
   const limit = 10;
@@ -440,6 +444,16 @@ export function CommentSection({ eventId }: CommentSectionProps) {
   const [hasMore, setHasMore] = useState(true);
   const [total, setTotal] = useState(0);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+
+  // Debug socket connection
+  useEffect(() => {
+    const socket = socketContext?.socket;
+    console.log("=== Socket debugging ===");
+    console.log("Socket context:", socketContext);
+    console.log("Socket object:", socket);
+    console.log("Socket connected:", socket?.connected);
+    console.log("Socket ID:", socket?.id);
+  }, [socketContext]);
 
   const fetchComments = useCallback(async (pageToFetch = 1, isInitialLoad = false) => {
     try {
@@ -463,17 +477,27 @@ export function CommentSection({ eventId }: CommentSectionProps) {
         return;
       }
 
-      // Fix: Access the correct response structure - data is directly in response
-      const { comments, positions, count } = response;
-      console.log("Extracted data:", { comments, positions, count });
+      // Try both possible response structures
+      const responseData = response.result || response;
+      console.log("Response data:", responseData);
 
-      setTotal(count || 0);
+      // Handle different possible response structures
+      let comments, positions, count;
 
-      if (!comments || !Array.isArray(comments)) {
-        console.log("No comments array found");
-        setHasMore(false);
-        return;
+      if ((responseData as any).data) {
+        // Standard PaginatedResponse format
+        comments = (responseData as any).data || [];
+        count = (responseData as any).total || 0;
+        positions = (responseData as any).positions || []; // positions might be in root
+      } else {
+        // Custom response format
+        comments = (responseData as any).comments || responseData || [];
+        positions = (responseData as any).positions || [];
+        count = (responseData as any).count || 0;
       }
+
+      console.log("Extracted data:", { comments, positions, count });
+      setTotal(count || 0);
 
       const positionsMap = new Map();
       (positions || []).forEach(item => {
@@ -499,7 +523,7 @@ export function CommentSection({ eventId }: CommentSectionProps) {
         };
       };
 
-      const flatComments = comments.reduce((acc, comment) => {
+      const flatComments = (comments || []).reduce((acc, comment) => {
         const { replies, ...parentComment } = comment;
         acc.push(addPositionsToComment(parentComment));
 
@@ -512,7 +536,7 @@ export function CommentSection({ eventId }: CommentSectionProps) {
         return acc;
       }, []);
 
-      console.log("Processed flatComments:", flatComments);
+      console.log("Processed flat comments:", flatComments);
 
       setComments(prevComments => {
         if (isInitialLoad) {
@@ -522,7 +546,7 @@ export function CommentSection({ eventId }: CommentSectionProps) {
       });
 
       setPage(pageToFetch);
-      setHasMore(comments.length === limit);
+      setHasMore((comments || []).length === limit);
 
     } catch (error) {
       console.error("Error loading comments:", error);
@@ -541,7 +565,9 @@ export function CommentSection({ eventId }: CommentSectionProps) {
       setIsLoading(false);
       setIsFetching(false);
     }
-  }, [eventId, limit]); useEffect(() => {
+  }, [eventId, limit]);
+
+  useEffect(() => {
     console.log("=== CommentSection useEffect triggered ===");
     console.log("eventId:", eventId);
     console.log("fetchComments function:", typeof fetchComments);
@@ -549,9 +575,17 @@ export function CommentSection({ eventId }: CommentSectionProps) {
     if (eventId) {
       console.log("Calling fetchComments...");
       fetchComments(1, true);
+      // Subscribe to this specific event for real-time updates
+      subscribe(eventId);
     } else {
       console.log("No eventId, skipping fetchComments");
     }
+
+    return () => {
+      if (eventId) {
+        unsubscribe(eventId);
+      }
+    };
   }, [eventId, fetchComments]);
 
   const handleReply = (commentId: string) => {
@@ -560,7 +594,8 @@ export function CommentSection({ eventId }: CommentSectionProps) {
 
   const handleDelete = async (commentId: string) => {
     try {
-      const { success, message } = await deleteComment({ id: commentId });
+      // Use the deleteComment from market service instead of user service
+      const { success, message } = await deleteComment(commentId);
       if (!success) {
         toastAlert(
           "error",
@@ -599,21 +634,66 @@ export function CommentSection({ eventId }: CommentSectionProps) {
     }
   };
 
-  const handleCommentAdded = useCallback(() => {
+  const handleCommentAdded = useCallback((data?: any) => {
+    console.log("=== handleCommentAdded triggered ===");
+    console.log("Socket data received:", data);
+
+    // Always refresh comments to ensure consistency
     fetchComments(1, true);
   }, [fetchComments]);
 
+  // Fallback polling mechanism - poll every 30 seconds to catch missed socket events
+  useEffect(() => {
+    if (!eventId) return;
+
+    const pollInterval = setInterval(() => {
+      console.log("=== Polling for comment updates ===");
+      fetchComments(1, true);
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [eventId, fetchComments]);
+
   useEffect(() => {
     const socket = socketContext?.socket;
-    if (!socket) {
+    if (!socket || !eventId) {
+      console.log("Socket or eventId not available:", { socket: !!socket, eventId });
       return;
     }
 
+    console.log("=== Setting up socket listeners for event:", eventId);
+
+    // Listen for both comment and reply events
     socket.on("comment", handleCommentAdded);
-    return () => {
-      socket.off("comment", handleCommentAdded);
+    socket.on("reply", handleCommentAdded);
+    socket.on("comment-update", handleCommentAdded);
+    // Listen for event-specific comment updates
+    socket.on(`comment-${eventId}`, handleCommentAdded);
+    socket.on(`reply-${eventId}`, handleCommentAdded);
+
+    // Add a general listener to see all events for debugging
+    const debugListener = (eventName: string) => {
+      return (data: any) => {
+        console.log(`=== Socket event received: ${eventName} ===`, data);
+      };
     };
-  }, [socketContext?.socket, handleCommentAdded]);
+
+    socket.onAny((eventName, ...args) => {
+      if (eventName.includes('comment') || eventName.includes('reply')) {
+        console.log(`=== Socket event received: ${eventName} ===`, args);
+      }
+    });
+
+    return () => {
+      console.log("=== Cleaning up socket listeners for event:", eventId);
+      socket.off("comment", handleCommentAdded);
+      socket.off("reply", handleCommentAdded);
+      socket.off("comment-update", handleCommentAdded);
+      socket.off(`comment-${eventId}`, handleCommentAdded);
+      socket.off(`reply-${eventId}`, handleCommentAdded);
+      socket.offAny();
+    };
+  }, [socketContext?.socket, handleCommentAdded, eventId]);
 
   return (
     <div className="mt-6">

@@ -17,21 +17,29 @@ axios.interceptors.request.use(
     let authorizationToken: string | undefined | null = null;
 
     if (isClient) {
+      // Try getCookie first
       authorizationToken = getCookie("user-token") as string;
-      if (authorizationToken) {
-        console.log("Client-side auth token found for request:", config.url);
-      } else {
-        console.log("No client-side auth token for request:", config.url);
 
+      // If no cookie found, try document.cookie directly
+      if (!authorizationToken && typeof document !== 'undefined') {
+        const cookies = document.cookie.split(';');
+        const userTokenCookie = cookies.find(cookie => cookie.trim().startsWith('user-token='));
+        if (userTokenCookie) {
+          authorizationToken = userTokenCookie.split('=')[1];
+        }
+      }
+
+      if (authorizationToken) {
+        // Remove console.log to reduce noise
+      } else {
         // Fallback: Check Redux store for token during hydration
         try {
           const authState = (store.getState() as any)?.auth?.session;
           if (authState?.signedIn && authState?.token) {
             authorizationToken = authState.token;
-            console.log("Using Redux token as fallback for request:", config.url);
           }
         } catch (error) {
-          console.log("No Redux token available for request:", config.url);
+          // Silent fallback
         }
       }
     } else {
@@ -42,12 +50,8 @@ axios.interceptors.request.use(
         const token = cookieStore.get("user-token");
         if (token) {
           authorizationToken = token.value;
-          console.log("Server-side auth token found for request:", config.url);
-        } else {
-          console.log("No server-side auth token for request:", config.url);
         }
       } catch (error) {
-        console.error("Error accessing server-side cookies for:", config.url, error);
         // In edge runtime or when cookies are not available, skip auth
         // This is expected for server-side API calls without user context
       }
@@ -56,14 +60,8 @@ axios.interceptors.request.use(
     if (authorizationToken) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${authorizationToken}`;
-      if (config.url?.includes('/comments')) {
-        console.log("Setting auth header for comment request:", config.headers.Authorization);
-      }
     } else {
       delete config.headers.Authorization;
-      if (config.url?.includes('/comments')) {
-        console.log("No auth token available for comment request:", config.url);
-      }
     }
     return config;
   },

@@ -38,9 +38,9 @@ const config: Config = process.env.NODE_ENV === "production"
   }
   : {
     frontUrl: "http://localhost:3000",
-    backendURL: "https://sonotradesdemo.wearedev.team",
+    backendURL: "https://sonotradesdemo.wearedev.team", // Use demo server for socket connections in development
     txLink: "https://amoy.polygonscan.com/",
-    getLoginInfo: "https://freeipapi.com/api/json",
+    getLoginInfo: "", // Use Next.js proxy for IP API in development
     txUrl: "https://solscan.io/tx/",
     networkType: "devnet",
     network: "solana",
@@ -52,7 +52,7 @@ const config: Config = process.env.NODE_ENV === "production"
     clientId: "787150198264-2qt0ai7tjcu85ehjfh81kum2nsh8momt.apps.googleusercontent.com",
     usdcAdd: "0xeC35E5e8c4B26510F5FA90b00F202E1B44B8F537",
     contractAdd: "0x07b67af96d444ea2842Faca9Ff2B68a358f83B82",
-    baseUrl: "https://sonotradesdemo.wearedev.team",
+    baseUrl: "", // Use Next.js proxy in development
   };
 
 export default config;

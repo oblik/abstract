@@ -16,17 +16,22 @@ export const setAuthToken = async (token: any) => {
 };
 
 export const getAuthToken = () => {
-    // Try cookies-next first
-    const token = getCookie("user-token");
-    if (token) return token;
-
-    // Fallback to document.cookie for client-side
+    // Try document.cookie first for immediate client-side access
     if (typeof document !== 'undefined') {
         const cookies = document.cookie.split(';');
         const userTokenCookie = cookies.find(cookie => cookie.trim().startsWith('user-token='));
         if (userTokenCookie) {
-            return userTokenCookie.split('=')[1];
+            const token = userTokenCookie.split('=')[1];
+            if (token && token !== 'undefined' && token !== 'null') {
+                return token;
+            }
         }
+    }
+
+    // Fallback to cookies-next
+    const token = getCookie("user-token");
+    if (token && token !== 'undefined' && token !== 'null') {
+        return token;
     }
 
     return null;

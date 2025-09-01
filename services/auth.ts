@@ -12,12 +12,13 @@ function getFreeIpApiBaseUrl() {
   return "/freeipapi"; // Use Next.js proxy in development
 }
 
-// Helper to get API base URL (use full URL for all requests to avoid middleware issues)
 function getApiBaseUrl() {
-  // Always use full backend URL for server-side requests to avoid malformed URL errors
-  // Next.js middleware and SSR context require absolute URLs
-  return config.backendURL;
+  if (process.env.NODE_ENV === "production") {
+    return config.backendURL;
+  }
+  return ""; // Use Next.js proxy in development
 }
+
 import { handleResp, setAuthorization } from "@/config/axios";
 import { signIn } from "@/store/slices/auth/sessionSlice";
 import { setUser } from "@/store/slices/auth/userSlice";

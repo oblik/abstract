@@ -14,7 +14,7 @@ import { getUserTradeHistory } from "@/services/user";
 import { HistoryIcon, Loader, ShareIcon, X } from "lucide-react";
 import { momentFormat } from "../helper/date";
 import { TabsList, TabsTrigger } from "@radix-ui/react-tabs";
-import { SocketContext } from "@/config/socketConnectivity";
+import { SocketContext, subscribe, unsubscribe } from "@/config/socketConnectivity";
 import { isEmpty } from "@/lib/isEmpty";
 import { positionClaim } from "@/services/market";
 import { toastAlert } from "@/lib/toast";
@@ -180,124 +180,166 @@ const Positions = (props) => {
   useEffect(() => {
     let socket = socketContext?.socket;
     if (!socket) return;
+
+    console.log("=== Setting up position socket listeners ===");
+    console.log("props.uniqueId:", props.uniqueId);
+    console.log("props.isPrivate:", props.isPrivate);
+
+    // Subscribe to user-specific updates if we have a user ID
+    if (props.uniqueId && props.isPrivate) {
+      subscribe(props.uniqueId);
+    }
+
     const handlePositions = (result) => {
-      const resData = JSON.parse(result);
+      console.log("=== Position update received ===", result);
+      try {
+        const resData = JSON.parse(result);
 
+        // Only process updates for the current user if this is a private view
+        if (props.isPrivate && props.uniqueId && resData.userId !== props.uniqueId) {
+          console.log("Position update not for current user, ignoring");
+          return;
+        }
 
-      setPositionHistory((prev) => {
-        const eventIndex = prev.findIndex(
-          (event) => event._id === resData.eventId
-        );
-        if (eventIndex === -1) {
-          const newEvent = {
-            _id: resData.eventId,
-            eventTitle: resData.eventTitle,
-            eventImage: resData.eventImage,
-            eventSlug: resData.eventSlug,
-            positions: [
-              {
+        setPositionHistory((prev) => {
+          const eventIndex = prev.findIndex(
+            (event) => event._id === resData.eventId
+          );
+          if (eventIndex === -1) {
+            const newEvent = {
+              _id: resData.eventId,
+              eventTitle: resData.eventTitle,
+              eventImage: resData.eventImage,
+              eventSlug: resData.eventSlug,
+              positions: [
+                {
+                  _id: resData._id,
+                  // userId: resData.userId,
+                  marketId: resData.marketId,
+                  marketGroupTitle: resData.marketGroupTitle,
+                  outcomes: resData.marketOutcomes,
+                  // createdAt: "$createdAt",
+                  side: resData.side,
+                  filled: resData.filled,
+                  quantity: resData.quantity,
+                  last: resData.marketLast,
+                  odd: resData.marketOdd
+                },
+              ],
+            };
+            return [newEvent, ...prev];
+          } else {
+            const positionData = prev[eventIndex].positions.find(
+              (position) => position._id === resData._id
+            );
+            if (isEmpty(positionData)) {
+              const newPosition = {
                 _id: resData._id,
-                // userId: resData.userId,
                 marketId: resData.marketId,
                 marketGroupTitle: resData.marketGroupTitle,
                 outcomes: resData.marketOutcomes,
-                // createdAt: "$createdAt",
                 side: resData.side,
                 filled: resData.filled,
                 quantity: resData.quantity,
                 last: resData.marketLast,
                 odd: resData.marketOdd
-              },
-            ],
-          };
-          return [newEvent, ...prev];
-        } else {
-          const positionData = prev[eventIndex].positions.find(
-            (position) => position._id === resData._id
-          );
-          if (isEmpty(positionData)) {
-            const newPosition = {
-              _id: resData._id,
-              marketId: resData.marketId,
-              marketGroupTitle: resData.marketGroupTitle,
-              outcomes: resData.marketOutcomes,
-              side: resData.side,
-              filled: resData.filled,
-              quantity: resData.quantity,
-              last: resData.marketLast,
-              odd: resData.marketOdd
-            };
-            const updatedEvent = {
-              ...prev[eventIndex],
-              positions: [...prev[eventIndex].positions, newPosition],
-            };
-            return [
-              ...prev.slice(0, eventIndex),
-              updatedEvent,
-              ...prev.slice(eventIndex + 1),
-            ];
-          } else {
-            if (resData.quantity === 0) {
-              const filteredPositions = prev[eventIndex].positions.filter(
-                (p) => p._id !== resData._id
-              );
-              if (filteredPositions.length === 0) {
-                return [
-                  ...prev.slice(0, eventIndex),
-                  ...prev.slice(eventIndex + 1),
-                ];
-              } else {
-                const updatedEvent = {
-                  ...prev[eventIndex],
-                  positions: filteredPositions,
-                };
-                return [
-                  ...prev.slice(0, eventIndex),
-                  updatedEvent,
-                  ...prev.slice(eventIndex + 1),
-                ];
+              };
+              const updatedEvent = {
+                ...prev[eventIndex],
+                positions: [...prev[eventIndex].positions, newPosition],
+              };
+              return [
+                ...prev.slice(0, eventIndex),
+                updatedEvent,
+                ...prev.slice(eventIndex + 1),
+              ];
+            } else {
+              if (resData.quantity === 0) {
+                const filteredPositions = prev[eventIndex].positions.filter(
+                  (p) => p._id !== resData._id
+                );
+                if (filteredPositions.length === 0) {
+                  return [
+                    ...prev.slice(0, eventIndex),
+                    ...prev.slice(eventIndex + 1),
+                  ];
+                } else {
+                  const updatedEvent = {
+                    ...prev[eventIndex],
+                    positions: filteredPositions,
+                  };
+                  return [
+                    ...prev.slice(0, eventIndex),
+                    updatedEvent,
+                    ...prev.slice(eventIndex + 1),
+                  ];
+                }
               }
-            }
 
-            const updatedPosition = {
-              ...positionData,
-              quantity: resData.quantity,
-              last: resData.marketLast,
-              filled: resData.filled,
-              price: resData.price,
-              last: resData.marketLast,
-              odd: resData.marketOdd,
-              side: resData.side,
-            };
-            const updatedEvent = {
-              ...prev[eventIndex],
-              positions: [
-                ...prev[eventIndex].positions.filter(
-                  (position) => position._id !== resData._id
-                ),
-                updatedPosition,
-              ],
-            };
-            return [
-              ...prev.slice(0, eventIndex),
-              updatedEvent,
-              ...prev.slice(eventIndex + 1),
-            ];
-            // positionData.quantity = resData.quantity
-            // positionData.last = resData.marketLast
-            // positionData.side = resData.side
-            // positionData.filled = resData.filled
+              const updatedPosition = {
+                ...positionData,
+                quantity: resData.quantity,
+                last: resData.marketLast,
+                filled: resData.filled,
+                price: resData.price,
+                last: resData.marketLast,
+                odd: resData.marketOdd,
+                side: resData.side,
+              };
+              const updatedEvent = {
+                ...prev[eventIndex],
+                positions: [
+                  ...prev[eventIndex].positions.filter(
+                    (position) => position._id !== resData._id
+                  ),
+                  updatedPosition,
+                ],
+              };
+              return [
+                ...prev.slice(0, eventIndex),
+                updatedEvent,
+                ...prev.slice(eventIndex + 1),
+              ];
+            }
           }
-        }
-      });
+        });
+      } catch (error) {
+        console.error("Error handling position update:", error);
+      }
     };
-    if (props.isPrivate) {
-      socket.on("pos-update", handlePositions);
+
+    const handleTradeUpdate = (result) => {
+      console.log("=== Trade update received ===", result);
+      // Refresh positions when trades happen
+      if (props.uniqueId) {
+        getUserPositionHistory();
+      }
+    };
+
+    // Listen for various socket events
+    socket.on("pos-update", handlePositions);
+    socket.on("trade-update", handleTradeUpdate);
+    socket.on("order-fill", handlePositions); // When orders get filled
+
+    // User-specific events if this is a private view
+    if (props.isPrivate && props.uniqueId) {
+      socket.on(`user-${props.uniqueId}`, handlePositions);
+      socket.on(`position-${props.uniqueId}`, handlePositions);
     }
+
     return () => {
+      console.log("=== Cleaning up position socket listeners ===");
       socket.off("pos-update", handlePositions);
+      socket.off("trade-update", handleTradeUpdate);
+      socket.off("order-fill", handlePositions);
+
+      if (props.isPrivate && props.uniqueId) {
+        socket.off(`user-${props.uniqueId}`, handlePositions);
+        socket.off(`position-${props.uniqueId}`, handlePositions);
+        unsubscribe(props.uniqueId);
+      }
     };
-  }, [socketContext, props.isPrivate]);
+  }, [socketContext, props.isPrivate, props.uniqueId]);
 
   const marketPositionClaim = async (id) => {
     try {

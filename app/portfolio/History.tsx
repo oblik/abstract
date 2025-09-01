@@ -17,7 +17,7 @@ import {
 import { momentFormat } from "../helper/date";
 import { getTimeframeDate } from "../../lib/dateTimeHelper";
 import { useSelector } from 'react-redux'
-import { getCookie } from 'cookies-next'
+import { getAuthToken } from '@/lib/cookies'
 
 // Type definitions
 interface GroupedByEvent {
@@ -59,25 +59,13 @@ const History: React.FC<HistoryProps> = (props) => {
 
   // Helper function to check if user is properly authenticated
   const isAuthenticated = () => {
-    console.log("=== HISTORY AUTHENTICATION CHECK ===");
-    console.log("signedIn:", signedIn);
-    console.log("data exists:", !!data);
-    console.log("data.id:", data?.id);
-    console.log("data._id:", data?._id);
+    const token = getAuthToken(); // Use the improved getAuthToken function
 
-    const token = getCookie("user-token");
-    console.log("token exists (getCookie):", !!token);
-    console.log("token value:", token);
+    // TEMPORARY WORKAROUND: If no token but user data exists and signedIn is true,
+    // assume authentication is valid (this handles hydration issues)
+    const isHydrationWorkaround = !token && signedIn && data && (data.id || data._id);
 
-    // Standard authentication check
-    const standardAuth = signedIn && data && (data.id || data._id) && token;
-
-    // Hydration workaround: if user appears authenticated via Redux but no cookie, allow it
-    const isHydrationWorkaround = signedIn && data && data._id && !token;
-    console.log("isHydrationWorkaround:", isHydrationWorkaround ? data._id : false);
-
-    const result = standardAuth || isHydrationWorkaround;
-    console.log("isAuthenticated result:", result ? (data._id || data.id) : false);
+    const result = (signedIn && data && (data.id || data._id) && token) || isHydrationWorkaround;
 
     return result;
   };

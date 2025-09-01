@@ -36,7 +36,7 @@ interface OrderBookData {
   [key: string]: any;
 }
 
-function getAccumulativeTotal(arr: OrderBookItem[] | undefined): number {
+function getAccumalativeTotal(arr: OrderBookItem[] | undefined): number {
   if (!Array.isArray(arr)) {
     return 0;
   }
@@ -78,20 +78,18 @@ const OrderbookAccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
 >(({ className, children, ...props }, ref) => {
-  // If the children is the string 'Orderbook', change it to 'Order Book'
-  const displayChildren = typeof children === 'string' && children.trim().toLowerCase() === 'orderbook' ? 'Order Book' : children;
   return (
-    <AccordionPrimitive.Header className="sm:text-[16px] text-[14px] flex items-center justify-between w-full">
+    <AccordionPrimitive.Header className="sm:text-[18px] text-[14px] flex items-center justify-between w-full">
       <AccordionPrimitive.Trigger
         ref={ref}
         className={cn(
-          "h-[56px] sm:h-[70px] sm:text-[16px] text-[14px] w-full pr-3 pl-3 sm:pr-3 sm:pl-4 flex flex-1 items-center justify-between sm:py-3 py-2 font-medium transition-all cursor-pointer",
+          "h-[68px] sm:h-[80px] sm:text-[18px] text-[14px] w-full pr-4 pl-4 sm:pr-3 sm:pl-4 flex flex-1 items-center justify-between sm:py-4 py-2 font-medium transition-all cursor-pointer",
           className
         )}
         {...props}
       >
-        <span className="text-[14px] sm:text-[16px] flex max-w-auto">
-          {displayChildren}
+        <span className="text-[16px] sm:text-[18px] flex max-w-auto">
+          {children}
         </span>
         <div className="flex-1" />
         <ChevronDown
@@ -153,7 +151,11 @@ const OrderbookAccordionContent = React.forwardRef<
     ref
   ) => {
     const onClickOrderBook = () => {
+      // if (setSelectedOrderBookData) {
+      //   setSelectedOrderBookData(orderBook);
       // }
+      // if (setSelectedIndex && typeof index === 'number') {
+      //   setSelectedIndex(index);
       // }
     };
     const param = useParams();
@@ -165,7 +167,7 @@ const OrderbookAccordionContent = React.forwardRef<
     const [selectedOpenOrder, setSelectedOpenOrder] = useState<any>(null);
     const [askBookHighest, setAskBookHighest] = useState<number>(0);
     const [bidBookHighest, setBidBookHighest] = useState<number>(0);
-    const [markets, setMarkets] = useState<any[]>([]);
+    const [markets, setMarkets] = useState([]);
 
     // Add proper interval state management
     const [chartInterval, setChartInterval] = useState<string>(interval || "1d");
@@ -200,34 +202,35 @@ const OrderbookAccordionContent = React.forwardRef<
       }
 
       return '--';
-    }, []);
+    }, [bids, asks]);
 
     useEffect(() => {
       const descending = (a: any, b: any) => Number(b[0]) - Number(a[0]);
       const ascending = (a: any, b: any) => Number(a[0]) - Number(b[0]);
+      // console.log(orderBook, "orderBook");
 
       if (activeView === "Yes") {
         const sortedBids = (orderBook?.bids?.[0] || []).sort(descending);
         setBids(sortedBids);
-        setBidBookHighest(getAccumulativeTotal(sortedBids));
+        setBidBookHighest(getAccumalativeTotal(sortedBids));
         let asks =
           orderBook?.asks?.[0]?.map((item: any) => {
             return [(100 - Number(item[0]))?.toString() || "0", item[1]];
           }) || [];
         const sortedAsks = asks.sort(ascending);
         setAsks(sortedAsks ? sortedAsks.reverse() : []);
-        setAskBookHighest(getAccumulativeTotal(sortedAsks))
+        setAskBookHighest(getAccumalativeTotal(sortedAsks))
       } else if (activeView === "No") {
         const sortedBids = (orderBook?.asks?.[0] || []).sort(descending);
         setBids(sortedBids);
-        setBidBookHighest(getAccumulativeTotal(sortedBids))
+        setBidBookHighest(getAccumalativeTotal(sortedBids))
         let asks =
           orderBook?.bids?.[0]?.map((item: any) => {
             return [(100 - Number(item[0]))?.toString() || "0", item[1]];
           }) || [];
         const sortedAsks = asks.sort(ascending);
         setAsks(sortedAsks ? sortedAsks.reverse() : []);
-        setAskBookHighest(getAccumulativeTotal(sortedAsks))
+        setAskBookHighest(getAccumalativeTotal(sortedAsks))
       }
     }, [activeView, orderBook]);
 
@@ -249,7 +252,7 @@ const OrderbookAccordionContent = React.forwardRef<
       });
     }, [asks, bids, activeView, isOpen]);
 
-    const getOpenOrders = React.useCallback(async () => {
+    const getOpenOrders = async () => {
       try {
         const respData = await getOpenOrdersByEvtId({
           id: selectedMarket?._id,
@@ -260,25 +263,23 @@ const OrderbookAccordionContent = React.forwardRef<
           setOpenOrders([]);
         }
       } catch (error) {
-        console.log(error, "error")
-        console.log(error, "error")
-
+        console.log(error, "error");
       }
-    }, [selectedMarket?._id, setOpenOrders]);
+    };
 
     useEffect(() => {
       getOpenOrders();
-    }, [selectedMarket, getOpenOrders]);
+    }, [selectedMarket]);
 
     const matchPriceAndQuantity = (data: any, targetPrice: number, side: any) => {
       let totalQty = 0;
 
       for (let [price, qty] of data) {
         let p = Number(price);
-        if (side === "ask" && p <= targetPrice) {
+        if (side == "ask" && p <= targetPrice) {
           totalQty += qty;
         }
-        if (side === "bid" && p >= targetPrice) {
+        if (side == "bid" && p >= targetPrice) {
           totalQty += qty;
         }
       }
@@ -288,11 +289,12 @@ const OrderbookAccordionContent = React.forwardRef<
     const onOrderCancel = async (orderId: any, success: any) => {
       try {
         if (success) {
-          let orderIndex = openOrders.findIndex((order: any) => order._id === orderId);
-          if (orderIndex !== -1) {
+          let orderIndex = openOrders.findIndex((order: any) => order._id == orderId);
+          if (orderIndex != -1) {
             let newOpenOrders = [...openOrders];
             newOpenOrders.splice(orderIndex, 1);
-            let selOpenOrderData = selectedOpenOrder.filter((order: any) => order._id !== orderId);
+            // setOpenOrders(newOpenOrders);
+            let selOpenOrderData = selectedOpenOrder.filter((order: any) => order._id != orderId);
             if (selOpenOrderData.length > 0) {
               setSelectedOpenOrder(selOpenOrderData)
             } else {
@@ -302,7 +304,7 @@ const OrderbookAccordionContent = React.forwardRef<
           }
         }
       } catch (error) {
-
+        console.log(error, "error");
       }
     }
     useEffect(() => {
@@ -313,6 +315,7 @@ const OrderbookAccordionContent = React.forwardRef<
         const resData = JSON.parse(result);
         // price quantity side eventid marketid groupItemTitle userSide action price execQty timeInForce createdAt _id
         if (resData.marketId._id !== selectedMarket?._id) return;
+        // if(resData.userId !== user?._id) return;
         setOpenOrders((prev: any) => {
           const findOrder = prev.find(order => order._id === resData._id)
           if (findOrder) {
@@ -362,7 +365,7 @@ const OrderbookAccordionContent = React.forwardRef<
         socket.off("order-update");
       };
 
-    }, [socketContext?.socket, selectedMarket?._id, setOpenOrders]);
+    }, [socketContext?.socket]);
 
     useEffect(() => {
       if (!id) {
@@ -371,11 +374,11 @@ const OrderbookAccordionContent = React.forwardRef<
 
       const fetchEvents = async () => {
         try {
-          let { success, result } = await getEventById({ id: Array.isArray(id) ? id[0] : id });
+          let { success, result } = await getEventById({ id: id });
           if (success) {
             if (result?.marketId && result?.marketId.length > 0) {
               setMarkets(
-                result.marketId.filter((market: any) =>
+                result.marketId.filter((market) =>
                   ["active", "closed", "resolved"].includes(market.status)
                 )
               );
@@ -404,24 +407,30 @@ const OrderbookAccordionContent = React.forwardRef<
                 setActiveView(val);
               }
             }}
+          // className="mt-4"
           >
-            <TabsList className="flex justify-start w-full sm:w-1/4 sm:min-w-[150px]">
+            <TabsList className="flex justify-start w-1/4 min-w-[150px]">
               <TabsTrigger
                 value="Yes"
-                className="flex-1 px-2 py-2 text-[12px] sm:text-base transition-all duration-300 border-b-2 border-transparent"
+                className="flex-1 px-2 py-2 transition-all duration-300 border-b-2 border-transparent"
               >
                 Trade {capitalize(selectedMarket?.outcome?.[0]?.title || "Yes")}
               </TabsTrigger>
               <TabsTrigger
                 value="No"
-                className="flex-1 px-2 py-2 text-[12px] sm:text-base transition-all duration-300 border-b-2 border-transparent"
+                className="flex-1 px-2 py-2 transition-all duration-300 border-b-2 border-transparent"
               >
                 Trade {capitalize(selectedMarket?.outcome?.[1]?.title || "No")}
               </TabsTrigger>
               {
                 forecast && <TabsTrigger
                   value="Graph"
-                  className="flex-1 px-2 py-2 text-[12px] sm:text-base transition-all duration-300 border-b-2 border-transparent data-[state=inactive]:border-b-2 data-[state=inactive]:border-transparent hover:border-transparent"
+                  className={cn(
+                    "flex-1 p-2 transition-colors duration-300",
+                    forecastGraph
+                      ? "bg-transparent text-pink-500"
+                      : "bg-transparent text-white hover:bg-transparent"
+                  )}
                 >
                   Graph
                 </TabsTrigger>
@@ -440,12 +449,12 @@ const OrderbookAccordionContent = React.forwardRef<
                   ) : (
                     <>
                       <div className="flex items-center h-[35px] w-full justify-between">
-                        <div className="text-[12px] sm:text-base w-[30%] p-3">
+                        <div className="w-[30%] p-3">
                           {activeView === "Yes" ? `Trade ${capitalize(selectedMarket?.outcome?.[0]?.title) || "Yes"}` : `Trade ${capitalize(selectedMarket?.outcome?.[1]?.title) || "No"}`}
                         </div>
-                        <div className="w-[20%] text-[12px] sm:text-base text-center">Price</div>
-                        <div className="w-[25%]  text-[12px] sm:text-base text-center">Shares</div>
-                        <div className="w-[25%]  text-[12px] sm:text-base text-center">Total</div>
+                        <div className="w-[20%] text-center">Price</div>
+                        <div className="w-[25%] text-center">Shares</div>
+                        <div className="w-[25%] text-center">Total</div>
                       </div>
                       <div className="w-full overflow-hidden h-[fit-content]">
                         <div
@@ -464,11 +473,11 @@ const OrderbookAccordionContent = React.forwardRef<
                               {asks.length > 0 &&
                                 asks.map((row: any, index: any) => {
                                   const orderBookLength = asks.length || 0;
-                                  const openOrder = openOrders?.filter((order: any) => (100 - Number(order.price)) === row[0]);
+                                  const openOrder = openOrders?.filter((order: any) => (100 - Number(order.price)) == row[0]);
                                   return (
                                     <div
                                       key={index}
-                                      className="flex items-center text-[12px] sm:text-base h-[35px] w-full justify-between duration-300 ease-in-out bg-black text-white hover:bg-[#240000] z-20 relative cursor-pointer"
+                                      className="flex items-center h-[35px] w-full justify-between duration-300 ease-in-out bg-black text-white hover:bg-[#240000] z-20 relative cursor-pointer"
                                       onClick={() => setSelectedOrder({
                                         side: activeView,
                                         row: matchPriceAndQuantity(asks || [], Number(row[0]), "ask"),
@@ -521,33 +530,33 @@ const OrderbookAccordionContent = React.forwardRef<
                               {/* Asks badge */}
                               {asks.length > 0 && (
                                 <div className="flex w-full">
-                                  <Badge className="w-[50px] text-xs text-white bg-[#ff0000] mb-1 absolute bottom-0 left-5 z-30 flex items-center justify-center px-3">
+                                  <Badge className="w-[50px] text-xs text-white bg-[#ff0000] mb-1 absolute bottom-0 left-5 z-30">
                                     Asks
                                   </Badge>
                                 </div>
                               )}{" "}
                             </div>
 
-                            <div className="flex text-[12px] sm:text-base items-center h-[35px] w-full p-3">
-                              <div className="w-[30%]">Last:
-                                {selectedMarket?.last ? (
-                                  activeView === "Yes" ? selectedMarket?.last || 0 : 100 - (selectedMarket?.last || 0)
-                                ) : "--"}
-                                ¢</div>
-                              <div className="text-[12px] sm:text-base w-[30%] text-center">
-                                {asks.length > 0 && bids.length > 0 ? (
-                                  <>Spread: {calcSpread(bids, asks)}</>
-                                ) : null}
+                            {asks && bids && asks.length > 0 && bids.length > 0 && (
+                              <div className="flex items-center h-[35px] w-full p-3">
+                                <div className="w-[30%]">Last:
+                                  {selectedMarket?.last ? (
+                                    activeView == "Yes" ? selectedMarket?.last || 0 : 100 - (selectedMarket?.last || 0)
+                                  ) : "--"}
+                                  ¢</div>
+                                <div className="w-[20%] text-center">
+                                  Spread: {calcSpread(bids, asks)}
+                                </div>
+                                <div className="w-[25%]"></div>
+                                <div className="w-[25%]"></div>
                               </div>
-                              <div className="w-[25%]"></div>
-                              <div className="w-[25%]"></div>
-                            </div>
+                            )}
 
                             {/* Bids badge */}
                             <div className="relative w-full">
                               {bids.length > 0 && (
                                 <div className="flex w-full">
-                                  <Badge className="w-[50px] text-xs text-white bg-[#00c735] mt-1 mb-1 absolute top-0 left-5 z-30 flex items-center justify-center px-3">
+                                  <Badge className="w-[50px] text-xs text-white bg-[#00c735] mt-1 mb-1 absolute top-0 left-5 z-30">
                                     Bids
                                   </Badge>
                                 </div>
@@ -557,11 +566,11 @@ const OrderbookAccordionContent = React.forwardRef<
                               {bids.length > 0 &&
                                 bids.map((row, index) => {
                                   const orderBookLength = bids.length || 0;
-                                  const openOrder = openOrders?.filter((order: any) => (order.price === row[0] && order.side === activeView?.toLowerCase()));
+                                  const openOrder = openOrders?.filter((order: any) => (order.price == row[0] && order.side == activeView?.toLowerCase()));
                                   return (
                                     <div
                                       key={index}
-                                      className="flex items-center text-[12px] sm:text-base h-[35px] w-full justify-between bg-black text-white duration-300 ease-in-out hover:bg-[#001202] z-20 relative cursor-pointer"
+                                      className="flex items-center h-[35px] w-full justify-between bg-black text-white duration-300 ease-in-out hover:bg-[#001202] z-20 relative cursor-pointer"
                                       onClick={() => setSelectedOrder({
                                         side: activeView,
                                         row: matchPriceAndQuantity(bids || [], Number(row[0]), "bid"),
@@ -618,7 +627,6 @@ const OrderbookAccordionContent = React.forwardRef<
                       </div>
                     </>
                   )}
-
                 </div>
               ) :
                 (

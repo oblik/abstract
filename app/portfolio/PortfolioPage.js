@@ -5,6 +5,7 @@ import { getCookie } from "cookies-next";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/app/components/ui/button";
 import config from "../../config/config";
+import { useWallet } from "@/app/walletconnect/walletContext";
 import {
   Tabs,
   TabsList,
@@ -56,7 +57,6 @@ import OpenOrders from "./OpenOrders";
 import Positions from "./Positions";
 import History from "./History";
 import { Footer } from "../components/customComponents/Footer";
-import { setWalletConnect } from "@/store/slices/walletconnect/walletSlice";
 import { PnLFormatted } from "@/utils/helpers";
 import { getWalletSettings, getCoinList } from "@/services/user";
 import { getAuthToken } from "@/lib/cookies";
@@ -88,17 +88,26 @@ export default function PortfolioPage() {
   const connection = useMemo(() => new Connection(config?.rpcUrl, "confirmed"), []);
   const PYTH_PRICE_ACCOUNT = new PublicKey(config?.PYTH_PRICE_ACCOUNT);
 
-  const { isConnected, address } = useSelector(
-    (state) => state?.walletconnect?.walletconnect
-  );
+  // Use wallet context only
+  const walletContext = useWallet();
+  const { isConnected, address } = walletContext;
+
   const walletData = useSelector((state) => state?.wallet?.data);
   const data = useSelector((state) => state?.auth?.user);
   const { signedIn } = useSelector((state) => state?.auth?.session);
+
+  // Initialize dispatch early to avoid initialization errors
+  const dispatch = useDispatch();
 
   console.log("=== INITIAL AUTH STATE ===");
   console.log("signedIn:", signedIn);
   console.log("data:", data);
   console.log("walletData:", walletData);
+  console.log("=== WALLET CONNECTION STATE ===");
+  console.log("isConnected:", isConnected);
+  console.log("address from Phantom wallet context:", address);
+  console.log("=== WALLET CONTEXT STATE ===");
+  console.log("walletContext:", walletContext);
 
   // Helper function to check if user is properly authenticated
   const isAuthenticated = () => {
@@ -144,10 +153,42 @@ export default function PortfolioPage() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Check for existing wallet connections on mount
+  useEffect(() => {
+    const checkExistingWallets = async () => {
+      console.log("=== CHECKING EXISTING WALLET CONNECTIONS ===");
+      // Wallet context will auto-detect existing connections
+      console.log("Wallet context will handle auto-detection");
+    };
+
+    checkExistingWallets();
+  }, []);
+
   const [open, setOpen] = useState(false);
   const [check, setCheck] = useState(false);
   const [step, setStep] = useState("");
+
+  // Use wallet context address directly
   const wallet = address;
+  console.log("=== FINAL WALLET ADDRESS ===");
+  console.log("Using wallet address:", wallet || "NULL/EMPTY");
+  console.log("Source: Wallet Context");
+
+  // Helper function to connect wallet
+  const handleConnectWallet = async () => {
+    try {
+      console.log("=== ATTEMPTING WALLET CONNECTION ===");
+
+      // Use wallet context connection
+      if (walletContext?.connectWallet) {
+        console.log("Connecting via wallet context...");
+        await walletContext.connectWallet();
+      }
+    } catch (error) {
+      console.error("Error connecting wallet:", error);
+    }
+  };
+
   const [balance, setBalance] = useState(0);
   const [tokenbalance, setTokenBalance] = useState(0);
   const [currentTab, setCurrentTab] = useState("positions");
@@ -175,7 +216,6 @@ export default function PortfolioPage() {
   };
 
   const router = useRouter();
-  const dispatch = useDispatch();
   const [profileData, setProfileData] = useState({
     username: "",
     avatar_url: "",
@@ -217,19 +257,15 @@ export default function PortfolioPage() {
         setTodayReal(result1?.totalPnl / 100);
       }
     } catch (err) {
-      console.log(err, "errr")
-      console.log(err, "errrr")
-      console.log(err, "ererrrr")
-      console.log(err, "errerr")
+      console.log(err, "error")
+      console.log(err, "error")
+      console.log(err, "error")
+      console.log(err, "error")
       console.log("error ", err)
       console.log(err, "err");
 
     }
   }, [chartInterval]);
-
-  useEffect(() => {
-    getPnl();
-  }, [walletData, chartInterval, getPnl]);
 
   useEffect(() => {
     if (!wallet) return;
@@ -247,13 +283,34 @@ export default function PortfolioPage() {
     fetchProfile();
   }, [wallet]);
 
+  // Helper function to validate address types
+  const isValidSolanaAddress = (address) => {
+    if (!address || typeof address !== 'string') return false;
+    if (address.startsWith('0x')) return false; // Ethereum address
+    if (address.length < 32 || address.length > 44) return false; // Solana addresses are typically 32-44 chars
+
+    // Basic base58 character check
+    const base58Regex = /^[1-9A-HJ-NP-Za-km-z]+$/;
+    return base58Regex.test(address);
+  };
+
   const balanceData = useCallback(async () => {
     try {
       if (address) {
+        console.log("=== BALANCE DATA CHECK ===");
+        console.log("Address:", address);
+        console.log("Address type:", address.startsWith('0x') ? 'Ethereum' : 'Solana');
+
+        // Only proceed if it's a valid Solana address
+        if (!isValidSolanaAddress(address)) {
+          console.log("Skipping Solana balance check for non-Solana address");
+          return;
+        }
+
         const publicKey = new PublicKey(address);
         const balanceLamports = await connection.getBalance(publicKey);
-        console.log(balanceSOL, balanceLamports, "balanceSOLbalanceSOL");
         const balanceSOL = balanceLamports / LAMPORTS_PER_SOL;
+        console.log(balanceSOL, balanceLamports, "balanceSOL");
         const formattedBalance = formatNumber(balanceSOL, 4);
         setBalance(formattedBalance);
 
@@ -261,12 +318,22 @@ export default function PortfolioPage() {
         const walletAddress = new PublicKey(address);
         const ata = await getAssociatedTokenAddress(mint, walletAddress);
         if (ata) {
-          const tokenAccount = await getAccount(connection, ata);
-          if (tokenAccount) {
-            const rawBalance = parseFloat(tokenAccount?.amount) / 10 ** 6;
+          try {
+            const tokenAccount = await getAccount(connection, ata);
+            if (tokenAccount) {
+              const rawBalance = parseFloat(tokenAccount?.amount) / 10 ** 6;
 
-            const formattedBalance1 = formatNumber(rawBalance, 4);
-            setTokenBalance(formattedBalance1);
+              const formattedBalance1 = formatNumber(rawBalance, 4);
+              setTokenBalance(formattedBalance1);
+            }
+          } catch (tokenErr) {
+            // Handle TokenAccountNotFoundError gracefully
+            if (tokenErr.name === 'TokenAccountNotFoundError') {
+              console.log("Token account not found for this wallet, setting balance to 0");
+              setTokenBalance("0.0000");
+            } else {
+              console.error("Error fetching token account:", tokenErr);
+            }
           }
         }
       }
@@ -275,96 +342,26 @@ export default function PortfolioPage() {
     }
   }, [address, connection]);
 
-  async function disconnectWallet() {
-    if (window.solana && window.solana.isPhantom) {
-      window.solana.disconnect();
-      dispatch(
-        setWalletConnect({
-          isConnected: false,
-          address: "",
-          network: "",
-          type: "",
-          rpc: "",
-          balance: 0,
-        })
-      );
-    }
-  }
-
   async function ConnectPhantomWallet() {
-    if (window.solana && window.solana.isPhantom) {
-      try {
-        if (window.solana.isConnected) {
-          await window.solana.disconnect();
-        }
-        const response = await window.solana.connect({ onlyIfTrusted: false });
+    try {
+      console.log("=== CONNECTING VIA WALLET CONTEXT ===");
 
-        const connection = new Connection(config?.rpcUrl);
-
-        const publicKey = new PublicKey(response.publicKey.toString());
-        const balanceLamports = await connection.getBalance(publicKey);
-        const balanceSOL = balanceLamports / 1e9;
-
-        const connectedAddress = response.publicKey.toString();
-
-        const { result } = await addressCheck({ address: connectedAddress });
-
-        if (isEmpty(data?.walletAddress) && result === true) {
-          toastAlert(
-            "error",
-            `This address is already exists. Please connect another new address.`,
-            "wallet"
-          );
-          setOpen(false);
-          disconnectWallet();
-          return;
-        } else if (
-          !isEmpty(data?.walletAddress) &&
-          connectedAddress?.toLowerCase() !== data?.walletAddress?.toLowerCase()
-        ) {
-          toastAlert(
-            "error",
-            `Please connect your wallet address ${data?.walletAddress}`,
-            "logout"
-          );
-          setOpen(false);
-          disconnectWallet();
-          return;
-        }
-
-        dispatch(
-          setWalletConnect({
-            isConnected: true,
-            address: response.publicKey.toString(),
-            network: config.network,
-            type: config.networkType,
-            rpc: config?.rpcUrl,
-            balance: balanceSOL,
-          })
-        );
+      // Use wallet context connect function
+      if (walletContext?.connectWallet) {
+        await walletContext.connectWallet();
         setOpen(false);
-        getAddress();
         toastAlert("success", "Wallet Connected successfully!!", "wallet");
-        setCheck(true)
-      } catch (err) {
-
-        if (err?.code === 4001) {
-          toastAlert("error", "Connection request was rejected", "wallet");
-        }
-        dispatch(
-          setWalletConnect({
-            isConnected: false,
-            address: "",
-            network: "",
-            type: "",
-            rpc: "",
-            balance: 0,
-          })
-        );
+        setCheck(true);
+      } else {
+        throw new Error("Wallet context not available");
+      }
+    } catch (err) {
+      console.error("Connection error:", err);
+      if (err?.code === 4001) {
+        toastAlert("error", "Connection request was rejected", "wallet");
+      } else {
         toastAlert("error", "Failed to connect wallet", "wallet");
       }
-    } else {
-      toastAlert("error", "Phantom wallet extension is not installed", "error");
     }
   }
 
@@ -565,10 +562,28 @@ export default function PortfolioPage() {
   };
 
   async function disconnect() {
-    disconnectWallet();
-  }
+    console.log("=== PORTFOLIO PAGE DISCONNECT TRIGGERED ===");
 
-  const getAnchorProvider = async () => {
+    try {
+      // Call wallet context disconnect (Phantom only)
+      if (walletContext?.disconnectWallet) {
+        await walletContext.disconnectWallet();
+        console.log("Phantom wallet disconnect completed");
+      }
+
+      // Clear local state
+      setPortfolioData({});
+      setOrders([]);
+      setOrderHistory([]);
+      console.log("Local state cleared");
+
+      // Force component re-render
+      window.location.reload();
+
+    } catch (error) {
+      console.error("Error during disconnect:", error);
+    }
+  } const getAnchorProvider = async () => {
     const provider = window.solana;
 
     if (!provider || !provider.isPhantom) {
@@ -594,7 +609,7 @@ export default function PortfolioPage() {
         const provider = await getAnchorProvider();
         const program = new Program(depositIDL, programID, provider);
         const connection = provider.connection;
-        console.log("USDCUSDC")
+        console.log("USDC")
 
         const mint = new PublicKey(config?.tokenMint);
         const receiverPubKey = new PublicKey(config?.adminAdd);
@@ -958,17 +973,18 @@ export default function PortfolioPage() {
           <div className="flex justify-end sm:mb-2 mb-0 sm:mt-2 mt-4">
             {isConnected ? (
               <>
+                {/* Display Phantom wallet address */}
                 <Button className="mr-2">{shortText(address)}</Button>
                 <Button
                   variant="outline"
-                  className="ml-auto min-w-[95px] text-[12px] sm:text-sm max-h-8 sm:max-h-12 px-4"
+                  className="ml-auto min-w-[95px] text-sm max-h-12 px-4"
                   onClick={() => disconnect()}>Disconnect</Button>
 
               </>
             ) : (
               <Button
                 variant='default'
-                className="ml-auto min-w-[95px] text-[12px] sm:text-sm max-h-8 sm:max-h-12 px-4"
+                className="ml-auto min-w-[95px] text-sm max-h-12 px-4"
                 onClick={() => setOpen(true)}>Connect Wallet</Button>
             )}
           </div>

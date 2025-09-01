@@ -4,22 +4,28 @@ import { setUser } from "@/store/slices/auth/userSlice";
 
 
 function getApiBaseUrl() {
-  // Always use full backend URL for server-side requests to avoid malformed URL errors
-  // Next.js middleware and SSR context require absolute URLs
-  return config.backendURL;
+  // For server-side rendering, we need to use the full backend URL
+  // even in development, because SSR can't use relative URLs
+  if (typeof window === "undefined") {
+    // Server-side: always use full backend URL
+    return process.env.NODE_ENV === "production"
+      ? config.backendURL
+      : "https://sonotradesdemo.wearedev.team"; // Use production URL in development for SSR
+  }
+
+  // Client-side: use Next.js proxy in development, full URL in production
+  if (process.env.NODE_ENV === "production") {
+    return config.backendURL;
+  }
+  return ""; // Use Next.js proxy routes in development
 }
 
-
-export const getUserData = async (dispatch: any) => {
-
+export const getUserData = async () => {
   try {
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/user/get-user`,
       method: "get",
     });
-    const { result } = respData.data;
-    console.log("result>>>>>>>>>>.", result)
-    dispatch(setUser(result));
     return handleResp(respData, "success");
   } catch (error: any) {
     return handleResp(error, "error");
@@ -27,26 +33,48 @@ export const getUserData = async (dispatch: any) => {
 };
 
 export const getUserById = async (id: string) => {
+  console.log("=== getUserById service called ===");
+  console.log("Raw ID parameter:", id);
+
+  // Clean the ID by removing @ symbol
+  const cleanId = id.replace("@", "");
+  console.log("Cleaned ID:", cleanId);
+
+  const url = `${getApiBaseUrl()}/api/v1/user/get-user/id/${cleanId}`;
+  console.log("API URL:", url);
+
   try {
     let respData = await axios({
-      url: `${getApiBaseUrl()}/api/v1/user/get-user/id/${id.replace("@", "")}`,
+      url: url,
       method: "get",
     });
+    console.log("getUserById response:", respData);
     return handleResp(respData, "success");
   } catch (error: any) {
-    console.log(error, "error");
+    console.error("getUserById error:", error);
+    console.error("Error status:", error?.response?.status);
+    console.error("Error data:", error?.response?.data);
     return handleResp(error, "error");
   }
 };
 export const getTradeOverviewById = async (id: string) => {
+  console.log("=== getTradeOverviewById service called ===");
+  console.log("ID parameter:", id);
+
+  const url = `${getApiBaseUrl()}/api/v1/user/user-trade-overview/id/${id}`;
+  console.log("Trade overview API URL:", url);
 
   try {
     let respData = await axios({
-      url: `${getApiBaseUrl()}/api/v1/user/user-trade-overview/id/${id}`,
+      url: url,
       method: "get",
     });
+    console.log("getTradeOverviewById response:", respData);
     return handleResp(respData, "success");
   } catch (error: any) {
+    console.error("getTradeOverviewById error:", error);
+    console.error("Error status:", error?.response?.status);
+    console.error("Error data:", error?.response?.data);
     return handleResp(error, "error");
   }
 };
@@ -113,17 +141,18 @@ export const getUserTradeHistory = async (data: any) => {
   }
 };
 
-export const getInfoCards = async () => {
+export const getInfoCards = async (data: any) => {
   try {
     let respData = await axios({
       url: `${getApiBaseUrl()}/api/v1/user/info-cards`,
       method: "get",
     });
     return handleResp(respData, "success");
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleResp(error, "error");
   }
 };
+
 
 export const setUserEmailNotification = async (data: any) => {
   try {
@@ -277,3 +306,4 @@ export const getNotifications = async () => {
     return handleResp(error, "error");
   }
 };
+

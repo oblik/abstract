@@ -350,12 +350,7 @@ export default function EventPage({ categories }) {
         </div>
         {/* Remove spacer and use padding-top on main content to offset header */}
         <div
-          className=" container mx-auto px-0 max-w-full overflow-hidden"
-          style={{
-            paddingTop: typeof window !== 'undefined' && window.innerWidth < 640 ? '40px' : '112px',
-            paddingLeft: typeof window !== 'undefined' && window.innerWidth < 640 ? 0 : undefined,
-            paddingRight: typeof window !== 'undefined' && window.innerWidth < 640 ? 0 : undefined
-          }}
+          className="container mx-auto px-0 max-w-full overflow-hidden pt-[40px] sm:pt-[112px] pl-0 pr-0"
         >
           {eventsLoading ? (
             <div className="flex justify-center items-center h-[80vh] w-full">

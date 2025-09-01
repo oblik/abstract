@@ -151,47 +151,42 @@ export default function SlideshowListingCarousel() {
                                     <span className="text-white text-sm font-bold">
                                       {market.odd !== undefined && market.odd !== null ? market.odd : "--"}%
                                     </span>
-                                    <span className="flex items-center gap-2 ml-2">
-                                      <span className="text-white text-sm font-bold">
-                                        {market.odd !== undefined && market.odd !== null ? market.odd : "--"}%
-                                      </span>
-                                      {/* Yes/No buttons */}
-                                      <div className="ml-3 relative group" style={{ minWidth: 40 }}>
-                                        <Button
-                                          variant="ghost"
-                                          className="h-[28px] px-6 text-[12px] font-semibold border border-transparent text-[#7dfdfe] hover:text-[#7dfdfe] bg-[#0d1a26] hover:bg-[#0d1a26] transition-colors duration-300 rounded-md capitalize relative z-10"
-                                          title={market.outcome?.[0]?.title || "Yes"}
-                                        >
-                                          {market.outcome?.[0]?.title || "Yes"}
-                                        </Button>
-                                        {/* Tron blue border animation - hover only */}
-                                        <div className="absolute inset-0 rounded-md z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                          <div className="absolute inset-0 rounded-md border border-[#00d4ff] animate-border-glow"></div>
-                                          <div className="absolute inset-0 rounded-md">
-                                            <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#00d4ff] to-transparent animate-line-flow" style={{ animationDelay: '0.2s' }}></div>
-                                            <div className="absolute top-0 right-0 w-0.5 h-full bg-gradient-to-b from-transparent via-[#00d4ff] to-transparent animate-line-flow-vertical" style={{ animationDelay: '0.7s' }}></div>
-                                            <div className="absolute bottom-0 right-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#00d4ff] to-transparent animate-line-flow" style={{ animationDelay: '1.2s' }}></div>
-                                            <div className="absolute bottom-0 left-0 w-0.5 h-full bg-gradient-to-b from-transparent via-[#00d4ff] to-transparent animate-line-flow-vertical" style={{ animationDelay: '1.7s' }}></div>
-                                          </div>
+                                    {/* Yes/No buttons */}
+                                    <div className="ml-3 relative group" style={{ minWidth: 40 }}>
+                                      <Button
+                                        variant="ghost"
+                                        className="h-[28px] px-6 text-[12px] font-semibold border border-transparent text-[#7dfdfe] hover:text-[#7dfdfe] bg-[#0d1a26] hover:bg-[#0d1a26] transition-colors duration-300 rounded-md capitalize relative z-10"
+                                        title={market.outcome?.[0]?.title || "Yes"}
+                                      >
+                                        {market.outcome?.[0]?.title || "Yes"}
+                                      </Button>
+                                      {/* Tron blue border animation - hover only */}
+                                      <div className="absolute inset-0 rounded-md z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        <div className="absolute inset-0 rounded-md border border-[#00d4ff] animate-border-glow"></div>
+                                        <div className="absolute inset-0 rounded-md">
+                                          <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#00d4ff] to-transparent animate-line-flow" style={{ animationDelay: '0.2s' }}></div>
+                                          <div className="absolute top-0 right-0 w-0.5 h-full bg-gradient-to-b from-transparent via-[#00d4ff] to-transparent animate-line-flow-vertical" style={{ animationDelay: '0.7s' }}></div>
+                                          <div className="absolute bottom-0 right-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#00d4ff] to-transparent animate-line-flow" style={{ animationDelay: '1.2s' }}></div>
+                                          <div className="absolute bottom-0 left-0 w-0.5 h-full bg-gradient-to-b from-transparent via-[#00d4ff] to-transparent animate-line-flow-vertical" style={{ animationDelay: '1.7s' }}></div>
                                         </div>
                                       </div>
-                                      <div className="relative group" style={{ minWidth: 40 }}>
-                                        <Button
-                                          variant="ghost"
-                                          className="h-[28px] px-7 text-[12px] font-semibold border border-transparent text-[#ec4899] hover:text-[#ec4899] bg-[#210d1a] hover:bg-[#210d1a] transition-colors duration-300 rounded-md capitalize relative z-10"
-                                          title={market.outcome?.[1]?.title || "No"}
-                                        >
-                                          {market.outcome?.[1]?.title || "No"}
-                                        </Button>
-                                        {/* Pink border animation - hover only */}
-                                        <div className="absolute inset-0 rounded-md z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                          <div className="absolute inset-0 rounded-md border border-[#ec4899] animate-border-glow"></div>
-                                          <div className="absolute inset-0 rounded-md">
-                                            <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#ec4899] to-transparent animate-line-flow" style={{ animationDelay: '0.2s' }}></div>
-                                            <div className="absolute top-0 right-0 w-0.5 h-full bg-gradient-to-b from-transparent via-[#ec4899] to-transparent animate-line-flow-vertical" style={{ animationDelay: '0.7s' }}></div>
-                                            <div className="absolute bottom-0 right-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#ec4899] to-transparent animate-line-flow" style={{ animationDelay: '1.2s' }}></div>
-                                            <div className="absolute bottom-0 left-0 w-0.5 h-full bg-gradient-to-b from-transparent via-[#ec4899] to-transparent animate-line-flow-vertical" style={{ animationDelay: '1.7s' }}></div>
-                                          </div>
+                                    </div>
+                                    <div className="relative group" style={{ minWidth: 40 }}>
+                                      <Button
+                                        variant="ghost"
+                                        className="h-[28px] px-7 text-[12px] font-semibold border border-transparent text-[#ec4899] hover:text-[#ec4899] bg-[#210d1a] hover:bg-[#210d1a] transition-colors duration-300 rounded-md capitalize relative z-10"
+                                        title={market.outcome?.[1]?.title || "No"}
+                                      >
+                                        {market.outcome?.[1]?.title || "No"}
+                                      </Button>
+                                      {/* Pink border animation - hover only */}
+                                      <div className="absolute inset-0 rounded-md z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        <div className="absolute inset-0 rounded-md border border-[#ec4899] animate-border-glow"></div>
+                                        <div className="absolute inset-0 rounded-md">
+                                          <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#ec4899] to-transparent animate-line-flow" style={{ animationDelay: '0.2s' }}></div>
+                                          <div className="absolute top-0 right-0 w-0.5 h-full bg-gradient-to-b from-transparent via-[#ec4899] to-transparent animate-line-flow-vertical" style={{ animationDelay: '0.7s' }}></div>
+                                          <div className="absolute bottom-0 right-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[#ec4899] to-transparent animate-line-flow" style={{ animationDelay: '1.2s' }}></div>
+                                          <div className="absolute bottom-0 left-0 w-0.5 h-full bg-gradient-to-b from-transparent via-[#ec4899] to-transparent animate-line-flow-vertical" style={{ animationDelay: '1.7s' }}></div>
                                         </div>
                                       </div>
                                     </div>

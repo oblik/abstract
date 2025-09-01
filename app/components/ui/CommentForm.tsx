@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useSelector, useDispatch } from "@/store";
 import { useState } from "react";
-import { useSelector, useDispatch } from "@/store";
 import { Button } from "./button";
 import { CommentProps } from "@/types/comments";
 import { postComment } from "@/services/market";
@@ -20,10 +19,10 @@ const CommentForm = ({ eventId, onCommentAdded }: CommentFormProps) => {
   const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalError, setModalError] = useState("");
+  const [modelError, setModelError] = useState("");
 
-  const { signedIn } = useSelector((state) => state?.auth?.session);
-  const { userId, userName } = useSelector((state) => state?.auth?.user || {});
+  const { signedIn } = useSelector((state: any) => state?.auth?.session);
+  const { _id: userId, userName } = useSelector((state: any) => state?.auth?.user || {});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,14 +43,17 @@ const CommentForm = ({ eventId, onCommentAdded }: CommentFormProps) => {
         content: newComment,
         parentId: null,
       };
+      console.log("reqData: ", reqData);
 
       const { success, message } = await postComment(reqData);
       if (!success) {
-        toastAlert("error",message|| "Failed to post comment. Please try again later.");
+        toastAlert("error", message || "Failed to post comment. Please try again later.");
         return;
       }
       toastAlert("success", "Comment posted successfully!");
       setNewComment("");
+      // Refresh the comments list
+      onCommentAdded({} as any);
     } catch (error) {
       console.error("Comment submission error:", error);
       toastAlert("error", "Failed to post comment. Please try again later.");
@@ -81,19 +83,19 @@ const CommentForm = ({ eventId, onCommentAdded }: CommentFormProps) => {
   const handleSaveUsername = async (username: string): Promise<boolean> => {
     try {
       if (!username.trim()) {
-        setModalError("Username cannot be empty.");
+        setModelError("Username cannot be empty.");
         return false;
       }
       if (username.length < 6) {
-        setModalError("Username must be at least 6 characters long.");
+        setModelError("Username must be at least 6 characters long.");
         return false;
       }
       if (username.length > 20) {
-        setModalError("Username must be at most 20 characters long.");
+        setModelError("Username must be at most 20 characters long.");
         return false;
       }
       if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-        setModalError(
+        setModelError(
           "Username can only contain letters, numbers, and underscores."
         );
         return false;
@@ -102,16 +104,17 @@ const CommentForm = ({ eventId, onCommentAdded }: CommentFormProps) => {
       const reqData = {
         userName: username,
       };
-      const { success, message, result } = await addUserName(reqData);
+      const { status, message, result } = await addUserName(reqData);
 
-      if (!success) {
+      if (!status) {
         if (message) {
           toastAlert("error", message);
         }
         return false;
       }
+      console.log("result: ", result);
 
-      setModalError("");
+      setModelError("");
       dispatch(setUser(result));
 
       toastAlert("success", "Username saved successfully!");
@@ -149,8 +152,8 @@ const CommentForm = ({ eventId, onCommentAdded }: CommentFormProps) => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveUsername}
-        error={modalError}
-        setError={setModalError}
+        error={modelError}
+        setError={setModelError}
       />
     </>
   );

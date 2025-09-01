@@ -7,7 +7,7 @@ import { useSelector } from "@/store";
 
 
 const CommentList: React.FC<CommentListProps> = (props) => {
-    const { signedIn } = useSelector((state) => state.auth?.session);
+    const { signedIn } = useSelector((state: any) => state?.auth?.session);
     const { comments, isLoading, onReply, onDelete, replyingTo, eventId, onReplyAdded, currentUserWallet, hasMore, onLoadMore, isFetching } = props;
 
     const [expandedComments, setExpandedComments] = useState<Record<string, boolean>>({});
@@ -15,13 +15,13 @@ const CommentList: React.FC<CommentListProps> = (props) => {
 
     const lastCommentRef = useCallback((node: HTMLDivElement | null) => {
         if (observer.current) observer.current.disconnect();
-    
+
         observer.current = new IntersectionObserver(entries => {
             if (entries[0].isIntersecting && hasMore && !isFetching) {
                 onLoadMore();
             }
         });
-    
+
         if (node) observer.current.observe(node);
     }, [hasMore, isFetching, onLoadMore]);
 
@@ -100,7 +100,7 @@ const CommentList: React.FC<CommentListProps> = (props) => {
                 <p className="text-center text-sm text-gray-300 mb-2">No comments yet. Be the first to comment!</p>
             )}
         </div>
-        
+
     );
 };
 

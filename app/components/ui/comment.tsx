@@ -70,6 +70,7 @@ export function Comment({
     .replace(/(\d+)\s*months?/g, (_, num) => `${parseInt(num, 10) * 30}d`)
     .replace(/(\d+)\s*years?/g, "$1y");
 
+  // Check if the current user is the author of this comment
   const isAuthor =
     currentUserWallet && comment.wallet_address === currentUserWallet;
 
@@ -100,18 +101,18 @@ export function Comment({
         <Link href={`/profile/@${comment?.userId?.uniqueId}`}>
           <Avatar>
             {/* {comment?.userId?.profileImg ? ( */}
-              <AvatarImage
-                src={comment?.userId?.profileImg}
-                alt={comment?.userId?.userName}
-              />
+            <AvatarImage
+              src={comment?.userId?.profileImg}
+              alt={comment?.userId?.userName}
+            />
             {/* ) : ( */}
-              <AvatarFallback
-                className={getColorFromUsername(comment?.userId?.userName)}
-              >
-                {comment?.userId?.userName
-                  ? comment?.userId?.userName.charAt(0).toUpperCase()
-                  : "unknown".charAt(0).toUpperCase()}
-              </AvatarFallback>
+            <AvatarFallback
+              className={getColorFromUsername(comment?.userId?.userName)}
+            >
+              {comment?.userId?.userName
+                ? comment?.userId?.userName.charAt(0).toUpperCase()
+                : "unknown".charAt(0).toUpperCase()}
+            </AvatarFallback>
             {/* )} */}
           </Avatar>
         </Link>
@@ -126,34 +127,34 @@ export function Comment({
             </Link>
           </span>
           {
-            comment.positions && comment.positions.length === 1 ? (
+            comment.positions && comment.positions.length == 1 ? (
               <button
                 className="flex items-center gap-1 px-1 py-0 text-[12px] font-normal rounded"
                 aria-label="Customise options"
-                style={{ 
-                  background: comment.positions?.[0].side === "yes" ? "#152632": "#210d1a", 
-                  color: comment.positions?.[0].side === "yes" ? "#7DFDFE": "#ec4899" 
+                style={{
+                  background: comment.positions?.[0].side == "yes" ? "#152632" : "#210d1a",
+                  color: comment.positions?.[0].side == "yes" ? "#7DFDFE" : "#ec4899"
                 }}
               >
                 <span>{longNumbersNoDecimals(comment.positions?.[0].quantity, 2)} | {comment.positions?.[0].label}</span>
               </button>
-              ) 
+            )
               : comment.positions.length > 1 ? (
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger asChild>
                     <button
                       className="flex items-center gap-1 px-2 py-0.5 text-[12px] font-normal rounded"
                       aria-label="Customise options"
-                      style={{ 
-                        background: comment.positions?.[0].side === "yes" ? "#152632": "#210d1a", 
-                        color: comment.positions?.[0].side === "yes" ? "#7DFDFE": "#ec4899" 
+                      style={{
+                        background: comment.positions?.[0].side == "yes" ? "#152632" : "#210d1a",
+                        color: comment.positions?.[0].side == "yes" ? "#7DFDFE" : "#ec4899"
                       }}
                     >
                       <span>{longNumbersNoDecimals(comment.positions?.[0].quantity, 2)} | {comment.positions?.[0].label}</span>
                       <ChevronDownIcon className="w-4 h-4" />
                     </button>
                   </DropdownMenu.Trigger>
-      
+
                   <DropdownMenu.Portal>
                     <DropdownMenu.Content
                       className="comment-dropdown-content"
@@ -162,14 +163,14 @@ export function Comment({
                       {
                         comment.positions?.map((item, index) => (
                           <DropdownMenu.Item key={index} className="px-2 py-0.5 cursor-pointer hover:bg-[#100f0f] text-[12px] font-normal flex gap-2 items-center justify-between">
-                            <span 
-                              style={{ 
-                                background: item.side === "yes" ? "#152632": "#210d1a", 
-                                color: item.side === "yes" ? "#7DFDFE": "#ec4899" 
+                            <span
+                              style={{
+                                background: item.side == "yes" ? "#152632" : "#210d1a",
+                                color: item.side == "yes" ? "#7DFDFE" : "#ec4899"
                               }}
                             >
                               {longNumbersNoDecimals(item.quantity, 2)}
-                            </span>                  
+                            </span>
                             <span>{item.label}</span>
                           </DropdownMenu.Item>
                         ))
@@ -177,8 +178,8 @@ export function Comment({
                     </DropdownMenu.Content>
                   </DropdownMenu.Portal>
                 </DropdownMenu.Root>
-              ) 
-              : null
+              )
+                : null
           }
           <span className="text-xs text-gray-400">{timeAgo}</span>
         </div>
@@ -208,7 +209,7 @@ export function Comment({
               Delete
             </button>
           )}
-          {}
+          {/* {getTimeAgo(comment.createdAt)} */}
         </div>
       </div>
     </div>
@@ -247,7 +248,7 @@ export function ReplyForm({
   useEffect(() => {
     try {
       setaccount(address ? address : "");
-    } catch (err) {}
+    } catch (err) { }
   }, [address]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -271,14 +272,17 @@ export function ReplyForm({
       };
       const { success, message } = await postComment(reqData);
       if (!success) {
-        toastAlert("error",message || "Failed to post comment. Please try again later.");
+        toastAlert("error", message || "Failed to post comment. Please try again later.");
         return;
       }
+      // toastAlert("success", "Comment posted successfully!");
+      // onReplyAdded(comment);
 
       setReply("");
       onCancel();
     } catch (error) {
       console.error("Reply submission error:", error);
+      // alert("Failed to post reply. Please try again later.");
     } finally {
       setIsSubmitting(false);
     }
@@ -316,14 +320,15 @@ export function ReplyForm({
       const reqData = {
         userName: username,
       };
-      const { success, message, result } = await addUserName(reqData);
+      const { status, message, result } = await addUserName(reqData);
 
-      if (!success) {
+      if (!status) {
         if (message) {
           toastAlert("error", message);
         }
         return false;
       }
+      console.log("result: ", result);
 
       setModelError("");
       dispatch(setUser(result));
@@ -396,6 +401,11 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ eventId }: CommentSectionProps) {
+  console.log("=== CommentSection RENDERING ===");
+  console.log("Received eventId:", eventId);
+  console.log("eventId type:", typeof eventId);
+  console.log("eventId truthy:", !!eventId);
+
   const socketContext = useContext(SocketContext);
 
   const limit = 10;
@@ -408,83 +418,117 @@ export function CommentSection({ eventId }: CommentSectionProps) {
   const [hasMore, setHasMore] = useState(true);
   const [total, setTotal] = useState(0);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  
+
   const fetchComments = useCallback(async (pageToFetch = 1, isInitialLoad = false) => {
     try {
+      console.log("=== FETCHING COMMENTS ===");
+      console.log("eventId:", eventId);
+      console.log("pageToFetch:", pageToFetch);
+      console.log("isInitialLoad:", isInitialLoad);
+
       if (isInitialLoad) {
         setIsLoading(true);
       } else {
         setIsFetching(true);
       }
-  
+
       const response = await getCommentsPaginate(eventId, { page: pageToFetch, limit });
-  
+      console.log("Full API response:", response);
+
       if (!response.success) {
+        console.log("API failed, response:", response);
         setHasMore(false);
         return;
       }
-  
-      const { comments, positions, count } = (response.result as any) || {};
+
+      // Fix: Access the correct response structure - data is directly in response
+      const { comments, positions, count } = response;
+      console.log("Extracted data:", { comments, positions, count });
+
       setTotal(count || 0);
 
+      if (!comments || !Array.isArray(comments)) {
+        console.log("No comments array found");
+        setHasMore(false);
+        return;
+      }
+
       const positionsMap = new Map();
-        (positions || []).forEach(item => {
-          const userId = item.userId.toString();
-          if (!positionsMap.has(userId)) {
-            positionsMap.set(userId, []);
-          }
-          
-          positionsMap.get(userId).push({
-            quantity: item.quantity,
-            side: item.side,
-            label: !isEmpty(item?.marketId?.groupItemTitle) 
-              ? item?.marketId?.groupItemTitle 
-              : (item.side === "yes" ? item.marketId.outcome[0].title : item.marketId.outcome[1].title)
-          });
+      (positions || []).forEach(item => {
+        const userId = item.userId.toString();
+        if (!positionsMap.has(userId)) {
+          positionsMap.set(userId, []);
+        }
+
+        positionsMap.get(userId).push({
+          quantity: item.quantity,
+          side: item.side,
+          label: !isEmpty(item?.marketId?.groupItemTitle)
+            ? item?.marketId?.groupItemTitle
+            : (item.side === "yes" ? item.marketId.outcome[0].title : item.marketId.outcome[1].title)
         });
+      });
 
-        const addPositionsToComment = (comment) => {
-          const userId = comment.userId._id?.toString() || comment.userId.toString();
-          return {
-            ...comment,
-            positions: positionsMap.get(userId) || []
-          };
+      const addPositionsToComment = (comment) => {
+        const userId = comment.userId._id?.toString() || comment.userId.toString();
+        return {
+          ...comment,
+          positions: positionsMap.get(userId) || []
         };
+      };
 
-        const flatComments = (comments || []).reduce((acc, comment) => {
-          const { replies, ...parentComment } = comment;
-          acc.push(addPositionsToComment(parentComment));
-          
-          if (replies?.length > 0) {
-            replies.forEach(reply => {
-              acc.push(addPositionsToComment(reply));
-            });
-          }
-          
-          return acc;
-        }, []);
-  
+      const flatComments = comments.reduce((acc, comment) => {
+        const { replies, ...parentComment } = comment;
+        acc.push(addPositionsToComment(parentComment));
+
+        if (replies?.length > 0) {
+          replies.forEach(reply => {
+            acc.push(addPositionsToComment(reply));
+          });
+        }
+
+        return acc;
+      }, []);
+
+      console.log("Processed flatComments:", flatComments);
+
       setComments(prevComments => {
         if (isInitialLoad) {
           return flatComments;
         }
         return [...prevComments, ...flatComments]; // Append new comments
       });
-  
+
       setPage(pageToFetch);
-      setHasMore((comments || []).length === limit);
-  
+      setHasMore(comments.length === limit);
+
     } catch (error) {
       console.error("Error loading comments:", error);
+      console.error("Error details:", {
+        eventId,
+        pageToFetch,
+        isInitialLoad,
+        error: error instanceof Error ? error.message : error
+      });
+      if (isInitialLoad) {
+        setTotal(0);
+        setComments([]);
+      }
+      setHasMore(false);
     } finally {
       setIsLoading(false);
       setIsFetching(false);
     }
-  }, [eventId, limit]);
-  
-  useEffect(() => {
+  }, [eventId, limit]); useEffect(() => {
+    console.log("=== CommentSection useEffect triggered ===");
+    console.log("eventId:", eventId);
+    console.log("fetchComments function:", typeof fetchComments);
+
     if (eventId) {
+      console.log("Calling fetchComments...");
       fetchComments(1, true);
+    } else {
+      console.log("No eventId, skipping fetchComments");
     }
   }, [eventId, fetchComments]);
 
@@ -532,7 +576,7 @@ export function CommentSection({ eventId }: CommentSectionProps) {
       fetchComments(page + 1);
     }
   };
-    
+
   const handleCommentAdded = useCallback(() => {
     fetchComments(1, true);
   }, [fetchComments]);

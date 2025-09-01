@@ -15,13 +15,13 @@ export const Footer: React.FC = () => {
 
   return (
     // Footer with black background and white text
-    <div className="w-full py-10 lg:py-20 bg-black text-white">
+    <div className="w-full py-6 lg:py-10 bg-black text-white">
       <div className="container mx-auto px-2 md:px-4 lg:px-0">
         {/* Main Footer Content */}
-        <div className="flex flex-col lg:flex-row items-start justify-between w-full">
+        <div className="flex flex-col lg:flex-row items-start justify-between w-full mb-6">
           {/* Brand and Description - Left side with same spacing as navbar logo */}
-          <div className="flex flex-col gap-6 lg:ml-4">
-            <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-4 lg:ml-4">
+            <div className="flex flex-col gap-1">
               <h2 className="text-2xl md:text-4xl tracking-tighter font-regular">
                 Sonotrade
               </h2>
@@ -37,10 +37,10 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Divider Line */}
-        <div className="mt-10 border-t border-[#202020]"></div>
+        <div className="mt-6 border-t border-[#202020]"></div>
 
         {/* Bottom Section */}
-        <div className="mt-6 pt-6 flex flex-col md:flex-row items-center justify-between text-sm text-white/75">
+        <div className="mt-6 flex flex-col md:flex-row items-center justify-between text-sm text-white/75">
           <span className="lg:ml-4">© {currentYear} Sonotrade</span>
           <div className="flex flex-wrap items-center gap-2 mt-4 md:mt-0 lg:pr-4">
             <Link href="/about" className="hover:underline">

@@ -835,14 +835,7 @@ const amount = new BN(parseFloat(depsoitAmt) * 10 ** 6);
         />
       </div>
       {/* Spacer to prevent content from being hidden behind the fixed header/navbar */}
-      <div
-        className="lg:mb-4 mb-0"
-        style={{
-          height: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
-          minHeight: typeof window !== 'undefined' && window.innerWidth < 1024 ? '95px' : '112px',
-          width: '100%'
-        }}
-      />
+      <div className="lg:mb-4 mb-0 h-[112px] lg:h-[112px] w-full" />
         <div className="px-1.5 sm:px-0 container mx-auto pb-0 sm:pb-4 container-sm">
           <div className="flex justify-end sm:mb-2 mb-0 sm:mt-2 mt-4">
             {isConnected ? (

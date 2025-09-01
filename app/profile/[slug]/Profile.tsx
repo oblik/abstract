@@ -292,6 +292,9 @@ export default function ProfilePage(props: ProfilePageProps) {
 
 
       </div>
+      <div className="hidden sm:block">
+        <Footer />
+      </div>
             <HeaderFixed />
 
       

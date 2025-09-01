@@ -11,7 +11,7 @@ import { getEvents, getEventById } from "@/services/market";
 import { SelectSeparator } from "@/app/components/ui/select";
 
 
-export default function SlideshowLintingCarousel() {
+export default function SlideshowListingCarousel() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);

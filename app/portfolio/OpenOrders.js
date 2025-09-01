@@ -203,8 +203,8 @@ const OpenOrders = (props) => {
                     </thead>
                     <tbody>
                         {openOrders?.length > 0 && !loading && openOrders.map((item) => (
-                            <>
-                                <React.Fragment key={item._id}>
+                            <React.Fragment key={item._id}>
+                                <React.Fragment>
                                     <tr>
                                         <td colSpan={8}>
                                             <div className="flex items-center space-x-2 cursor-pointer" onClick={() => route.push(`/event-page/${item?.eventSlug}`)}>
@@ -254,7 +254,7 @@ const OpenOrders = (props) => {
                                 <tr>
                                     <td colSpan={9} className='border-b border-[#262626]'></td>
                                 </tr>
-                            </>
+                            </React.Fragment>
                         )
                         )}
 

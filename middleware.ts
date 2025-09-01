@@ -7,6 +7,11 @@ const PUBLIC_FILE = /\.(.*)$/;
 export function middleware(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
     const currentUser = request.cookies.get("user-token");
+    console.log("current user test console/.......")
+    console.log("currentUser", currentUser)
+    if (currentUser) {
+        console.log("currentUser is true.......")
+    }
 
     // Debug logging - ALWAYS log every request
     console.log("=== MIDDLEWARE START ===");
@@ -34,14 +39,14 @@ export function middleware(request: NextRequest) {
     }
 
     const authPathnameRegex = new RegExp(
-        `^(${authRoutes
+        `^(${(authRoutes as string[])
             .map((route) => (route.includes("[") ? route.replace(/\[.*?\]/g, "[^/]+") : route))
             .join("|")})/?$`,
         "i"
     );
 
     const protectedPathnameRegex = new RegExp(
-        `^(${protectedRoutes
+        `^(${(protectedRoutes as string[])
             .map((route) => (route.includes("[") ? route.replace(/\[.*?\]/g, "[^/]+") : route))
             .join("|")})/?$`,
         "i"
@@ -70,6 +75,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-    // Matcher ignoring `/_next/` and `/api/`
     matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };

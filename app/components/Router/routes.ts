@@ -1,8 +1,8 @@
 export const authRoutes = [
-    "/login",
-    "/register",
-    "/forgot-password",
-    "/reset-password/[token]",
+    // "/login",
+    // "/register",
+    // "/forgot-password",
+    // "/reset-password/[token]",
 ]
 
 export const protectedRoutes: string[] = [

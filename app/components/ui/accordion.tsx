@@ -210,19 +210,23 @@ const AccordionTrigger = React.forwardRef<
 
     return (
       <AccordionPrimitive.Header className="flex items-center justify-between w-full">
-        <AccordionPrimitive.Trigger
-          onClick={(e) => handleSelection("yes", e)}
+         <AccordionPrimitive.Trigger
+          asChild
           ref={(node) => {
             if (typeof ref === "function") ref(node);
-            else if (ref) ref.current = node;
+            else if (ref) (ref as React.MutableRefObject<any>).current = node;
             triggerRef.current = node;
           }}
-          className={cn(
-            "h-full md:h-[86px] w-full flex flex-1 items-center justify-between sm:py-4 py-2 font-medium data-[state=closed]:hover:bg-[#0a0a0a] transition-colors duration-300 flex-col md:flex-row !gap-3",
-            className
-          )}
           {...props}
         >
+          {/* This wrapper div will now receive Radix props like data-state */}
+          <div
+            className={cn(
+              "h-full md:h-[86px] w-full flex flex-1 items-center justify-between sm:py-4 py-2 font-medium data-[state=closed]:hover:bg-[#0a0a0a] transition-colors duration-300 flex-col md:flex-row !gap-3",
+              className
+            )}
+            onClick={(e) => handleSelection("yes", e)}
+          >
           {/* Mobile layout - single row with title, volume, and odds */}
           <div className="flex md:hidden items-center justify-between w-full">
             <div className="flex items-center pr-0">
@@ -489,6 +493,7 @@ const AccordionTrigger = React.forwardRef<
                 </div>
               </div>
             </div>
+          </div>
           </div>
         </AccordionPrimitive.Trigger>
       </AccordionPrimitive.Header>

@@ -3,14 +3,12 @@ export function decimalToPercentage(decimal) {
   const percentage = decimal * 100;
   // Round to the nearest whole number
   const roundedPercentage = Math.round(percentage);
-  // Add the percentage sign
+  // return the percentage 
   return roundedPercentage;
 }
 
 export function toTwoDecimal(decimal) {
-  // Round to the nearest whole number
   const roundedPercentage = Math.round(decimal * 100) / 100;
-  // Add the percentage sign
   return roundedPercentage;
 }
 

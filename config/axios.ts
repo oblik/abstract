@@ -10,7 +10,6 @@ import { toastAlert } from "@/lib/toast";
 
 const isClient = typeof window !== "undefined";
 
-axios.defaults.baseURL = config.baseUrl;
 
 axios.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {

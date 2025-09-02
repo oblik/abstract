@@ -6,11 +6,24 @@ import axios, { handleResp } from "@/config/axios";
  * Centralized environment detection utilities
  */
 export const getEnvironment = () => {
+  const isServer = typeof window === "undefined";
+  const isClient = typeof window !== "undefined";
+  
+  // Check if we're running locally (dev server or production build on localhost)
+  const isLocalhost = isClient ? 
+    window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" :
+    false;
+  
+  // True production means NODE_ENV=production AND not running on localhost
+  const isActualProduction = process.env.NODE_ENV === "production" && !isLocalhost;
+  
   return {
     isDevelopment: process.env.NODE_ENV !== "production",
     isProduction: process.env.NODE_ENV === "production",
-    isServer: typeof window === "undefined",
-    isClient: typeof window !== "undefined"
+    isActualProduction, // Only true when deployed, not on localhost
+    isLocalhost,
+    isServer,
+    isClient
   };
 };
 
@@ -21,18 +34,23 @@ export const getEnvironment = () => {
 export function getApiBaseUrl(): string {
   const env = getEnvironment();
 
-  if (env.isProduction) {
+  // Only use direct backend URL when actually deployed to production
+  if (env.isActualProduction) {
     return config.backendURL;
   }
 
-  // Development environment
-  if (env.isServer) {
-    // SSR needs full URL - fixes the SSR proxy bypass issue
-    return config.backendURL;
+  // For localhost (both dev and production build), use Next.js proxy
+  if (env.isLocalhost) {
+    if (env.isServer) {
+      // SSR on localhost needs full URL
+      return config.backendURL;
+    }
+    // Client-side on localhost can use Next.js proxy
+    return "";
   }
 
-  // Client-side can use Next.js proxy routes
-  return "";
+  // Fallback for any other case
+  return config.backendURL;
 }
 
 /**

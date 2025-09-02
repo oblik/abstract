@@ -4,7 +4,7 @@
 TMP_DIR="./next-deploy"
 REPO="git@gitlab.com:wealwinprojects/sonotrade-frontend-2025.git"
 SSH_KEY="/Users/mariselvam/Documents/project/sonotrade/ref/developerssh.pem"
-BRANCH="main"
+BRANCH="develop"
 
 # npx @cloudflare/next-on-pages
 
